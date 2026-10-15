@@ -41,7 +41,7 @@ Sections: [1 What it fixes](#en-1) · [2 What hurts in the official app](#en-2) 
 1. «Create my EQ» no longer crashes the app: a preset name without a number is skipped.
 2. The speaker is found and connected with location turned off — both on the permission screens and inside the
    Bluetooth library that used to refuse the scan.
-3. Every screen fits under an enlarged system display size: screens are drawn at the panel's native pixel density.
+3. Every screen fits whole on a phone and a tablet, at any system display size.
 4. Texts live in resource files and are translated by people; the server's broken texts and the Chinese left in the
    code are replaced with ours.
 5. Screens are laid out for tablets and landscape.
@@ -82,11 +82,11 @@ and use it. The first release comes with step 7 of the roadmap.
 | # | Step | State |
 |---|---|---|
 | 1 | Research: 2,648 Google Play reviews, the languages to translate into, the pains of the official app | ✅ done |
-| 2 | Patches: the EQ crash, location in both places, screens under display zoom, password symbols, name, icon | ✅ written, not yet tested on a device |
+| 2 | Patches: the EQ crash, location in both places, password symbols, name, icon | ✅ written, not yet tested on a device |
 | 3 | The first patched build on the author's tablet with a StormBox Blast 2 | 🔧 next |
-| 4 | Texts: ours in resource files instead of the server's and the hard-coded ones; English and Russian by hand | 🔧 research |
-| 5 | Layouts for tablets and landscape | 🔧 research |
-| 6 | Crashes, lost connections, what the Tribit server is really needed for | 🔧 research |
+| 4 | Texts: ours in resource files instead of the server's and the hard-coded ones; English and Russian by hand | 🔧 research done, patch next |
+| 5 | Layouts for tablets and landscape: the screen scaling fits the whole design, cut-off screens scroll | 🔧 research done, patch next |
+| 6 | Crashes, lost connections, the app no longer waits for the Tribit server | 🔧 research done, patch next |
 | 7 | Debug and release builds, the first signed release on GitHub | 🔲 planned |
 
 <a name="en-5"></a>
@@ -171,7 +171,7 @@ Tribit, которые знает официальное приложение, �
 1. Кнопка «создать свой EQ» больше не роняет приложение: имя пресета без номера пропускается.
 2. Колонка находится и подключается при выключенной геолокации — и на экранах разрешений, и внутри библиотеки
    Bluetooth, которая раньше отказывалась искать.
-3. Каждый экран помещается при увеличенном системном масштабе: экраны рисуются в родной плотности пикселей панели.
+3. Каждый экран целиком помещается на телефоне и планшете при любом системном масштабе.
 4. Тексты лежат в файлах ресурсов и переведены людьми; кривые тексты с сервера и китайский, оставленный в коде,
    заменены нашими.
 5. Экраны свёрстаны под планшет и альбомную ориентацию.
@@ -213,11 +213,11 @@ Krinik Tribit и пользуйтесь. Первый релиз выходит 
 | № | Шаг | Состояние |
 |---|---|---|
 | 1 | Разведка: 2648 отзывов Google Play, языки перевода, боли официального приложения | ✅ сделано |
-| 2 | Патчи: вылет на эквалайзере, геолокация в обоих местах, экраны при масштабе, символы в пароле, название, иконка | ✅ написаны, на устройстве пока не проверены |
+| 2 | Патчи: вылет на эквалайзере, геолокация в обоих местах, символы в пароле, название, иконка | ✅ написаны, на устройстве пока не проверены |
 | 3 | Первая патченая сборка на планшете автора с колонкой StormBox Blast 2 | 🔧 следующий |
-| 4 | Тексты: наши в файлах ресурсов вместо серверных и зашитых в код; английский и русский руками | 🔧 разведка |
-| 5 | Вёрстка под планшет и альбомную ориентацию | 🔧 разведка |
-| 6 | Вылеты, обрывы подключения, что из присланного сервером Tribit нужно приложению | 🔧 разведка |
+| 4 | Тексты: наши в файлах ресурсов вместо серверных и зашитых в код; английский и русский руками | 🔧 разведка готова, дальше патч |
+| 5 | Вёрстка под планшет и альбомную ориентацию: масштаб экранов вмещает весь макет, обрезанные экраны прокручиваются | 🔧 разведка готова, дальше патч |
+| 6 | Вылеты, обрывы подключения, приложение больше не ждёт сервер Tribit | 🔧 разведка готова, дальше патч |
 | 7 | Сборки debug и release, первый подписанный релиз на GitHub | 🔲 в плане |
 
 <a name="ru-5"></a>
@@ -297,7 +297,7 @@ adb install-multiple out/signed/*.apk
 
 1. 点「创建我的 EQ」不再闪退：不带编号的预设名会被跳过。
 2. 关闭定位也能找到并连接音箱——无论是权限界面，还是以前拒绝搜索的内置蓝牙库。
-3. 放大系统显示大小后，每个界面都能完整显示：界面按屏幕原生像素密度绘制。
+3. 无论系统显示大小如何，每个界面都能在手机和平板上完整显示。
 4. 文字放在资源文件里，由人工翻译；服务器下发的错误文字和代码里残留的中文都换成了我们的文字。
 5. 界面适配平板和横屏。
 6. 密码框接受字母、数字和符号。
@@ -336,11 +336,11 @@ Android 设备。先卸载官方 Tribit 应用（签名不同），再安装 Kri
 | # | 步骤 | 状态 |
 |---|---|---|
 | 1 | 调研：2648 条 Google Play 评论、翻译语言、官方应用的问题 | ✅ 已完成 |
-| 2 | 补丁：均衡器闪退、两处定位要求、显示缩放下的界面、密码符号、应用名、图标 | ✅ 已写好，尚未在设备上实测 |
+| 2 | 补丁：均衡器闪退、两处定位要求、密码符号、应用名、图标 | ✅ 已写好，尚未在设备上实测 |
 | 3 | 在作者的平板和 StormBox Blast 2 上运行第一个补丁版本 | 🔧 下一步 |
-| 4 | 文字：用资源文件里我们的文字替换服务器下发和代码写死的文字；英文和俄文人工翻译 | 🔧 调研中 |
-| 5 | 平板和横屏布局 | 🔧 调研中 |
-| 6 | 闪退、断连，以及 Tribit 服务器到底用来做什么 | 🔧 调研中 |
+| 4 | 文字：用资源文件里我们的文字替换服务器下发和代码写死的文字；英文和俄文人工翻译 | 🔧 调研完成，下一步打补丁 |
+| 5 | 平板和横屏布局：界面缩放容纳整个设计稿，被裁的界面可以滚动 | 🔧 调研完成，下一步打补丁 |
+| 6 | 闪退、断连，应用不再等待 Tribit 服务器 | 🔧 调研完成，下一步打补丁 |
 | 7 | debug 和 release 两个版本，GitHub 上的首个签名正式版 | 🔲 计划中 |
 
 <a name="zh-5"></a>
