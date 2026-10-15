@@ -1,0 +1,10 @@
+# Proprietary Tribit material - local only, never published
+original-apk/
+decompiled/
+work/
+out/
+tools/
+diagnostics/
+*.apk
+*.keystore
+*.jks
