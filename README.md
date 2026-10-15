@@ -1,10 +1,4 @@
 <p align="center">
-  <img src="design/icon.svg" alt="Krinik Tribit: a pink square with a black three-loop knot drawn in one stroke" width="200">
-</p>
-
-<h1 align="center">Krinik Tribit</h1>
-
-<p align="center">
   <a href="#english"><img src="https://img.shields.io/badge/English-2C7BE5?style=for-the-badge" alt="English"></a>
   &nbsp;
   <a href="#russian"><img src="https://img.shields.io/badge/Русский-C0392B?style=for-the-badge" alt="Русский"></a>
