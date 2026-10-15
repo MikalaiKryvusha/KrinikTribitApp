@@ -69,7 +69,7 @@
 
 [AI]Факт разведки: в APK уже есть Jetpack Compose — `runtime` и `foundation` 1.7.8, `material` 1.4.3, `activity-compose`
 1.8.0 (`work/base/unknown/META-INF/*.version`); их собственный код вызывает `setContent`/`ComposeView` в 176 файлах smali.
-Наши экраны компилируются под те же версии в отдельном модуле Gradle, переводятся в smali и вшиваются в дерево
+Наши экраны компилируются под Compose 1.7.8 из APK в отдельном модуле Gradle, переводятся в smali и вшиваются в дерево
 apktool; библиотеки второй раз не едут.
 
 - **Вечер 1:** волна 1 (патчи 8–13) и патчи 14–15 с пробным `values-ru`.
