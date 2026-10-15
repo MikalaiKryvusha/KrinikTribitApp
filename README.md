@@ -4,9 +4,6 @@
 
 <h1 align="center">Krinik Tribit</h1>
 
-<p align="center"><b>The Tribit speaker app, fixed — by people, for people</b><br>
-Open source · No crashes · No location · Tablets and big screens · Proper translations</p>
-
 <p align="center">
   <a href="#english"><img src="https://img.shields.io/badge/English-2C7BE5?style=for-the-badge" alt="English"></a>
   &nbsp;
@@ -15,18 +12,21 @@ Open source · No crashes · No location · Tablets and big screens · Proper tr
   <a href="#chinese"><img src="https://img.shields.io/badge/中文-E67E22?style=for-the-badge" alt="中文"></a>
 </p>
 
-<p align="center">
-  <a href="#en-1"><img src="https://img.shields.io/badge/platform-Android-3DDC84.svg" alt="Platform: Android"></a>
-  <a href="#en-1"><img src="https://img.shields.io/badge/speakers-Tribit-FF1A8C.svg" alt="Speakers: Tribit"></a>
-  <a href="#en-4"><img src="https://img.shields.io/badge/status-early%20development-orange.svg" alt="Status: early development"></a>
-  <a href="https://github.com/MikalaiKryvusha/KAIF"><img src="https://img.shields.io/badge/framework-KAIF-7F52FF.svg" alt="Framework: KAIF"></a>
-</p>
-
 ---
 
 <a name="english"></a>
 
-## English
+<h2 align="center">Krinik Tribit</h2>
+
+<p align="center"><b>The Tribit speaker app, fixed — by people, for people</b><br>
+Open source · No crashes · No location · Tablets and big screens · Proper translations</p>
+
+<p align="center">
+  <a href="#en-1"><img src="https://img.shields.io/badge/platform-Android-3DDC84.svg" alt="Platform: Android"></a>
+  <a href="#en-1"><img src="https://img.shields.io/badge/speakers-Tribit-FF1A8C.svg" alt="Speakers: Tribit"></a>
+  <a href="#en-4"><img src="https://img.shields.io/badge/status-early_development-orange.svg" alt="Status: early development"></a>
+  <a href="https://github.com/MikalaiKryvusha/KAIF"><img src="https://img.shields.io/badge/framework-KAIF-7F52FF.svg" alt="Framework: KAIF"></a>
+</p>
 
 [Читать по-русски →](#russian) · [阅读中文 →](#chinese)
 
@@ -140,7 +140,17 @@ Author: Mikalai Kryvusha (Krinik).
 
 <a name="russian"></a>
 
-## Русский
+<h2 align="center">Krinik Tribit</h2>
+
+<p align="center"><b>Приложение для колонок Tribit, исправленное — от людей для людей</b><br>
+Открытый код · Без вылетов · Без геолокации · Планшеты и большие экраны · Нормальные переводы</p>
+
+<p align="center">
+  <a href="#ru-1"><img src="https://img.shields.io/badge/%D0%BF%D0%BB%D0%B0%D1%82%D1%84%D0%BE%D1%80%D0%BC%D0%B0-Android-3DDC84.svg" alt="Платформа: Android"></a>
+  <a href="#ru-1"><img src="https://img.shields.io/badge/%D0%BA%D0%BE%D0%BB%D0%BE%D0%BD%D0%BA%D0%B8-Tribit-FF1A8C.svg" alt="Колонки: Tribit"></a>
+  <a href="#ru-4"><img src="https://img.shields.io/badge/%D1%81%D0%BE%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%B8%D0%B5-%D1%80%D0%B0%D0%BD%D0%BD%D1%8F%D1%8F_%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0-orange.svg" alt="Состояние: ранняя разработка"></a>
+  <a href="https://github.com/MikalaiKryvusha/KAIF"><img src="https://img.shields.io/badge/%D1%84%D1%80%D0%B5%D0%B9%D0%BC%D0%B2%D0%BE%D1%80%D0%BA-KAIF-7F52FF.svg" alt="Фреймворк: KAIF"></a>
+</p>
 
 [Read in English →](#english) · [阅读中文 →](#chinese)
 
@@ -256,7 +266,17 @@ adb install-multiple out/signed/*.apk
 
 <a name="chinese"></a>
 
-## 中文
+<h2 align="center">Krinik Tribit</h2>
+
+<p align="center"><b>修好了的 Tribit 音箱应用——来自大家，服务大家</b><br>
+开源 · 不闪退 · 无需定位 · 适配平板和大屏 · 通顺的翻译</p>
+
+<p align="center">
+  <a href="#zh-1"><img src="https://img.shields.io/badge/%E5%B9%B3%E5%8F%B0-Android-3DDC84.svg" alt="平台：Android"></a>
+  <a href="#zh-1"><img src="https://img.shields.io/badge/%E9%9F%B3%E7%AE%B1-Tribit-FF1A8C.svg" alt="音箱：Tribit"></a>
+  <a href="#zh-4"><img src="https://img.shields.io/badge/%E7%8A%B6%E6%80%81-%E6%97%A9%E6%9C%9F%E5%BC%80%E5%8F%91-orange.svg" alt="状态：早期开发"></a>
+  <a href="https://github.com/MikalaiKryvusha/KAIF"><img src="https://img.shields.io/badge/%E6%A1%86%E6%9E%B6-KAIF-7F52FF.svg" alt="框架：KAIF"></a>
+</p>
 
 [Read in English →](#english) · [Читать по-русски →](#russian)
 
