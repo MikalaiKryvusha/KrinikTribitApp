@@ -18,7 +18,7 @@
 
 <h2 align="center">Krinik Tribit</h2>
 
-<p align="center"><b>The Tribit speaker app, fixed — by people, for people</b><br>
+<p align="center"><b>The Tribit speaker app, fixed — made by people, for people</b><br>
 Open source · No crashes · No location · Tablets and big screens · Proper translations</p>
 
 <p align="center">
@@ -142,7 +142,7 @@ Author: Mikalai Kryvusha (Krinik).
 
 <h2 align="center">Krinik Tribit</h2>
 
-<p align="center"><b>Приложение для колонок Tribit, исправленное — от людей для людей</b><br>
+<p align="center"><b>Приложение для колонок Tribit, исправленное — сделанное людьми для людей</b><br>
 Открытый код · Без вылетов · Без геолокации · Планшеты и большие экраны · Нормальные переводы</p>
 
 <p align="center">
@@ -268,7 +268,7 @@ adb install-multiple out/signed/*.apk
 
 <h2 align="center">Krinik Tribit</h2>
 
-<p align="center"><b>修好了的 Tribit 音箱应用——来自大家，服务大家</b><br>
+<p align="center"><b>修好了的 Tribit 音箱应用——由人打造，为人服务</b><br>
 开源 · 不闪退 · 无需定位 · 适配平板和大屏 · 通顺的翻译</p>
 
 <p align="center">
