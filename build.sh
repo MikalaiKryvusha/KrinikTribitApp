@@ -36,6 +36,14 @@ rm -rf work/base "$OUT" out/aligned.apk
 if [ "$VARIANT" = debug ]; then python -I patches/apply.py work/base --debug; else python -I patches/apply.py work/base; fi
 "$JAVA" -jar tools/apktool.jar b work/base -o out/unsigned.apk >/dev/null
 
+# Our own code (patches/java, e.g. krinik.ScrollFix of patch 16) -> one extra classesN.dex inside the APK.
+SDK="${ANDROID_SDK_KRINIK:-C:/Android/Sdk}"
+ANDROID_JAR="$SDK/platforms/android-36/android.jar"
+rm -rf work/java && mkdir -p work/java/classes work/java/dex
+"$JAVA_HOME/bin/javac" --release 11 -nowarn -classpath "$ANDROID_JAR" -d work/java/classes $(find patches/java -name '*.java')
+JAVA_HOME="$JAVA_HOME" "$BT/d8.bat" --min-api 26 --lib "$ANDROID_JAR" --output work/java/dex $(find work/java/classes -name '*.class')
+python -I patches/add_dex.py out/unsigned.apk work/java/dex/classes.dex
+
 if [ ! -f "$KEYSTORE" ]; then
   "$JAVA_HOME/bin/keytool" -genkeypair -keystore "$KEYSTORE" -alias krinik -keyalg RSA -keysize 3072 \
     -validity 10000 -storepass "$KS_PASS" -keypass "$KS_PASS" -dname "CN=Krinik Tribit $VARIANT, O=Krinik" >/dev/null

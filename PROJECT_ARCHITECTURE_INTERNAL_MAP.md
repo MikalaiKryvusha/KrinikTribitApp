@@ -15,7 +15,7 @@
 | Fork build | their split APK set, patched base + untouched splits, one signing key | what goes on the Titan today |
 | Speaker | a Tribit speaker (StormBox Blast 2 on the stand) | the device both apps control |
 | Speaker protocol | packets `EA <len> <cmd> <data> <checksum>` over RFCOMM (UUID `0CF12D31-…`) or BLE (`0000ffa0`/`ffa1`) | EQ (cmds 4, 11), volume (13), light (12/52), battery (6); EQ gain shifted +12 |
-| Krinik Tribit | their app + our patches, signed by our key | the product: the owner chose to fix their app (2026-10-16) |
+| Krinik Tribit | their app + our patches, signed by our key | the product: the owner chose to fix their app — «чиним ИХ приложение» (chat 2026-10-16) |
 
 All protocol facts above are read from decompiled code (`researches/03_tribit_app_pains.md`), `[NOT-TESTED]` on a speaker.
 

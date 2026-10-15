@@ -82,12 +82,12 @@ and use it. The first release comes with step 7 of the roadmap.
 | # | Step | State |
 |---|---|---|
 | 1 | Research: 2,648 Google Play reviews, the languages to translate into, the pains of the official app | ✅ done |
-| 2 | Patches: the EQ crash, location in both places, password symbols, name, icon | ✅ written, not yet tested on a device |
-| 3 | The first patched build on the author's tablet with a StormBox Blast 2 | 🔧 next |
+| 2 | Patches: the EQ crash, location (three places), screen scaling and scrolling, pink brand, password symbols, name, icon | ✅ written, run on the author's tablet |
+| 3 | The first patched build on the author's tablet with a StormBox Blast 2: from the splash to a custom EQ without a crash and without a location permission request | ✅ done, the author is testing it |
 | 4 | Texts: ours in resource files instead of the server's and the hard-coded ones; English and Russian by hand | 🔧 research done, patch next |
-| 5 | Layouts for tablets and landscape: the screen scaling fits the whole design, cut-off screens scroll | 🔧 research done, patch next |
+| 5 | Layouts: the screen scaling fits the whole design and cut-off screens scroll (done, run on the tablet); landscape and the remaining screens next | 🔧 in progress |
 | 6 | Crashes, lost connections, the app no longer waits for the Tribit server | 🔧 research done, patch next |
-| 7 | Debug and release builds, the first signed release on GitHub | 🔲 planned |
+| 7 | Two builds: debug «Debug Krinik Tribit» beside the original (done); release and the first signed release on GitHub | 🔧 debug done, release planned |
 
 <a name="en-5"></a>
 
@@ -210,12 +210,12 @@ Krinik Tribit и пользуйтесь. Первый релиз выходит 
 | № | Шаг | Состояние |
 |---|---|---|
 | 1 | Разведка: 2648 отзывов Google Play, языки перевода, боли официального приложения | ✅ сделано |
-| 2 | Патчи: вылет на эквалайзере, геолокация в обоих местах, символы в пароле, название, иконка | ✅ написаны, на устройстве пока не проверены |
-| 3 | Первая патченая сборка на планшете автора с колонкой StormBox Blast 2 | 🔧 следующий |
+| 2 | Патчи: вылет на эквалайзере, геолокация (три места), масштаб и прокрутка экранов, розовый стиль, символы в пароле, название, иконка | ✅ написаны, прогнаны на планшете автора |
+| 3 | Первая патченая сборка на планшете автора с колонкой StormBox Blast 2: от заставки до своего эквалайзера без вылетов и без запроса разрешения на геолокацию | ✅ сделано, автор тестирует |
 | 4 | Тексты: наши в файлах ресурсов вместо серверных и зашитых в код; английский и русский руками | 🔧 разведка готова, дальше патч |
-| 5 | Вёрстка под планшет и альбомную ориентацию: масштаб экранов вмещает весь макет, обрезанные экраны прокручиваются | 🔧 разведка готова, дальше патч |
+| 5 | Вёрстка: масштаб экранов вмещает весь макет, обрезанные экраны прокручиваются (сделано, прогнано на планшете); дальше альбомная ориентация и остальные экраны | 🔧 в работе |
 | 6 | Вылеты, обрывы подключения, приложение больше не ждёт сервер Tribit | 🔧 разведка готова, дальше патч |
-| 7 | Сборки debug и release, первый подписанный релиз на GitHub | 🔲 в плане |
+| 7 | Две сборки: debug «Debug Krinik Tribit» рядом с оригиналом (сделано); release и первый подписанный релиз на GitHub | 🔧 debug готов, release в плане |
 
 <a name="ru-5"></a>
 
@@ -331,12 +331,12 @@ Android 设备。先卸载官方 Tribit 应用（签名不同），再安装 Kri
 | # | 步骤 | 状态 |
 |---|---|---|
 | 1 | 调研：2648 条 Google Play 评论、翻译语言、官方应用的问题 | ✅ 已完成 |
-| 2 | 补丁：均衡器闪退、两处定位要求、密码符号、应用名、图标 | ✅ 已写好，尚未在设备上实测 |
-| 3 | 在作者的平板和 StormBox Blast 2 上运行第一个补丁版本 | 🔧 下一步 |
+| 2 | 补丁：均衡器闪退、定位要求（三处）、界面缩放与滚动、粉色风格、密码符号、应用名、图标 | ✅ 已写好，已在作者的平板上运行 |
+| 3 | 在作者的平板和 StormBox Blast 2 上运行第一个补丁版本：从启动页到自定义均衡器，不闪退、不申请定位权限 | ✅ 已完成，作者正在测试 |
 | 4 | 文字：用资源文件里我们的文字替换服务器下发和代码写死的文字；英文和俄文人工翻译 | 🔧 调研完成，下一步打补丁 |
-| 5 | 平板和横屏布局：界面缩放容纳整个设计稿，被裁的界面可以滚动 | 🔧 调研完成，下一步打补丁 |
+| 5 | 布局：界面缩放容纳整个设计稿，被裁的界面可以滚动（已完成，已在平板上运行）；接下来是横屏和其余界面 | 🔧 进行中 |
 | 6 | 闪退、断连，应用不再等待 Tribit 服务器 | 🔧 调研完成，下一步打补丁 |
-| 7 | debug 和 release 两个版本，GitHub 上的首个签名正式版 | 🔲 计划中 |
+| 7 | 两个版本：与原版并存的 debug「Debug Krinik Tribit」（已完成）；release 及 GitHub 上的首个签名正式版 | 🔧 debug 已完成，release 计划中 |
 
 <a name="zh-5"></a>
 

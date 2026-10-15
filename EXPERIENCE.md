@@ -56,7 +56,7 @@
 > <!-- classes: question-already-answered, guard-not-proven-against-threat, shown-as-link,
 >      claim-before-evidence, owner-decision-not-applied, text-in-agents-world,
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
->      field-dropped-in-rebuild -->
+>      field-dropped-in-rebuild, renamed-package-identity, own-work-not-recalled -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -71,6 +71,8 @@
 > | `escaping-layer` | one escaping level lost between the tool and the file |
 > | `twins-missed` | one of two layers/copies moved and the twin stayed behind |
 > | `field-dropped-in-rebuild` | a field or section silently lost when an artifact was regenerated |
+| `renamed-package-identity` | a renamed application package breaks code that looks things up by the package name |
+| `own-work-not-recalled` | a tool or recipe the owner's projects already have was not looked up before the work |
 >
 > The `#tags` are **trigger-tags**: before a task, grep by the task's tags and QUOTE the relevant
 > lessons in your report (id + one line) — or state "no relevant lessons". An unquoted recall is
@@ -86,3 +88,42 @@
 **Result:** ✅ — the experience log is live and greppable.
 **Lesson:** capture lessons at the level of *approach* (what worked / what to avoid), not defect detail
 (that lives in `bugs/`); one short entry beats a long story.   → link: (none)
+
+### EXP-0002 · 2026-10-16 · ❌ · #adb #gitbash #titan
+class: shell-lied
+none-cheap: a per-shell setting; the recipe stands in HOUSE_RULES.md (dossier and the UI-agent row)
+**Context:** reading a UI dump on the Titan from Git Bash: `adb shell cat /sdcard/kt.xml`.
+**Tried / did:** the command answered «No such file»: Git Bash rewrote `/sdcard/kt.xml` into `C:/Program Files/Git/sdcard/kt.xml`.
+**Result:** ❌ one lost step; with `export MSYS_NO_PATHCONV=1` the file was read.
+**Lesson:** in Git Bash every device path in an `adb` argument needs `MSYS_NO_PATHCONV=1`; better — drive the Titan with the
+UI agent from PowerShell.   → link: `HOUSE_RULES.md` §4
+
+### EXP-0003 · 2026-10-16 · ❌ · #claims #markers #escaping
+class: claim-before-evidence
+none-cheap: whether a cause was probed before it was named is judgement; /fable-judge hunts it
+**Context:** three slips in one session: a chat line «Cyrillic in the heredoc got corrupted» said before any probe (the probe
+showed the heredoc intact; the cause was a `\n` escaping slip in my Python); a `[TESTED]` marker written into `add_dex.py`
+before the script had ever run; a Windows path `C:\Android\...\ui-agent` inside a Python string literal of a heredoc (`\u`
+read as an escape — AGENT_GUIDE "text travels through files", face 3).
+**Tried / did:** all caught (a byte probe; a re-read of the file; the interpreter's error) and corrected where they stood.
+**Result:** ❌ three corrections; no falsehood left standing.
+**Lesson:** the cause is named after the probe, never before it; a fresh file is born `[NOT-TESTED]` and flips only with the run
+named; text with backslashes goes into a file written by the Write tool, as a raw string.   → link: `TESTING_FRAMEWORK.md` markers
+
+### EXP-0004 · 2026-10-16 · ❌ · #debug #package #resources
+class: renamed-package-identity
+**Context:** the debug variant renames the package (`com.kriniks.tribit.debug`) so it installs beside the original.
+**Tried / did:** dialogs showed Chinese designer placeholders: the calls of `getIdentifier(name, type, getPackageName())` (about 26-35
+of the 73 `getIdentifier` calls) found nothing, because the resource table keeps the original package name.
+**Result:** ✅ after routing every `Resources.getIdentifier` through `krinik.Res` with a fallback to the original name.
+**Lesson:** after `renameManifestPackage` grep the smali for `getPackageName()` users — `getIdentifier`, authorities,
+`PackageManager` lookups — before the first device run.   mechanized: patches/apply.py   → link: `patches/java/krinik/Res.java`
+
+### EXP-0005 · 2026-10-16 · ❌ · #titan #ui-agent #tools
+class: own-work-not-recalled
+none-cheap: recall of sibling projects' tools is a reading step (AGENT_GUIDE checklist step 2), now recorded in HOUSE_RULES.md §6
+**Context:** the first device runs went through `uiautomator dump` (about 3 s a call) and taps by coordinates.
+**Tried / did:** the owner pointed at `C:\Android\private\ui-agent\` — already listed in `KARTUN/HOUSE_RULES.md` §6.
+**Result:** ✅ with the UI agent a whole flow (splash → login → search → speaker → EQ) ran in seconds per screen.
+**Lesson:** before driving a device, read the house rules of the owner's sibling projects for that device (checklist step 2).
+→ link: `HOUSE_RULES.md` §6

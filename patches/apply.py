@@ -334,23 +334,73 @@ def patch_autosize_fit():
     print("ok 11 AutoSize fits the whole design")
 
 
-# --- Patch 17: Krinik's brand - pink instead of yellow, «KRINIK TRIBIT», vector logos -----------------------
-# The owner (chat 2026-10-16 ≈ 00:40–00:50 +03:00): «желтные цветна меняем на нашу дизайн схему с розовым» ·
-# «назваение везде меняем на KRINIK TRIBIT» · «мы вектором сверстаем свои» · «иконку уже вектором сверстали» ·
-# «так е и где нужно сверстаем изображения» · «векторные».
-#   a. The app's own yellow colours -> Krinik pink #FF1A8C: five named colours in values/colors.xml and the yellow
-#      literals in the app's own layouts/drawables/styles (library palettes quantum_*, m3_* stay untouched).
-#   b. Splash (activity_first_new): the full-screen photo PNG with Tribit's logo, name and slogan is replaced by a dark
-#      background, the vector logo tile, «KRINIK TRIBIT» and the tagline as real text (sharp at any density).
-#   c. Login (activity_login_new): the «TRIBIT» logo PNG -> the vector mark + «KRINIK TRIBIT» text.
-#   d. Registration title «TRIBIT» -> «KRINIK TRIBIT».
+# --- Patch 16: every screen scrolls when it does not fit --------------------------------------------------
+# The owner: «они не скролятся у них нихуя» · «не масштабируются». 42 own screens have no scrolling container and all
+# are DataBinding screens, so their XML cannot be wrapped (the binding casts its root). BaseActivity.onCreate calls
+# our krinik.ScrollFix.wrap(activity, root) right after it stores rootView: the root is moved into a ScrollView
+# (fillViewport) unless the screen already scrolls or must fill the window. The class is compiled from
+# patches/java/krinik/ScrollFix.java by build.sh into an extra classesN.dex of the APK (Android loads every dex).
 # [NOT-TESTED]
-PINK = "#ffff1a8c"
-YELLOW_COLOURS = ("common_button_enableed_bg", "et_foucused_color", "text_et_undeline_focus", "color_upgrade_now")
-YELLOW_LITERALS = ("ffe900", "ffeb00", "ffd700", "ffea38")
+def patch_scroll_fix():
+    p = smali("com.thousandshores.tribit.base.BaseActivity")
+    store = "    iput-object v0, p0, Lcom/thousandshores/tribit/base/BaseActivity;->rootView:Landroid/view/View;\n"
+    text = p.read_text(encoding="utf-8")
+    header = next((h for h in (".method public onCreate(Landroid/os/Bundle;)V", ".method protected onCreate(Landroid/os/Bundle;)V") if h in text), None)
+    if header is None:
+        sys.exit("FAIL: BaseActivity.onCreate not found")
+    replace_in_method(p, header, store,
+        store + "\n    invoke-static {p0, v0}, Lkrinik/ScrollFix;->wrap(Landroid/app/Activity;Landroid/view/View;)V\n")
+    print("ok 16 screens scroll when they do not fit")
+
+
+# --- Patch 18: no location permission on Android 12+ -------------------------------------------------------
+# Found on the Titan 2026-10-16 01:01: after patches 2 and 7 the permission screen still stopped on «Enable Location ->
+# Go to set» - PermissionNewActivity.checkToActivity also demands the APP's ACCESS_FINE_LOCATION permission (isLocation),
+# and the same check sits in PermissionActivity, CheckSearchConditionActivity, PairHelper, the search screens.
+# The manifest already declares BLUETOOTH_SCAN neverForLocation, so the platform does not need location on API 31+.
+# Every own call of ContextCompat.checkSelfPermission (com/thousandshores/**) goes through krinik.Perm.check
+# (patches/java/krinik/Perm.java): location reads as granted on API 31+, all else is the real check.
+# [NOT-TESTED]
+def patch_location_permission():
+    old = "Landroidx/core/content/ContextCompat;->checkSelfPermission(Landroid/content/Context;Ljava/lang/String;)I"
+    new = "Lkrinik/Perm;->check(Landroid/content/Context;Ljava/lang/String;)I"
+    calls = files = 0
+    for p in ROOT.glob("smali*/com/thousandshores/**/*.smali"):
+        t = p.read_text(encoding="utf-8")
+        n = t.count(old)
+        if n:
+            p.write_text(t.replace(old, new), encoding="utf-8")
+            calls += n
+            files += 1
+    if calls < 20:
+        sys.exit(f"FAIL: expected ~25 checkSelfPermission calls in own code, found {calls}")
+    print(f"ok 18 location permission not demanded on Android 12+ ({calls} calls in {files} files)")
+
+
+# --- Patch 17: Krinik's brand - pink instead of yellow, «KRINIK TRIBIT», vector logos -----------------------
+# The owner (chat 2026-10-16 ≈ 00:40–01:00 +03:00): «желтные цветна меняем на нашу дизайн схему с розовым» ·
+# «назваение везде меняем на KRINIK TRIBIT» · «мы вектором сверстаем свои» · «так е и где нужно сверстаем изображения» ·
+# «векторные» · «при тапах по кнопкам странный увет кнопки» · «сделано людьми для людей - убрать» · about the splash:
+# «как у них было на главном экране, чтобы был узнаваем их флоу».
+#   a. The app's yellow -> Krinik pink: named colours (opaque and the 80 % pressed one) and every yellow literal in the
+#      app's own layouts/drawables/styles with ANY alpha kept as is (#7FFFE900 pressed -> #7FFF1A8C); amber #FFC107
+#      too. Library palettes (quantum_*, m3_*, material_*, abc_*) stay untouched.
+#   b. Splash keeps Tribit's own background (their flow stays recognisable): the yellow logo, «TRIBIT» and the slogan
+#      baked into app_start_up.png are painted out with the background colour (ImageMagick, feathered mask), and the
+#      vector logo tile and «KRINIK TRIBIT» as real text stand in their place.
+#   c. Login: the «TRIBIT» logo PNG -> vector mark + «KRINIK TRIBIT»; the «Войти» button was anchored below the one-line
+#      «* » marker instead of the three-line hint and covered it - now anchored below the hint (tv_title1).
+#   d. Registration: «TRIBIT» -> «KRINIK TRIBIT» on its own line under the welcome text (it was squeezed to the right of
+#      it); the big grey Tribit watermark -> our vector mark at low opacity.
+# [NOT-TESTED]
+PINK_RGB = "ff1a8c"
+YELLOW_RGB = ("ffe900", "ffeb00", "ffd700", "ffea38", "ffc107")
+YELLOW_COLOURS = ("common_button_enableed_bg", "common_button_enableed_80_bg", "et_foucused_color",
+                  "text_et_undeline_focus", "color_upgrade_now")
 BRAND = "KRINIK TRIBIT"
-TAGLINE_EN = "Made by people, for people"
-TAGLINE_RU = "Сделано людьми для людей"
+# Area of app_start_up.png (1125 x 2436) holding Tribit's baked logo, name and slogan, and the background colour there.
+SPLASH_LOGO_BOX = "270,700 855,1235"
+SPLASH_BG = "rgb(13,13,12)"
 MARK_GROUP = (
     '    <group android:scaleX="0.0371" android:scaleY="0.0371"\n'
     '        android:translateX="18.05" android:translateY="17.14">\n'
@@ -360,30 +410,50 @@ MARK_GROUP = (
     '    </group>\n')
 
 
+def _sub_once(path, old, new, what):
+    t = path.read_text(encoding="utf-8")
+    if t.count(old) != 1:
+        sys.exit(f"FAIL: {what} anchor found {t.count(old)}x")
+    path.write_text(t.replace(old, new), encoding="utf-8")
+
+
 def patch_brand():
+    import subprocess
     res = ROOT / "res"
     # a. colours
     colors = res / "values/colors.xml"
     t = colors.read_text(encoding="utf-8")
     for name in YELLOW_COLOURS:
-        hits = re.findall(rf'<color name="{name}">#[0-9a-fA-F]+</color>', t)
-        if len(hits) != 1:
-            sys.exit(f"FAIL: colour {name} found {len(hits)}x")
-        t = t.replace(hits[0], f'<color name="{name}">{PINK}</color>')
+        hits = re.findall(rf'<color name="{name}">#([0-9a-fA-F]{{2}})([0-9a-fA-F]{{6}})</color>', t)
+        if len(hits) != 1 or hits[0][1].lower() not in YELLOW_RGB:
+            sys.exit(f"FAIL: colour {name}: {hits}")
+        alpha, rgb = hits[0]
+        t = t.replace(f'<color name="{name}">#{alpha}{rgb}</color>', f'<color name="{name}">#{alpha}{PINK_RGB}</color>')
     colors.write_text(t, encoding="utf-8")
-    lit = re.compile(r"#(?:ff)?(" + "|".join(YELLOW_LITERALS) + r")\b", re.I)
+    lit = re.compile(r"#([0-9a-f]{2})?(" + "|".join(YELLOW_RGB) + r")\b", re.I)
     files = [p for d in ("layout", "drawable", "drawable-v21", "drawable-v24") for p in (res / d).glob("*.xml")] + [res / "values/styles.xml"]
     changed = 0
     for p in files:
         if not p.exists():
             continue
         s = p.read_text(encoding="utf-8")
-        s2 = lit.sub(PINK, s)
+        s2 = lit.sub(lambda m: "#" + (m.group(1) or "") + PINK_RGB, s)
         if s2 != s:
             p.write_text(s2, encoding="utf-8")
             changed += 1
     if changed < 15:
-        sys.exit(f"FAIL: yellow literals found in only {changed} files (expected ~19)")
+        sys.exit(f"FAIL: yellow literals found in only {changed} files (expected ~20)")
+    # yellow colour strings in the app's own code (the EQ chart line "#FFE900" and ~30 more files)
+    code_lit = re.compile(r'(const-string(?:/jumbo)? [vp]\d+, ")#([0-9a-fA-F]{2})?(' + "|".join(YELLOW_RGB) + r')(")', re.I)
+    code_files = 0
+    for p in ROOT.glob("smali*/com/thousandshores/**/*.smali"):
+        s = p.read_text(encoding="utf-8")
+        s2 = code_lit.sub(lambda m: f"{m.group(1)}#{(m.group(2) or '').upper()}{PINK_RGB.upper()}{m.group(4)}", s)
+        if s2 != s:
+            p.write_text(s2, encoding="utf-8")
+            code_files += 1
+    if code_files < 20:
+        sys.exit(f"FAIL: yellow colour strings in code found in only {code_files} files (expected ~30)")
 
     # vector drawables: the logo tile (pink rounded square + black mark) and the white mark
     (res / "drawable/krinik_logo_tile.xml").write_text(
@@ -398,60 +468,61 @@ def patch_brand():
         '    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">\n'
         + MARK_GROUP.replace("{stroke}", "#FFFFFF") + '</vector>\n', encoding="utf-8")
 
-    # strings
     s = res / "values/strings.xml"
-    t = s.read_text(encoding="utf-8")
-    if "krinik_brand" in t:
-        sys.exit("FAIL: krinik_brand already present")
-    t = t.replace("</resources>", f'    <string name="krinik_brand" translatable="false">{BRAND}</string>\n'
-                                  f'    <string name="krinik_tagline">{TAGLINE_EN}</string>\n</resources>')
-    s.write_text(t, encoding="utf-8")
-    ru = res / "values-ru/strings.xml"
-    t = ru.read_text(encoding="utf-8")
-    ru.write_text(t.replace("</resources>", f'    <string name="krinik_tagline">{TAGLINE_RU}</string>\n</resources>'), encoding="utf-8")
+    _sub_once(s, "</resources>", f'    <string name="krinik_brand" translatable="false">{BRAND}</string>\n</resources>', "strings end")
 
-    # b. splash
+    # b. splash: Tribit's background with their baked logo painted out, our vector logo and name on top
+    png = res / "mipmap-xxhdpi/app_start_up.png"
+    if not png.exists():
+        sys.exit("FAIL: app_start_up.png missing")
+    mask = png.with_name("krinik_mask.png")
+    x1y1, x2y2 = SPLASH_LOGO_BOX.split()
+    for cmd in (["magick", str(png), "-fill", "black", "-colorize", "100", "-fill", "white", "-draw",
+                 f"roundrectangle {x1y1} {x2y2} 90,90", "-blur", "0x40", str(mask)],
+                ["magick", str(png), "(", "+clone", "-fill", SPLASH_BG, "-colorize", "100", ")", str(mask),
+                 "-composite", str(png)]):
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode != 0:
+            sys.exit(f"FAIL: ImageMagick: {r.stderr.strip()[:200]}")
+    mask.unlink()
     first = res / "layout/activity_first_new.xml"
-    t = first.read_text(encoding="utf-8")
     old = '<ImageView android:layout_width="fill_parent" android:layout_height="fill_parent" android:src="@mipmap/app_start_up" android:scaleType="centerCrop" />'
-    if t.count(old) != 1:
-        sys.exit("FAIL: splash image anchor")
-    t = t.replace(old,
-        '<View android:background="#ff0d0d0d" android:layout_width="fill_parent" android:layout_height="fill_parent" />\n'
+    _sub_once(first, old, old + '\n'
         '    <LinearLayout android:orientation="vertical" android:gravity="center_horizontal" android:layout_gravity="center" '
         'android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/dp_160">\n'
         '        <ImageView android:layout_width="@dimen/dp_100" android:layout_height="@dimen/dp_100" android:src="@drawable/krinik_logo_tile" />\n'
         '        <TextView android:textSize="26.0sp" android:textStyle="bold" android:textColor="#ffffffff" android:layout_width="wrap_content" '
         'android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_20" android:letterSpacing="0.06" android:text="@string/krinik_brand" />\n'
-        '        <TextView android:textSize="15.0sp" android:textColor="#ffa1a1a6" android:layout_width="wrap_content" '
-        'android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:text="@string/krinik_tagline" />\n'
-        '    </LinearLayout>')
-    first.write_text(t, encoding="utf-8")
+        '    </LinearLayout>', "splash image")
 
-    # c. login logo
+    # c. login: logo, and the button anchored below the hint
     login = res / "layout/activity_login_new.xml"
-    t = login.read_text(encoding="utf-8")
-    old = ('<ImageView android:layout_width="@dimen/dp_148" android:layout_height="@dimen/dp_60" android:layout_marginLeft="@dimen/dp_20" '
-           'android:layout_marginTop="@dimen/dp_56" android:layout_marginBottom="@dimen/dp_2" android:src="@mipmap/ic_login_icon" />')
-    if t.count(old) != 1:
-        sys.exit("FAIL: login logo anchor")
-    t = t.replace(old,
+    _sub_once(login,
+        '<ImageView android:layout_width="@dimen/dp_148" android:layout_height="@dimen/dp_60" android:layout_marginLeft="@dimen/dp_20" '
+        'android:layout_marginTop="@dimen/dp_56" android:layout_marginBottom="@dimen/dp_2" android:src="@mipmap/ic_login_icon" />',
         '<LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="wrap_content" '
         'android:layout_height="@dimen/dp_60" android:layout_marginLeft="@dimen/dp_20" android:layout_marginTop="@dimen/dp_56" '
         'android:layout_marginBottom="@dimen/dp_2">\n'
         '            <ImageView android:layout_width="@dimen/dp_44" android:layout_height="@dimen/dp_44" android:src="@drawable/krinik_mark_white" />\n'
         '            <TextView android:textSize="22.0sp" android:textStyle="bold" android:textColor="#ffffffff" android:layout_width="wrap_content" '
         'android:layout_height="wrap_content" android:layout_marginLeft="@dimen/dp_10" android:letterSpacing="0.06" android:text="@string/krinik_brand" />\n'
-        '        </LinearLayout>')
-    login.write_text(t, encoding="utf-8")
+        '        </LinearLayout>', "login logo")
+    t = login.read_text(encoding="utf-8")
+    btn = re.search(r'<Button [^>]*android:id="@id/btn_login"[^>]*>', t)
+    if not btn or btn.group(0).count('android:layout_below="@id/tv_title"') != 1:
+        sys.exit("FAIL: login button anchor")
+    login.write_text(t.replace(btn.group(0), btn.group(0).replace('android:layout_below="@id/tv_title"',
+                                                                    'android:layout_below="@id/tv_title1"')), encoding="utf-8")
 
-    # d. registration title
+    # d. registration: the name on its own line, our watermark
     reg = res / "layout/activity_register_new.xml"
-    t = reg.read_text(encoding="utf-8")
-    if t.count('android:text="TRIBIT"') != 1:
-        sys.exit("FAIL: registration TRIBIT anchor")
-    reg.write_text(t.replace('android:text="TRIBIT"', 'android:text="@string/krinik_brand"'), encoding="utf-8")
-    print(f"ok 17 brand: pink in {changed} files + 4 colours, {BRAND}, vector logos on splash and login")
+    _sub_once(reg, 'android:layout_marginLeft="@dimen/dp_10" android:layout_marginTop="@dimen/dp_8" android:text="TRIBIT" '
+                   'android:layout_toRightOf="@id/tv_title1" android:layout_below="@id/tv_title" />',
+                   'android:layout_marginLeft="@dimen/dp_20" android:layout_marginTop="@dimen/dp_8" android:text="@string/krinik_brand" '
+                   'android:layout_below="@id/tv_title1" />', "registration title")
+    _sub_once(reg, 'android:src="@mipmap/ic_register_icon"', 'android:src="@drawable/krinik_mark_white" android:alpha="0.12"',
+              "registration watermark")
+    print(f"ok 17 brand: pink in {changed} res files + {code_files} code files + {len(YELLOW_COLOURS)} colours, {BRAND}, splash/login/registration")
 
 
 # --- Variant: debug — «Debug Krinik Tribit», its own package beside the original ---------------------------
@@ -485,13 +556,29 @@ def variant_debug():
                   f'"{DEBUG_PACKAGE}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"')
     m.write_text(t, encoding="utf-8")
 
+    # Resources keep the original package name: route every Resources.getIdentifier through krinik.Res, which falls
+    # back to it (73 Resources.getIdentifier calls routed, about 26-35 of them pass getPackageName(); dialogs showed
+    # designer placeholders without it).
+    sig = "Landroid/content/res/Resources;->getIdentifier(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I"
+    ours = "Lkrinik/Res;->getIdentifier(Landroid/content/res/Resources;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I"
+    pat = re.compile(r"invoke-virtual(/range)? \{([^}]*)\}, " + re.escape(sig))
+    n = 0
+    for p in ROOT.glob("smali*/**/*.smali"):
+        t = p.read_text(encoding="utf-8")
+        t2, k = pat.subn(lambda m: f"invoke-static{m.group(1) or ''} {{{m.group(2)}}}, {ours}", t)
+        if k:
+            p.write_text(t2, encoding="utf-8")
+            n += k
+    if n < 26:
+        sys.exit(f"FAIL: expected >= 26 Resources.getIdentifier calls, found {n}")
+
     s = ROOT / "res/values/strings.xml"
     t = s.read_text(encoding="utf-8")
     old = '<string name="app_name">Krinik Tribit</string>'
     if t.count(old) != 1:
         sys.exit("FAIL: app_name after patch 4")
     s.write_text(t.replace(old, '<string name="app_name">Debug Krinik Tribit</string>'), encoding="utf-8")
-    print(f"ok  debug variant: {DEBUG_PACKAGE}, Debug Krinik Tribit")
+    print(f"ok  debug variant: {DEBUG_PACKAGE}, Debug Krinik Tribit, {n} getIdentifier calls via krinik.Res")
 
 
 if __name__ == "__main__":
@@ -505,7 +592,9 @@ if __name__ == "__main__":
     patch_password_symbols()
     patch_ble_no_gps_check()
     patch_autosize_fit()
+    patch_scroll_fix()
     patch_brand()
+    patch_location_permission()
     if "--debug" in sys.argv[2:]:
         variant_debug()
     print("all patches applied")
