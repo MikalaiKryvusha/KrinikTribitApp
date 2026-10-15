@@ -16,6 +16,10 @@
 
 <a name="english"></a>
 
+<p align="center">
+  <img src="design/icon.svg" alt="Krinik Tribit: a pink square with a black three-loop knot drawn in one stroke" width="160">
+</p>
+
 <h2 align="center">Krinik Tribit</h2>
 
 <p align="center"><b>The Tribit speaker app, fixed — made by people, for people</b><br>
@@ -139,6 +143,10 @@ Author: Mikalai Kryvusha (Krinik).
 ---
 
 <a name="russian"></a>
+
+<p align="center">
+  <img src="design/icon.svg" alt="Krinik Tribit: розовый квадрат с чёрным узлом из трёх петель, нарисованным одним штрихом" width="160">
+</p>
 
 <h2 align="center">Krinik Tribit</h2>
 
@@ -265,6 +273,10 @@ adb install-multiple out/signed/*.apk
 ---
 
 <a name="chinese"></a>
+
+<p align="center">
+  <img src="design/icon.svg" alt="Krinik Tribit：粉色方块上一笔画成的黑色三环结" width="160">
+</p>
 
 <h2 align="center">Krinik Tribit</h2>
 
