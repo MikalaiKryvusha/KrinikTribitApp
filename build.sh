@@ -1,36 +1,47 @@
 #!/usr/bin/env bash
-# Krinik Tribit - build the patched app from the official split APKs.
+# Krinik Tribit - build ONE patched universal APK from the official split APKs.
+#   bash build.sh            -> release: «Krinik Tribit», package com.thousandshores.tribit (replaces the original)
+#   bash build.sh debug      -> debug:   «Debug Krinik Tribit», package com.kriniks.tribit.debug (installs beside it)
+# Steps:
 #   1. original-apk/ holds the split APKs pulled from a device (adb shell pm path com.thousandshores.tribit).
-#   2. apktool decodes base.apk fresh, patches/apply.py patches it, apktool rebuilds it.
-#   3. every APK of the set (patched base + untouched splits) is zipaligned and signed with ONE key -
-#      Android refuses a split set with mixed signatures.
-# Output: out/signed/*.apk  ->  adb install-multiple out/signed/*.apk
+#   2. APKEditor merges the splits into one universal APK (work/merged.apk) - a split set cannot change its package,
+#      and the owner's release is one APK (GOAL.md, success line 7).
+#   3. apktool decodes it fresh, patches/apply.py patches it (debug: + the variant), apktool rebuilds it.
+#   4. zipalign + apksigner with the variant's own key (owner's rule R6: different keys for debug and release).
+# Output: out/KrinikTribit-<variant>.apk  ->  adb install -r out/KrinikTribit-<variant>.apk
 set -euo pipefail
 cd "$(dirname "$0")"
+
+VARIANT="${1:-release}"
+case "$VARIANT" in release|debug) ;; *) echo "FAIL: variant must be release or debug, got: $VARIANT"; exit 1 ;; esac
 
 JAVA_HOME="${JAVA_HOME_KRINIK:-C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot}"
 JAVA="$JAVA_HOME/bin/java"
 BT="${ANDROID_BUILD_TOOLS:-C:/Android/Sdk/build-tools/36.0.0}"
-KEYSTORE="keys/krinik-tribit.keystore"
-KS_PASS="${KRINIK_KS_PASS:-krinik-tribit}"   # personal fork key, not a secret of value; override via env
+APKEDITOR="tools/APKEditor-1.4.9.jar"   # REAndroid/APKEditor V1.4.9, sha256 a9cd40df…6e67 (checked against GitHub's digest)
+KEYSTORE="keys/krinik-tribit-$VARIANT.keystore"
+KS_PASS="${KRINIK_KS_PASS:-krinik-tribit}"   # personal fork keys, not secrets of value; override via env
+OUT="out/KrinikTribit-$VARIANT.apk"
 
 [ -f original-apk/base.apk ] || { echo "FAIL: original-apk/base.apk missing"; exit 1; }
+[ -f "$APKEDITOR" ] || { echo "FAIL: $APKEDITOR missing - download V1.4.9 from github.com/REAndroid/APKEditor/releases"; exit 1; }
 
-rm -rf work/base out
-mkdir -p out/aligned out/signed keys
-"$JAVA" -jar tools/apktool.jar d -f -o work/base original-apk/base.apk >/dev/null
-python -I patches/apply.py work/base
-"$JAVA" -jar tools/apktool.jar b work/base -o out/base-unsigned.apk >/dev/null
+mkdir -p work out keys
+if [ ! -f work/merged.apk ] || [ -n "$(find original-apk -name '*.apk' -newer work/merged.apk)" ]; then
+  "$JAVA" -jar "$APKEDITOR" m -f -i original-apk -o work/merged.apk >/dev/null
+fi
+
+rm -rf work/base "$OUT" out/aligned.apk
+"$JAVA" -jar tools/apktool.jar d -f -o work/base work/merged.apk >/dev/null
+if [ "$VARIANT" = debug ]; then python -I patches/apply.py work/base --debug; else python -I patches/apply.py work/base; fi
+"$JAVA" -jar tools/apktool.jar b work/base -o out/unsigned.apk >/dev/null
 
 if [ ! -f "$KEYSTORE" ]; then
   "$JAVA_HOME/bin/keytool" -genkeypair -keystore "$KEYSTORE" -alias krinik -keyalg RSA -keysize 3072 \
-    -validity 10000 -storepass "$KS_PASS" -keypass "$KS_PASS" -dname "CN=Krinik Tribit, O=Krinik" >/dev/null
+    -validity 10000 -storepass "$KS_PASS" -keypass "$KS_PASS" -dname "CN=Krinik Tribit $VARIANT, O=Krinik" >/dev/null
 fi
 
-for src in out/base-unsigned.apk original-apk/split_*.apk; do
-  name=$(basename "$src"); [ "$name" = base-unsigned.apk ] && name=base.apk
-  "$BT/zipalign.exe" -f -p 4 "$src" "out/aligned/$name"
-  "$BT/apksigner.bat" sign --ks "$KEYSTORE" --ks-pass "pass:$KS_PASS" --out "out/signed/$name" "out/aligned/$name"
-done
-rm -f out/signed/*.idsig
-"$BT/apksigner.bat" verify out/signed/base.apk && echo "built: $(ls out/signed)"
+"$BT/zipalign.exe" -f -p 4 out/unsigned.apk out/aligned.apk
+"$BT/apksigner.bat" sign --ks "$KEYSTORE" --ks-pass "pass:$KS_PASS" --out "$OUT" out/aligned.apk
+rm -f out/unsigned.apk out/aligned.apk "$OUT.idsig"
+"$BT/apksigner.bat" verify "$OUT" && echo "built: $OUT"

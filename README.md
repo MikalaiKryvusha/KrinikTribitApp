@@ -106,9 +106,6 @@ adb uninstall com.thousandshores.tribit           # the signature differs, so th
 adb install-multiple out/signed/*.apk
 ```
 
-Signing in with email works as before. Signing in with Google or Facebook most likely does not: those logins are bound
-to Tribit's own signature.
-
 <a name="en-6"></a>
 
 ### 6. Project map
@@ -237,8 +234,6 @@ adb uninstall com.thousandshores.tribit           # оригинал нужно 
 adb install-multiple out/signed/*.apk
 ```
 
-Вход по почте работает как раньше. Вход через Google и Facebook, вероятно, не сработает: он привязан к подписи Tribit.
-
 <a name="ru-6"></a>
 
 ### 6. Карта проекта
@@ -359,8 +354,6 @@ bash build.sh                                     # 解包、打补丁、重新�
 adb uninstall com.thousandshores.tribit           # 签名不同，必须先卸载原版
 adb install-multiple out/signed/*.apk
 ```
-
-邮箱登录照常可用；Google 和 Facebook 登录很可能不行，因为它们绑定了 Tribit 自己的签名。
 
 <a name="zh-6"></a>
 

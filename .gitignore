@@ -51,3 +51,7 @@ keystore.properties
 .env
 .env.*
 !.env.example
+/tools/APKEditor-*.jar
+
+# Python bytecode.
+__pycache__/

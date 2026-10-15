@@ -108,6 +108,7 @@
 
 | Команда | Что делает | От чего страхует |
 |---|---|---|
+| UI-агент на устройстве (вне репозитория: `C:\Android\private\ui-agent\`, описание — `UI_AGENT.md` там же; APK `evegf.app.macrobenchmark` на Титане уже стоит): `$env:PATH="C:\Android\Sdk\platform-tools;$env:PATH"; $env:PYTHONUTF8="1"; python C:\Android\private\ui-agent\ui.py --serial 192.168.1.3:5555 --start ping`, дальше `wait <текст>` · `tapText <текст>` · `tap x y` · `labels` · `tree` · `shot <файл>` | водит интерфейс за десятки мс на команду, `wait` возвращается по событию смены экрана — вместо `uiautomator dump` по 3 с | медленные прогоны; клиент одновременно только один — если Титан ведёт сессия KARTUN, ждать её слова; без `PYTHONUTF8=1` кириллица в ответах ломается; через 10 мин без клиента агент гаснет — вновь `--start` |
 | `bash build.sh` | собирает патченую сборку из `original-apk/` и подписывает набор сплитов одним ключом | якорь патча не найден (exit 1); смешанные подписи в наборе |
 | `node researches/01_play_reviews/make-reviews-md.mjs` | пересобирает `researches/01_play_reviews.md` из сырых отзывов (вне git) | ручная правка сгенерированной таблицы |
 | `node tools/unwire-owner-word-hooks.mjs` | снимает хуки `pretool-owner-word` и `stop-owner-answer` из `.claude/settings.json` | возврат хуков ⏩ после обновления KAIF |

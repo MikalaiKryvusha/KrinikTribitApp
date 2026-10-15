@@ -515,14 +515,15 @@ servers from the agent's tooling (the owner's word 2026-10-15 ≈ 23:3x +03:00 �
 ## Build
 
 ```bash
-bash build.sh
+bash build.sh debug     # «Debug Krinik Tribit», com.kriniks.tribit.debug, beside the original
+bash build.sh           # release «Krinik Tribit», the original package
 ```
 
 Krinik Tribit is the official Tribit app 5.0.0 with our patches (the owner's word 2026-10-16: «чиним ИХ приложение»).
-The build runs in Git Bash: apktool decodes `original-apk/base.apk` from scratch,
+The build runs in Git Bash: APKEditor merges the splits of `original-apk/` into `work/merged.apk`, apktool decodes it from scratch,
 `patches/apply.py` applies every patch (each fails with exit 1 when its anchor is missing), apktool rebuilds,
-`zipalign` + `apksigner` from `C:/Android/Sdk/build-tools/36.0.0` sign the whole split set with one key
-(`keys/`, created on first run, outside git). Output: `out/signed/*.apk`. JDK 21 is set inside the script
+`zipalign` + `apksigner` from `C:/Android/Sdk/build-tools/36.0.0` sign it
+(`keys/`, one key per variant, created on first run, outside git). Output: `out/KrinikTribit-<variant>.apk` - one universal APK merged from the splits by APKEditor 1.4.9 (`tools/`, outside git). JDK 21 is set inside the script
 (`C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot`); `zipalign`/`apksigner` are not on PATH — the script
 calls them by full path.
 

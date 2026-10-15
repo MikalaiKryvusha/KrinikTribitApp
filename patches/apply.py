@@ -6,6 +6,7 @@ Every patch finds its anchor by exact text and fails loudly (exit 1) when the an
 so a new Tribit version never gets a half-applied fork. Run on a FRESH `apktool d` output.
 """
 import pathlib
+import re
 import sys
 
 ROOT = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else None
@@ -333,6 +334,166 @@ def patch_autosize_fit():
     print("ok 11 AutoSize fits the whole design")
 
 
+# --- Patch 17: Krinik's brand - pink instead of yellow, «KRINIK TRIBIT», vector logos -----------------------
+# The owner (chat 2026-10-16 ≈ 00:40–00:50 +03:00): «желтные цветна меняем на нашу дизайн схему с розовым» ·
+# «назваение везде меняем на KRINIK TRIBIT» · «мы вектором сверстаем свои» · «иконку уже вектором сверстали» ·
+# «так е и где нужно сверстаем изображения» · «векторные».
+#   a. The app's own yellow colours -> Krinik pink #FF1A8C: five named colours in values/colors.xml and the yellow
+#      literals in the app's own layouts/drawables/styles (library palettes quantum_*, m3_* stay untouched).
+#   b. Splash (activity_first_new): the full-screen photo PNG with Tribit's logo, name and slogan is replaced by a dark
+#      background, the vector logo tile, «KRINIK TRIBIT» and the tagline as real text (sharp at any density).
+#   c. Login (activity_login_new): the «TRIBIT» logo PNG -> the vector mark + «KRINIK TRIBIT» text.
+#   d. Registration title «TRIBIT» -> «KRINIK TRIBIT».
+# [NOT-TESTED]
+PINK = "#ffff1a8c"
+YELLOW_COLOURS = ("common_button_enableed_bg", "et_foucused_color", "text_et_undeline_focus", "color_upgrade_now")
+YELLOW_LITERALS = ("ffe900", "ffeb00", "ffd700", "ffea38")
+BRAND = "KRINIK TRIBIT"
+TAGLINE_EN = "Made by people, for people"
+TAGLINE_RU = "Сделано людьми для людей"
+MARK_GROUP = (
+    '    <group android:scaleX="0.0371" android:scaleY="0.0371"\n'
+    '        android:translateX="18.05" android:translateY="17.14">\n'
+    f'        <path android:pathData="{ICON_PATH}"\n'
+    '            android:fillColor="#00000000" android:strokeColor="{stroke}"\n'
+    '            android:strokeWidth="80" android:strokeLineJoin="round"/>\n'
+    '    </group>\n')
+
+
+def patch_brand():
+    res = ROOT / "res"
+    # a. colours
+    colors = res / "values/colors.xml"
+    t = colors.read_text(encoding="utf-8")
+    for name in YELLOW_COLOURS:
+        hits = re.findall(rf'<color name="{name}">#[0-9a-fA-F]+</color>', t)
+        if len(hits) != 1:
+            sys.exit(f"FAIL: colour {name} found {len(hits)}x")
+        t = t.replace(hits[0], f'<color name="{name}">{PINK}</color>')
+    colors.write_text(t, encoding="utf-8")
+    lit = re.compile(r"#(?:ff)?(" + "|".join(YELLOW_LITERALS) + r")\b", re.I)
+    files = [p for d in ("layout", "drawable", "drawable-v21", "drawable-v24") for p in (res / d).glob("*.xml")] + [res / "values/styles.xml"]
+    changed = 0
+    for p in files:
+        if not p.exists():
+            continue
+        s = p.read_text(encoding="utf-8")
+        s2 = lit.sub(PINK, s)
+        if s2 != s:
+            p.write_text(s2, encoding="utf-8")
+            changed += 1
+    if changed < 15:
+        sys.exit(f"FAIL: yellow literals found in only {changed} files (expected ~19)")
+
+    # vector drawables: the logo tile (pink rounded square + black mark) and the white mark
+    (res / "drawable/krinik_logo_tile.xml").write_text(
+        '<?xml version="1.0" encoding="utf-8"?>\n'
+        '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
+        '    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">\n'
+        '    <path android:fillColor="#FF1A8C" android:pathData="M24,0 H84 A24,24 0 0 1 108,24 V84 A24,24 0 0 1 84,108 H24 A24,24 0 0 1 0,84 V24 A24,24 0 0 1 24,0 Z"/>\n'
+        + MARK_GROUP.replace("{stroke}", "#0D0D0D") + '</vector>\n', encoding="utf-8")
+    (res / "drawable/krinik_mark_white.xml").write_text(
+        '<?xml version="1.0" encoding="utf-8"?>\n'
+        '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
+        '    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">\n'
+        + MARK_GROUP.replace("{stroke}", "#FFFFFF") + '</vector>\n', encoding="utf-8")
+
+    # strings
+    s = res / "values/strings.xml"
+    t = s.read_text(encoding="utf-8")
+    if "krinik_brand" in t:
+        sys.exit("FAIL: krinik_brand already present")
+    t = t.replace("</resources>", f'    <string name="krinik_brand" translatable="false">{BRAND}</string>\n'
+                                  f'    <string name="krinik_tagline">{TAGLINE_EN}</string>\n</resources>')
+    s.write_text(t, encoding="utf-8")
+    ru = res / "values-ru/strings.xml"
+    t = ru.read_text(encoding="utf-8")
+    ru.write_text(t.replace("</resources>", f'    <string name="krinik_tagline">{TAGLINE_RU}</string>\n</resources>'), encoding="utf-8")
+
+    # b. splash
+    first = res / "layout/activity_first_new.xml"
+    t = first.read_text(encoding="utf-8")
+    old = '<ImageView android:layout_width="fill_parent" android:layout_height="fill_parent" android:src="@mipmap/app_start_up" android:scaleType="centerCrop" />'
+    if t.count(old) != 1:
+        sys.exit("FAIL: splash image anchor")
+    t = t.replace(old,
+        '<View android:background="#ff0d0d0d" android:layout_width="fill_parent" android:layout_height="fill_parent" />\n'
+        '    <LinearLayout android:orientation="vertical" android:gravity="center_horizontal" android:layout_gravity="center" '
+        'android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="@dimen/dp_160">\n'
+        '        <ImageView android:layout_width="@dimen/dp_100" android:layout_height="@dimen/dp_100" android:src="@drawable/krinik_logo_tile" />\n'
+        '        <TextView android:textSize="26.0sp" android:textStyle="bold" android:textColor="#ffffffff" android:layout_width="wrap_content" '
+        'android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_20" android:letterSpacing="0.06" android:text="@string/krinik_brand" />\n'
+        '        <TextView android:textSize="15.0sp" android:textColor="#ffa1a1a6" android:layout_width="wrap_content" '
+        'android:layout_height="wrap_content" android:layout_marginTop="@dimen/dp_8" android:text="@string/krinik_tagline" />\n'
+        '    </LinearLayout>')
+    first.write_text(t, encoding="utf-8")
+
+    # c. login logo
+    login = res / "layout/activity_login_new.xml"
+    t = login.read_text(encoding="utf-8")
+    old = ('<ImageView android:layout_width="@dimen/dp_148" android:layout_height="@dimen/dp_60" android:layout_marginLeft="@dimen/dp_20" '
+           'android:layout_marginTop="@dimen/dp_56" android:layout_marginBottom="@dimen/dp_2" android:src="@mipmap/ic_login_icon" />')
+    if t.count(old) != 1:
+        sys.exit("FAIL: login logo anchor")
+    t = t.replace(old,
+        '<LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="wrap_content" '
+        'android:layout_height="@dimen/dp_60" android:layout_marginLeft="@dimen/dp_20" android:layout_marginTop="@dimen/dp_56" '
+        'android:layout_marginBottom="@dimen/dp_2">\n'
+        '            <ImageView android:layout_width="@dimen/dp_44" android:layout_height="@dimen/dp_44" android:src="@drawable/krinik_mark_white" />\n'
+        '            <TextView android:textSize="22.0sp" android:textStyle="bold" android:textColor="#ffffffff" android:layout_width="wrap_content" '
+        'android:layout_height="wrap_content" android:layout_marginLeft="@dimen/dp_10" android:letterSpacing="0.06" android:text="@string/krinik_brand" />\n'
+        '        </LinearLayout>')
+    login.write_text(t, encoding="utf-8")
+
+    # d. registration title
+    reg = res / "layout/activity_register_new.xml"
+    t = reg.read_text(encoding="utf-8")
+    if t.count('android:text="TRIBIT"') != 1:
+        sys.exit("FAIL: registration TRIBIT anchor")
+    reg.write_text(t.replace('android:text="TRIBIT"', 'android:text="@string/krinik_brand"'), encoding="utf-8")
+    print(f"ok 17 brand: pink in {changed} files + 4 colours, {BRAND}, vector logos on splash and login")
+
+
+# --- Variant: debug — «Debug Krinik Tribit», its own package beside the original ---------------------------
+# Owner's rule R6 (HOUSE_RULES.md): two builds, debug named «Debug Krinik Tribit», release «Krinik Tribit», different
+# signing keys. The debug build gets its own package so it installs next to the owner's original Tribit and the agent
+# tests on the Titan without removing it. apktool's renameManifestPackage renames the manifest package (component
+# class names stay); the 7 provider authorities and the one custom permission carry the old package prefix and would
+# clash with the installed original, so they are renamed too - the code builds every authority at run time from
+# getPackageName() (no smali string holds "com.thousandshores.tribit.<suffix>", checked 2026-10-16), so the renamed
+# authorities match. Runs AFTER patch 4 (app name).
+# [NOT-TESTED]
+DEBUG_PACKAGE = "com.kriniks.tribit.debug"
+ORIGINAL_PACKAGE = "com.thousandshores.tribit"
+
+
+def variant_debug():
+    yml = ROOT / "apktool.yml"
+    t = yml.read_text(encoding="utf-8")
+    if t.count("  renameManifestPackage: null") != 1:
+        sys.exit("FAIL: renameManifestPackage anchor")
+    yml.write_text(t.replace("  renameManifestPackage: null", f"  renameManifestPackage: {DEBUG_PACKAGE}"), encoding="utf-8")
+
+    m = ROOT / "AndroidManifest.xml"
+    t = m.read_text(encoding="utf-8")
+    n_auth = t.count(f'android:authorities="{ORIGINAL_PACKAGE}.')
+    n_perm = t.count(f'android:name="{ORIGINAL_PACKAGE}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"')
+    if n_auth != 7 or n_perm < 1:
+        sys.exit(f"FAIL: expected 7 authorities and the receiver permission, found {n_auth} and {n_perm}")
+    t = t.replace(f'android:authorities="{ORIGINAL_PACKAGE}.', f'android:authorities="{DEBUG_PACKAGE}.')
+    t = t.replace(f'"{ORIGINAL_PACKAGE}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"',
+                  f'"{DEBUG_PACKAGE}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"')
+    m.write_text(t, encoding="utf-8")
+
+    s = ROOT / "res/values/strings.xml"
+    t = s.read_text(encoding="utf-8")
+    old = '<string name="app_name">Krinik Tribit</string>'
+    if t.count(old) != 1:
+        sys.exit("FAIL: app_name after patch 4")
+    s.write_text(t.replace(old, '<string name="app_name">Debug Krinik Tribit</string>'), encoding="utf-8")
+    print(f"ok  debug variant: {DEBUG_PACKAGE}, Debug Krinik Tribit")
+
+
 if __name__ == "__main__":
     if ROOT is None or not (ROOT / "apktool.yml").exists():
         sys.exit("usage: python -I patches/apply.py <apktool-decoded-dir>")
@@ -344,4 +505,7 @@ if __name__ == "__main__":
     patch_password_symbols()
     patch_ble_no_gps_check()
     patch_autosize_fit()
+    patch_brand()
+    if "--debug" in sys.argv[2:]:
+        variant_debug()
     print("all patches applied")
