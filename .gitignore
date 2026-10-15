@@ -36,3 +36,18 @@ interviews/decisions/*.lock
 # there 2026-10-14 "Публичный слепок"). This repository is public and a portrait may quote the owner's private
 # writing, so the file lives on disk and never ships. Refresh: cp d:\work\ai_sandbox\KAIF\AUTHOR_STYLOMETRY.md .
 AUTHOR_STYLOMETRY.md
+
+# Android / Gradle build output and local machine files.
+.gradle/
+build/
+.kotlin/
+local.properties
+.idea/
+*.iml
+captures/
+
+# Release signing - the release key and its passwords live outside git (owner's rule R6, HOUSE_RULES.md).
+keystore.properties
+.env
+.env.*
+!.env.example

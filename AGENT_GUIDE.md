@@ -86,7 +86,7 @@ relies entirely on this document to get to work.
 8. Read the relevant plan         # plans/<feature>.md, if the task touches a specific feature. Code by citing the plan: before implementing a step, QUOTE the anchor line you are doing right now — if you can't name the line, that's scope drift caught BEFORE the diff. A HEAVY task with no plan yet → build the ladder first (Planning discipline below; /plan-task for ordinary work, /plan-epic for epics). Filing a plan/bug/idea → goal vector + acceptance criteria FIRST, per REQUIREMENTS_FRAMEWORK.md
 9. Recon before code (external truth)  # the task rests on an external truth (an old/reference system, a foreign API, prod behavior, a vendor doc)? The FIRST artifact is a recon doc in researches/ — code is forbidden until it exists; then code by the document, not from recall. Recon docs are reused by every future session. The same door opens for an ENGINEERING FORK with a price of error (the fourth door, PHILOSOPHY.md): recon of the domain's authorities BEFORE the choice, never the agent's own reasoning alone
 10. Check the map & blast radius   # before editing code: PROJECT_ARCHITECTURE_INTERNAL_MAP.md — who is affected; update the map if relations change
-11. Run the build (if touching code)   # bash build.sh (patched fork, today) — the own app's Gradle command replaces it (see Build)
+11. Run the build (if touching code)   # bash build.sh (the patched Tribit app, see Build)
 12. Use the test harness          # adb on the Titan 1 tablet (HOUSE_RULES.md §3) + testcases/ — drive/observe the software without a human
 13. Comment the code              # comment blocks, classes, modules, important lines — with a test-status marker: fresh raw content gets [NOT-TESTED]; verified-by-observation flips to [TESTED: date · how] (TESTING_FRAMEWORK.md)
 14. Reflect on bugs in bugs/      # one md per bug; follow BUG_FIXING_FRAMEWORK.md
@@ -518,13 +518,13 @@ servers from the agent's tooling (the owner's word 2026-10-15 ≈ 23:3x +03:00 �
 bash build.sh
 ```
 
-Today the build is the patched fork (Git Bash): apktool decodes `original-apk/base.apk` from scratch,
+Krinik Tribit is the official Tribit app 5.0.0 with our patches (the owner's word 2026-10-16: «чиним ИХ приложение»).
+The build runs in Git Bash: apktool decodes `original-apk/base.apk` from scratch,
 `patches/apply.py` applies every patch (each fails with exit 1 when its anchor is missing), apktool rebuilds,
 `zipalign` + `apksigner` from `C:/Android/Sdk/build-tools/36.0.0` sign the whole split set with one key
 (`keys/`, created on first run, outside git). Output: `out/signed/*.apk`. JDK 21 is set inside the script
 (`C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot`); `zipalign`/`apksigner` are not on PATH — the script
-calls them by full path. The own Kotlin app (`MASTER_PLAN.md` phase 1) brings its Gradle command; it replaces
-this section the day the project exists.
+calls them by full path.
 
 ---
 

@@ -52,7 +52,7 @@
 
 ### R6. Два варианта приложения: debug — «Debug Krinik Tribit», release — «Krinik Tribit»
 
-1. Сборок своего приложения ровно две: для разработки — `debug` с названием «Debug Krinik Tribit», прод — `release` с
+1. Сборок Krinik Tribit ровно две: для разработки — `debug` с названием «Debug Krinik Tribit», прод — `release` с
    названием «Krinik Tribit».
 2. Подписывай `debug` и `release` разными ключами. Ключи и пароли лежат вне git (`*.jks`, `*.keystore`, `/keys/` уже в
    `.gitignore`); в чат, журналы и коммиты их значения не попадают.
@@ -89,6 +89,7 @@
 | Java в PATH | `C:\Program Files\Microsoft\jdk-21.0.11.10-hotspot` | `which java` |
 | Android build-tools | `C:\Android\Sdk\build-tools\35.0.0`, `36.0.0`; `zipalign` и `apksigner` не в PATH | `ls /c/Android/Sdk/build-tools` |
 | adb | первый в PATH — `C:\adb\adb.exe` 1.0.32 (старый) | `which -a adb`, `adb version` |
+| Пути устройства в Git Bash | Git Bash переписывает `/sdcard/…` в аргументах `adb shell` в путь Windows (`C:/Program Files/Git/sdcard/…`); ставь `export MSYS_NO_PATHCONV=1` перед командами `adb` | проба 2026-10-16 00:02: `adb shell cat /sdcard/kt.xml` → «No such file», с `MSYS_NO_PATHCONV=1` — файл прочитан |
 | Кириллица в Git Bash | heredoc пишет UTF-8 без потерь; Python печатает кириллицу в traceback кракозябрами, пока не задан `PYTHONIOENCODING=utf-8` (вывод портится, файлы целы) | проба 2026-10-15 23:5x: байты heredoc `d091d0bed0bbd0b8…` = «Боли» в UTF-8 |
 
 ## 5. Маршруты, рецепты и соглашения — указатель своей работы

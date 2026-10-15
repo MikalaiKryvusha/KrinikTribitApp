@@ -15,7 +15,7 @@
 | Fork build | their split APK set, patched base + untouched splits, one signing key | what goes on the Titan today |
 | Speaker | a Tribit speaker (StormBox Blast 2 on the stand) | the device both apps control |
 | Speaker protocol | packets `EA <len> <cmd> <data> <checksum>` over RFCOMM (UUID `0CF12D31-…`) or BLE (`0000ffa0`/`ffa1`) | EQ (cmds 4, 11), volume (13), light (12/52), battery (6); EQ gain shifted +12 |
-| Own app (planned) | Kotlin + Compose app «Krinik Tribit» (`MASTER_PLAN.md` phase 1) | talks the speaker protocol directly; no Tribit server |
+| Krinik Tribit | their app + our patches, signed by our key | the product: the owner chose to fix their app (2026-10-16) |
 
 All protocol facts above are read from decompiled code (`researches/03_tribit_app_pains.md`), `[NOT-TESTED]` on a speaker.
 
@@ -23,7 +23,6 @@ All protocol facts above are read from decompiled code (`researches/03_tribit_ap
 
 ```
 original-apk ──decode──▶ work/base ──patches──▶ fork build ──adb──▶ Titan ──BT──▶ Speaker
-decompiled code ──read by agent──▶ speaker protocol notes ──implemented by──▶ own app ──BT──▶ Speaker
 ```
 
 ## Invariants & rules of the model
@@ -34,5 +33,5 @@ decompiled code ──read by agent──▶ speaker protocol notes ──implem
 
 ## Key decisions embedded in the architecture
 
-- Fork first, own app second: the fork fixes the owner's tablet now; the own app fixes what patches cannot
-  (translations come from their server, layout is phone-only) — `researches/03_tribit_app_pains.md` §6, §8.
+- Their app is fixed by patches, not rewritten (the owner, 2026-10-16: «чиним ИХ приложение»). Texts that come from
+  their server are intercepted and replaced by ours; layouts are reworked as resources (researches 04–06).

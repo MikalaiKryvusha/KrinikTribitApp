@@ -265,6 +265,23 @@ def patch_password_symbols():
     print("ok  6 password symbols")
 
 
+# --- Patch 7: the Bluetooth library does not demand location either ------------------------------------
+# Patch 2 lifted location from the permission screens, but the bundled BLE library refuses to scan on its own:
+# BleScanRequest.java:140 fails the scan with GPSDisable when location is off and needCheckGps is set, with no
+# Android-version check; TribitApp.initBle sets it: `.setNeedCheckGps(true)` (TribitApp.java:229). Fix: pass false.
+# The `true` lives in register v3, which is ALSO the 1 of setMaxConnectNum(1) and of the connect retry count -
+# so v3 is not touched: a fresh `const/4 v1, 0x0` right before the call carries the false (v1 is free there:
+# it already held 0 for setStopScanWhenStartConnect two lines above).
+# [NOT-TESTED]
+def patch_ble_no_gps_check():
+    p = smali("com.thousandshores.tribit.TribitApp")
+    replace_in_method(p, ".method public final initBle()V",
+        "    invoke-virtual {v0, v3}, Lcom/bhm/ble/attribute/BleOptions$Builder;->setNeedCheckGps(Z)Lcom/bhm/ble/attribute/BleOptions$Builder;",
+        "    const/4 v1, 0x0\n\n"
+        "    invoke-virtual {v0, v1}, Lcom/bhm/ble/attribute/BleOptions$Builder;->setNeedCheckGps(Z)Lcom/bhm/ble/attribute/BleOptions$Builder;")
+    print("ok  7 BLE library: no location check")
+
+
 if __name__ == "__main__":
     if ROOT is None or not (ROOT / "apktool.yml").exists():
         sys.exit("usage: python -I patches/apply.py <apktool-decoded-dir>")
@@ -274,4 +291,5 @@ if __name__ == "__main__":
     patch_app_name()
     patch_icon()
     patch_password_symbols()
+    patch_ble_no_gps_check()
     print("all patches applied")
