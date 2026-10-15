@@ -8,3 +8,6 @@ diagnostics/
 *.apk
 *.keystore
 *.jks
+keys/
+research/play-reviews-raw.json
+research/play-reviews-negative-raw.txt
