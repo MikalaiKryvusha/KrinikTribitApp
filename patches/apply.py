@@ -282,6 +282,57 @@ def patch_ble_no_gps_check():
     print("ok  7 BLE library: no location check")
 
 
+# --- Patch 11: every screen fits the whole design, portrait and landscape ----------------------------------
+# AndroidAutoSize (me.jessyan.autosize, design 375x667 dp in the manifest meta-data) sets the density of every
+# screen to screenWidthPx / 375 - "base on width". On the Titan that is 4.27 px/dp in portrait, ~600 dp of height
+# for a 667 dp design (the bottoms of 17-20 screens fall off), and 6.83 px/dp in landscape, ~230 dp of height
+# (researches/05 section 1). No own screen implements CustomAdapt/CancelAdapt (0 files), so the global
+# AutoSizeConfig.isBaseOnWidth() decides for all of them. Fix: base on width only when width is the tighter side,
+#   screenW * designH <= screenH * designW   -> width;   otherwise -> height,
+# so the density is min(w/375, h/667) and the whole design fits: Titan portrait 3.84 px/dp (417 x 667 dp),
+# landscape 2.4 px/dp (1067 x 667 dp); a phone taller than 16:9 keeps base-on-width exactly as before.
+# [NOT-TESTED]
+def patch_autosize_fit():
+    p = smali("me.jessyan.autosize.AutoSizeConfig")
+    cfg = "Lme/jessyan/autosize/AutoSizeConfig;"
+    replace_method(p, ".method public isBaseOnWidth()Z", f"""
+.method public isBaseOnWidth()Z
+    .locals 3
+
+    invoke-virtual {{p0}}, {cfg}->getScreenWidth()I
+
+    move-result v0
+
+    invoke-virtual {{p0}}, {cfg}->getDesignHeightInDp()I
+
+    move-result v1
+
+    mul-int/2addr v0, v1
+
+    invoke-virtual {{p0}}, {cfg}->getScreenHeight()I
+
+    move-result v1
+
+    invoke-virtual {{p0}}, {cfg}->getDesignWidthInDp()I
+
+    move-result v2
+
+    mul-int/2addr v1, v2
+
+    if-gt v0, v1, :base_on_height
+
+    const/4 v2, 0x1
+
+    return v2
+
+    :base_on_height
+    const/4 v2, 0x0
+
+    return v2
+.end method""")
+    print("ok 11 AutoSize fits the whole design")
+
+
 if __name__ == "__main__":
     if ROOT is None or not (ROOT / "apktool.yml").exists():
         sys.exit("usage: python -I patches/apply.py <apktool-decoded-dir>")
@@ -292,4 +343,5 @@ if __name__ == "__main__":
     patch_icon()
     patch_password_symbols()
     patch_ble_no_gps_check()
+    patch_autosize_fit()
     print("all patches applied")
