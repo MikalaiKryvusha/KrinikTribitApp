@@ -1,13 +1,3 @@
-<p align="center">
-  <a href="#english"><img src="https://img.shields.io/badge/English-2C7BE5?style=for-the-badge" alt="English"></a>
-  &nbsp;
-  <a href="#russian"><img src="https://img.shields.io/badge/Русский-C0392B?style=for-the-badge" alt="Русский"></a>
-  &nbsp;
-  <a href="#chinese"><img src="https://img.shields.io/badge/中文-E67E22?style=for-the-badge" alt="中文"></a>
-</p>
-
----
-
 <a name="english"></a>
 
 <p align="center">
@@ -15,6 +5,14 @@
 </p>
 
 <h2 align="center">Krinik Tribit</h2>
+
+<p align="center">
+  <a href="#english"><img src="https://img.shields.io/badge/English-2C7BE5?style=for-the-badge" alt="English"></a>
+  &nbsp;
+  <a href="#russian"><img src="https://img.shields.io/badge/Русский-C0392B?style=for-the-badge" alt="Русский"></a>
+  &nbsp;
+  <a href="#chinese"><img src="https://img.shields.io/badge/中文-E67E22?style=for-the-badge" alt="中文"></a>
+</p>
 
 <p align="center"><b>The Tribit speaker app, fixed — made by people, for people</b><br>
 Open source · No crashes · No location · Tablets and big screens · Proper translations</p>
