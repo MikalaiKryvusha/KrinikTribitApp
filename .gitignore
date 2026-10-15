@@ -1,13 +1,38 @@
 # Proprietary Tribit material - local only, never published
-original-apk/
-decompiled/
-work/
-out/
-tools/
-diagnostics/
+/original-apk/
+/decompiled/
+/work/
+/out/
+/tools/apktool.jar
+/tools/jadx/
+/diagnostics/
 *.apk
 *.keystore
 *.jks
-keys/
-research/play-reviews-raw.json
-research/play-reviews-negative-raw.txt
+/keys/
+researches/01_play_reviews/play-reviews-raw.json
+researches/01_play_reviews/play-reviews-negative-raw.txt
+.kaif/install/
+/KAIF.md
+/KAIF-LOADER.mjs
+/KAIF_ADAPTATION_TASK.md
+/KAIF_UPDATE_TASK.md
+/KAIF_UPDATE_TASK.superseded.md
+/KAIF_ADAPTATION_TASK.superseded.md
+.kaif/backup-*/
+.kaif/update-journal.json
+.kaif/heartbeat.log
+.kaif/guarded-loop.json
+.kaif/refresh-marker.json
+.kaif/voice-marker.json
+.kaif/contour-window/
+.kaif/.contour-tmp/
+interviews/decisions/*.lock
+.kaif/update-rehearsal.json
+
+# --- Krinik Tribit: ignore-first ---
+
+# The owner's voice portrait - the PUBLIC snapshot of his voice core (same edition as KARTUN, owner's choice
+# there 2026-10-14 "Публичный слепок"). This repository is public and a portrait may quote the owner's private
+# writing, so the file lives on disk and never ships. Refresh: cp d:\work\ai_sandbox\KAIF\AUTHOR_STYLOMETRY.md .
+AUTHOR_STYLOMETRY.md
