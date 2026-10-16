@@ -52,6 +52,17 @@ Sections: [1 What it fixes](#en-1) · [2 What hurts in the official app](#en-2) 
 9. Firebase is switched off: Krinik Tribit collects no analytics, does not read the advertising ID and receives no push
    messages; Crashlytics report collection is off. The app does not declare the advertising-ID permission.
 
+**Privacy.** Krinik Tribit respects the privacy of personal data and the GDPR. We are against usage tracking through
+Firebase and the Tribit server. The Tribit server must not learn who uses the app, and we are building Krinik Tribit so
+that the Tribit server cannot identify a person.
+
+- Done and checked on a Samsung A51: Firebase is off; the app has no Firebase analytics, no advertising ID and no push
+  messages.
+- In progress: the app will talk to the Tribit server only as an anonymous guest. No data about the person, their phone
+  or tablet will go to the server. A field the server demands will get a random value, new for every request. Of the
+  speaker's data, the server will get only the model of the speaker that asks for firmware and settings. Cloud copies of
+  EQ presets and the support form will be switched off.
+
 <a name="en-2"></a>
 
 ### 2. What hurts in the official app
@@ -184,6 +195,17 @@ Tribit, которые знает официальное приложение, �
 9. Firebase выключен: Krinik Tribit не собирает аналитику, не читает рекламный идентификатор и не получает пуши,
    сбор отчётов Crashlytics выключен. Разрешения на рекламный идентификатор в приложении нет.
 
+**Приватность.** Krinik Tribit уважает приватность личных данных и GDPR. Мы против отслеживания метрик через Firebase
+и сервер Tribit. Сервер Tribit не должен узнать, кто пользуется приложением, и мы делаем так, чтобы сервер Tribit не смог
+установить личность человека.
+
+- Сделано и проверено на Samsung A51: Firebase выключен, аналитики Firebase, рекламного идентификатора и пушей в
+  приложении нет.
+- В работе: приложение будет обращаться к серверу Tribit только анонимным гостем. Данные человека, его телефона или
+  планшета на сервер уходить не будут. Поле, которое сервер требует, будет получать случайное значение, новое при каждом
+  запросе. Из данных о колонке сервер будет получать только модель колонки, которая просит прошивку и настройки.
+  Облачные копии пресетов эквалайзера и форма поддержки будут отключены.
+
 <a name="ru-2"></a>
 
 ### 2. Что болит в официальном приложении
@@ -309,6 +331,11 @@ adb install-multiple out/signed/*.apk
 7. 应用名为「Krinik Tribit」，有自己的粉色图标。
 8. 没有强制更新窗口。该窗口没有关闭按钮，会跳转到 Google Play，并用 Tribit 官方应用覆盖 Krinik Tribit。
 9. Firebase 已关闭：Krinik Tribit 不收集分析数据，不读取广告标识符，也不接收推送；Crashlytics 报告收集已关闭。应用不再申请广告标识符权限。
+
+**隐私。** Krinik Tribit 尊重个人数据隐私和 GDPR。我们反对通过 Firebase 和 Tribit 服务器追踪使用数据。Tribit 服务器不应知道谁在使用本应用，我们正在让 Tribit 服务器无法识别用户身份。
+
+- 已完成并在 Samsung A51 上验证：Firebase 已关闭，应用中没有 Firebase 分析、广告标识符和推送。
+- 进行中：应用将只以匿名访客身份访问 Tribit 服务器。用户本人及其手机或平板的数据将不会发送到服务器。服务器要求的字段将在每次请求时填入新的随机值。关于音箱，服务器只会收到请求固件和设置的音箱型号。均衡器预设的云端副本和反馈表单将被关闭。
 
 <a name="zh-2"></a>
 
