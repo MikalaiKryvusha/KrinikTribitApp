@@ -17,7 +17,9 @@ import java.util.List;
  * Owner 2026-10-16 10:45 +03:00 (interviews/interview_001 Q1 = C): «работаем с сервером трибит анонимным аккаунтом без
  * передачи им данных о пользователе, девайс ид и прочее»; accepted 11:00 +03:00 («ДА, принято»): the guest ID is random
  * 16 hex characters per install; the phone model and Android version are a random real pair from the device base, picked
- * ONCE per install (MASTER_PLAN decision journal); 11:07: Android 15 or 16 only.
+ * ONCE per install (MASTER_PLAN decision journal); 11:07: Android 15 or 16 only. No reset button (interviews/interview_002
+ * Q3 = A, 13:38 «А, без кнопки»): a new guest = reinstall, or Android's «Clear data» of the app (wipes these preferences
+ * and their guest_token) - the user guide in the app's settings says so.
  *
  * Their app builds the guest login (VistitorLogin) from the MAC or ANDROID_ID, Build.MODEL and the real Android version;
  * patch 8 makes the VistitorLogin constructor take these three values from here instead, so the URL and the JSON body
@@ -38,7 +40,7 @@ public final class Anon {
 
     private Anon() {}
 
-    /** The guest ID sent as emailAccount: random per install, kept until reset(). */
+    /** The guest ID sent as emailAccount: random per install, kept until the app's data is cleared or it is reinstalled. */
     public static synchronized String id() {
         SharedPreferences p = prefs();
         String id = p.getString(KEY_ID, null);
@@ -74,11 +76,6 @@ public final class Anon {
             p.edit().putString(KEY_OS, os).apply();
         }
         return os;
-    }
-
-    /** A new anonymous guest: the next id(), model() and os() are picked afresh. For the reset button (next step). */
-    public static synchronized void reset() {
-        prefs().edit().clear().apply();
     }
 
     private static List<String> readModels() {
