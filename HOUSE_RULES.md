@@ -92,6 +92,9 @@
 3. Публичный `KrinikTribitApp` остаётся витриной и местом выпусков APK. Код Tribit в него не попадает: `/native/` стоит в
    его `.gitignore`.
 4. Коммить и пушь `native/` отдельными командами git в его каталоге (`git -C native …`), как в R8.
+5. Debug починенного Tribit ставится как `com.kriniks.tribit.old` («Old Krinik Tribit»); `com.kriniks.tribit.debug` — debug
+   своего приложения из `app/` ([OWNER] 2026-10-16 ≈ 15:53 +03:00, чат: «com.kriniks.tribit.debug - так будет называться НАШЕ
+   приложение, починеное можно переименовать в олд»).
 - **Исключение:** шаг варианта сборки (имя пакета debug, журнал запросов только в debug) остаётся скриптом
   `patches/apply.py --variant`: он отличает debug от release, а дерево `native/` у них общее.
 

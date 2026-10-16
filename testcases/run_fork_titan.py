@@ -2,7 +2,7 @@
 
 Usage (PowerShell, from the repo root; platform-tools first in PATH so ui.py's bare `adb` is the SDK one):
     $env:PATH="C:\\Android\\Sdk\\platform-tools;$env:PATH"; $env:PYTHONUTF8="1"
-    python testcases/run_fork_titan.py <out-dir> [package]   # default com.kriniks.tribit.debug; com.thousandshores.tribit = the original
+    python testcases/run_fork_titan.py <out-dir> [package]   # default com.kriniks.tribit.old; com.thousandshores.tribit = the original
 Walks: splash (T16) -> login (T17) -> registration (T8) -> landscape on login (T10), a screenshot and the on-screen
 labels at every step, the crash buffer at the end. Rotation settings are restored to what they were.
 [NOT-TESTED]
@@ -19,7 +19,7 @@ from ui import Agent  # noqa: E402
 ADB = r"C:\Android\Sdk\platform-tools\adb.exe"
 SERIAL = "192.168.1.3:5555"
 OUT = sys.argv[1]
-PKG = sys.argv[2] if len(sys.argv) > 2 else "com.kriniks.tribit.debug"
+PKG = sys.argv[2] if len(sys.argv) > 2 else "com.kriniks.tribit.old"
 
 
 def adb(*args):

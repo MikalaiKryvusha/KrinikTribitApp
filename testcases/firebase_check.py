@@ -16,7 +16,7 @@ sys.path.append(r"C:\Android\private\ui-agent")
 from ui import Agent  # noqa: E402
 
 ADB = r"C:\Android\Sdk\platform-tools\adb.exe"
-PACKAGE = "com.kriniks.tribit.debug"
+PACKAGE = "com.kriniks.tribit.old"
 TAGS = ("FA", "FA-SVC", "FirebaseCrashlytics", "FirebaseMessaging", "FirebaseSessions", "FirebaseInstallations",
         "FirebaseApp", "FirebaseInAppMessaging")
 AD_PERMS = ("AD_ID", "ACCESS_ADSERVICES", "c2dm.permission.RECEIVE")

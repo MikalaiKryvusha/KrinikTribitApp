@@ -2,7 +2,7 @@
 
 Usage (PowerShell, PYTHONUTF8=1, the UI agent started on the device):
     python testcases/splash_request_check.py <serial> <agent port>
-Clears the data of com.kriniks.tribit.debug (our package only), clears nothing else, starts the app, waits for START,
+Clears the data of com.kriniks.tribit.old (our package only), clears nothing else, starts the app, waits for START,
 then counts in the logcat since the start the EasyHttp lines of the dictionary request
 `api-app/api/lang/getLangInfoBySchemaOrLangKey` (ProductString.smali:92). Old build: > 0. Patch 8a: 0.
 The app talks to its own server by itself (HOUSE_RULES R2: not a request of the agent).
@@ -16,7 +16,7 @@ sys.path.append(r"C:\Android\private\ui-agent")
 from ui import Agent  # noqa: E402
 
 ADB = r"C:\Android\Sdk\platform-tools\adb.exe"
-PACKAGE = "com.kriniks.tribit.debug"
+PACKAGE = "com.kriniks.tribit.old"
 MARK = "getLangInfoBySchemaOrLangKey"
 
 serial, port = sys.argv[1], int(sys.argv[2])

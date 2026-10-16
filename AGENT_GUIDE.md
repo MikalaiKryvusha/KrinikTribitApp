@@ -515,7 +515,7 @@ servers from the agent's tooling (the owner's word 2026-10-15 ≈ 23:3x +03:00 �
 ## Build
 
 ```bash
-bash build.sh debug     # «Debug Krinik Tribit», com.kriniks.tribit.debug, beside the original
+bash build.sh debug     # the patched fallback «Old Krinik Tribit», com.kriniks.tribit.old, beside the original
 bash build.sh           # release «Krinik Tribit», the original package
 ```
 

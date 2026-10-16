@@ -30,9 +30,11 @@
    13+, уже в `app/build.gradle.kts`); «От людей для людей» убран из приложения (слоган только README). Следующее — мета-план
    `plans/04_EPIC_own_app.md` (вектор цели, критерии, фазы: главный путь на Blast 2 → красота → прошивка и модели →
    релиз), закоммитить до кода; затем план первой фазы.
-4. **Решить до первой сборки своего приложения на A51:** debug каркаса и debug запасного пути — один пакет
-   `com.kriniks.tribit.debug` (`app/build.gradle.kts` и `patches/apply.py` `DEBUG_PACKAGE`); на A51 сейчас стоит запасной
-   путь — предложение: пакет запасного пути переименовать.
+4. **Пакеты разведены** (слово владельца ≈ 15:53): `com.kriniks.tribit.debug` — своё приложение, запасной путь —
+   `com.kriniks.tribit.old` «Old Krinik Tribit» (`patches/apply.py` `DEBUG_PACKAGE`, `DEBUG_LABEL`; подпись ждёт
+   подтверждения владельца). **Не проверено:** чат закрыт срочно во время `bash build.sh debug`; первым шагом —
+   собрать, на A51 `adb uninstall com.kriniks.tribit.debug` (это ещё старый запасной путь), поставить
+   `out/KrinikTribit-debug.apk` (теперь `com.kriniks.tribit.old`) и `app/build/outputs/apk/debug/app-debug.apk`, открыть оба.
 
 ## Где мы сейчас
 

@@ -3,7 +3,7 @@ package krinik;
 import android.content.res.Resources;
 
 /**
- * Debug variant only (patches/apply.py variant_debug): the package is renamed to com.kriniks.tribit.debug, but the
+ * Debug variant only (patches/apply.py variant_debug): the package is renamed to com.kriniks.tribit.old, but the
  * resource table keeps the original package name, so Tribit's calls of
  * getResources().getIdentifier(name, type, getPackageName()) (about 26-35 of the 73 getIdentifier calls) found nothing - dialogs showed their designer placeholders
  * (seen on the Titan 2026-10-16 01:06: the notification dialog in Chinese). Every Resources.getIdentifier call of the

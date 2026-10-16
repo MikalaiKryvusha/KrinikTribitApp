@@ -1417,7 +1417,8 @@ def make_dex_room():
     print(f"ok  dex room: {n} classes of {DEX_MOVE[2]} moved {DEX_MOVE[0]} -> {DEX_MOVE[1]}")
 
 
-# --- Variant: debug — «Debug Krinik Tribit», its own package beside the original ---------------------------
+# --- Variant: debug — «Old Krinik Tribit», its own package beside the original -----------------------------
+# Package com.kriniks.tribit.old - the owner, 2026-10-16 ≈ 15:53 +03:00: «com.kriniks.tribit.debug - так будет называться НАШЕ приложение, починеное можно переименовать в олд».
 # Owner's rule R6 (HOUSE_RULES.md): two builds, debug named «Debug Krinik Tribit», release «Krinik Tribit», different
 # signing keys. The debug build gets its own package so it installs next to the owner's original Tribit and the agent
 # tests on the Titan without removing it. apktool's renameManifestPackage renames the manifest package (component
@@ -1426,7 +1427,8 @@ def make_dex_room():
 # getPackageName() (no smali string holds "com.thousandshores.tribit.<suffix>", checked 2026-10-16), so the renamed
 # authorities match. Runs AFTER patch 4 (app name).
 # [NOT-TESTED]
-DEBUG_PACKAGE = "com.kriniks.tribit.debug"
+DEBUG_PACKAGE = "com.kriniks.tribit.old"
+DEBUG_LABEL = "Old Krinik Tribit"
 ORIGINAL_PACKAGE = "com.thousandshores.tribit"
 
 
@@ -1469,8 +1471,8 @@ def variant_debug():
     old = '<string name="app_name">Krinik Tribit</string>'
     if t.count(old) != 1:
         sys.exit("FAIL: app_name after patch 4")
-    s.write_text(t.replace(old, '<string name="app_name">Debug Krinik Tribit</string>'), encoding="utf-8")
-    print(f"ok  debug variant: {DEBUG_PACKAGE}, Debug Krinik Tribit, {n} getIdentifier calls via krinik.Res")
+    s.write_text(t.replace(old, f'<string name="app_name">{DEBUG_LABEL}</string>'), encoding="utf-8")
+    print(f"ok  debug variant: {DEBUG_PACKAGE}, {DEBUG_LABEL}, {n} getIdentifier calls via krinik.Res")
 
 
 if __name__ == "__main__":

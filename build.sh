@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Krinik Tribit - build ONE patched universal APK from the official split APKs.
 #   bash build.sh            -> release: «Krinik Tribit», package com.thousandshores.tribit (replaces the original)
-#   bash build.sh debug      -> debug:   «Debug Krinik Tribit», package com.kriniks.tribit.debug (installs beside it)
+#   bash build.sh debug      -> debug:   «Old Krinik Tribit», package com.kriniks.tribit.old (installs beside it;
+#                                        com.kriniks.tribit.debug belongs to our own app in app/)
 # Steps:
 #   1. original-apk/ holds the split APKs pulled from a device (adb shell pm path com.thousandshores.tribit).
 #   2. APKEditor merges the splits into one universal APK (work/merged.apk) - a split set cannot change its package,

@@ -2,7 +2,7 @@
 
 Usage (PowerShell, SDK first in PATH for ui.py, PYTHONUTF8=1, the UI agent already started on the device):
     python testcases/splash_timing.py <serial> <agent port> <runs>
-Clears the data of com.kriniks.tribit.debug (our package only, HOUSE_RULES R1/R7), starts it, waits for "START"
+Clears the data of com.kriniks.tribit.old (our package only, HOUSE_RULES R1/R7), starts it, waits for "START"
 through the UI agent and prints one line per run plus the median. Run it on the old build (control) and on the new one.
 [NOT-TESTED]
 """
@@ -15,7 +15,7 @@ sys.path.append(r"C:\Android\private\ui-agent")
 from ui import Agent  # noqa: E402
 
 ADB = r"C:\Android\Sdk\platform-tools\adb.exe"
-PACKAGE = "com.kriniks.tribit.debug"
+PACKAGE = "com.kriniks.tribit.old"
 WAIT_MS = 90000  # their dictionary wait can reach ~80 s (researches/06 Z1)
 
 serial, port, runs = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
