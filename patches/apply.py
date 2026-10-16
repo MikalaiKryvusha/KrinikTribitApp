@@ -550,87 +550,47 @@ def patch_splash_no_dictionary_wait():
     print("ok  8a splash: no wait for the server dictionary (FirstActivity, FirstNewActivity)")
 
 
-# --- Patch 8: no account - the app opens on the main screen ------------------------------------------------
-# Owner 2026-10-16 ≈ 09:16 +03:00: «аккаунт не нужен» · «выпиливаем НАХУЙ аккаунты» (MASTER_PLAN decision journal).
-# Play complaints 11 «why an account» (77) and 17 «needs their server» (63). The splash sends a user without a token to
-# autoLogin (a guest account made on their server from the MAC / ANDROID_ID, no network - no entry), and START opens
-# LoginNewActivity (researches/06 З2, З3). Fix: checkToken always ends in ViewModelFirst.startMainActivity (a stored
-# token still goes into the Authorization header, as before); START marks the agreement and calls checkToken instead
-# of opening the login screen. Requests without a token are answered «Full authentication» - patch 9 keeps the user.
-# [TESTED: 2026-10-16 · A51: START -> main screen without login - BUT the speaker page never opens: their gateway answers
-# «Full authentication» to the device catalog without a token (Found 0 of testcases/reports/2026-10-16_wave1.md). NOT applied.]
-CHECK_TOKEN = """
-.method private final checkToken()V
-    .locals 4
-
-    invoke-static {}, Lcom/thousandshores/tribit/database/datamanager/AccountTokenManager;->getInstance()Lcom/thousandshores/tribit/database/datamanager/AccountTokenManager;
-
-    move-result-object v0
-
-    invoke-virtual {v0}, Lcom/thousandshores/tribit/database/datamanager/AccountTokenManager;->getAccountToken()Lcom/thousandshores/tribit/database/entity/TokenInfo;
-
-    move-result-object v0
-
-    if-eqz v0, :krinik_main
-
-    invoke-virtual {v0}, Lcom/thousandshores/tribit/database/entity/TokenInfo;->getAccess_token()Ljava/lang/String;
-
-    move-result-object v1
-
-    invoke-static {v1}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
-
-    move-result v2
-
-    if-nez v2, :krinik_main
-
-    invoke-static {}, Lcom/hjq/http/EasyConfig;->getInstance()Lcom/hjq/http/EasyConfig;
-
-    move-result-object v0
-
-    new-instance v2, Ljava/lang/StringBuilder;
-
-    invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
-
-    const-string v3, "Bearer "
-
-    invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-
-    invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-
-    move-result-object v1
-
-    const-string v2, "Authorization"
-
-    invoke-virtual {v0, v2, v1}, Lcom/hjq/http/EasyConfig;->addHeader(Ljava/lang/String;Ljava/lang/String;)Lcom/hjq/http/EasyConfig;
-
-    :krinik_main
-    iget-object v0, p0, Lcom/thousandshores/tribit/modulelogin/activity/FirstNewActivity;->mViewModel:Lcom/thousandshores/tribit/modulelogin/viewmodel/ViewModelFirst;
-
-    if-nez v0, :krinik_vm
-
-    const-string v0, "mViewModel"
-
-    invoke-static {v0}, Lkotlin/jvm/internal/Intrinsics;->throwUninitializedPropertyAccessException(Ljava/lang/String;)V
-
-    return-void
-
-    :krinik_vm
-    invoke-virtual {v0}, Lcom/thousandshores/tribit/modulelogin/viewmodel/ViewModelFirst;->startMainActivity()V
-
-    return-void
-.end method
-"""
+# --- Patch 8: no account - an anonymous guest that carries nothing of the person or the phone --------------------
+# Owner 2026-10-16 ≈ 09:16 +03:00: «аккаунт не нужен» · «выпиливаем НАХУЙ аккаунты»; 10:45 (interviews/interview_001 Q1 = C):
+# «работаем с сервером трибит анонимным аккаунтом без передачи им данных о пользователе, девайс ид и прочее»; 11:00 «ДА,
+# принято» - guest ID random per install, model + Android a random real pair picked once per install (MASTER_PLAN journal).
+# Play complaints 11 «why an account» (77) and 17 «needs their server» (63). Their gateway answers «Full authentication»
+# to the speaker catalog without a token (testcases/reports/2026-10-16_wave1.md, Found 0), so the guest login stays - the
+# splash already logs a user without a token in as a guest (FirstNewActivity.checkToken -> autoLogin -> loginGuest), only
+# START opens LoginNewActivity (researches/06 З2, З3). Fix, three parts:
+#  1. START marks the agreement and calls the splash's checkToken (the guest path) instead of the login screen;
+#  2. the VistitorLogin constructor - the one class all four loginGuest sites build - takes emailAccount, logMobModel and
+#     operSystem from krinik.Anon instead of MAC/ANDROID_ID, Build.MODEL and the real Android version; EasyHttp builds both
+#     the URL and the JSON body from these fields (seen in diagnostics/2026-10-16_a51_easyhttp_visitor.log);
+#  3. FireUpgrade sends their original packageName (owner 11:00), so the debug package name never leaves the phone.
+# Everything else of the account (profile, device list sync, statistics) is cut by krinik.Gate (patch 20).
+# [TESTED: 2026-10-16 · A51 clean install: START -> guest -> main -> speaker page -> EQ, no login screen, no crash;
+# packageName com.thousandshores.tribit in checkFirmwareUpgrade; anon_check.py 0 real values · testcases/reports/2026-10-16_patch8_anon.md]
+ANON_FIELDS = [  # (constructor parameter register, field, krinik.Anon method)
+    ("p1", "emailAccount", "id"),
+    ("p3", "logMobModel", "model"),
+    ("p6", "operSystem", "os"),
+]
 
 
 def patch_no_account():
     p = smali("com.thousandshores.tribit.modulelogin.activity.FirstNewActivity")
-    replace_method(p, ".method private final checkToken()V", CHECK_TOKEN)
     # START: the button's context is the splash activity; call its checkToken. Any other context keeps the old path.
     h = ".method private static final onCreate$lambda$1(Landroid/view/View;)V"
     replace_method(p, h, h + START_HANDLER)
-    print("ok  8 no account: splash and START open the main screen")
+
+    v = smali("com.thousandshores.tribit.http.model.VistitorLogin")
+    ctor = ".method public constructor <init>(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V"
+    for reg, field, method in ANON_FIELDS:
+        put = f"    iput-object {reg}, p0, Lcom/thousandshores/tribit/http/model/VistitorLogin;->{field}:Ljava/lang/String;\n"
+        replace_in_method(v, ctor, put,
+            f"    invoke-static {{}}, Lkrinik/Anon;->{method}()Ljava/lang/String;\n\n    move-result-object {reg}\n\n" + put)
+
+    f = smali("com.thousandshores.tribit.http.model.FireUpgrade")
+    put = "    iput-object p3, p0, Lcom/thousandshores/tribit/http/model/FireUpgrade;->packageName:Ljava/lang/String;\n"
+    replace_in_method(f, ".method public constructor <init>(IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+        put, f'    const-string p3, "{ORIGINAL_PACKAGE}"\n\n' + put)
+    print("ok  8 no account: START -> anonymous guest; guest login and firmware check carry krinik.Anon values only")
 
 
 START_HANDLER = """
@@ -741,7 +701,10 @@ def patch_no_forced_update():
 # silent log upload). Fixed by form, in ONE place: an OkHttp interceptor in the app's only client (TribitApp, EasyConfig)
 # fails these requests on the phone with an IOException - EasyHttp's onHttpFail path, which the app already handles;
 # presets stay in the local database. Every cut is logged under the tag KrinikNoCloud (observable on the device).
-# [NOT-TESTED]
+# [NOT-TESTED] the cut itself (A51: only the user path without crashes - testcases/reports/2026-10-16_wave1.md)
+# Widened 2026-10-16 with patch 8 (owner 10:45 «только сообщаем, какая колонка просит прошивку и настроек»): the decision
+# moved into krinik.Gate (patches/java) - an ALLOW list of their API paths; the three paths above are cut by it as well.
+# [TESTED: 2026-10-16 · A51: the profile request cut on the phone, allowed paths passed · testcases/reports/2026-10-16_patch8_anon.md]
 NO_CLOUD_SMALI = """
 .class public final Lkrinik/NoCloud;
 .super Ljava/lang/Object;
@@ -762,32 +725,9 @@ NO_CLOUD_SMALI = """
 .method private static cut(Ljava/lang/String;)Z
     .locals 1
 
-    const-string v0, "/equalizer/"
-
-    invoke-virtual {p0, v0}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+    invoke-static {p0}, Lkrinik/Gate;->cut(Ljava/lang/String;)Z
 
     move-result v0
-
-    if-nez v0, :yes
-
-    const-string v0, "/persound/"
-
-    invoke-virtual {p0, v0}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
-
-    move-result v0
-
-    if-nez v0, :yes
-
-    const-string v0, "/userFeedback/"
-
-    invoke-virtual {p0, v0}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
-
-    move-result v0
-
-    return v0
-
-    :yes
-    const/4 v0, 0x1
 
     return v0
 .end method
@@ -915,11 +855,26 @@ def _drop_line(text, line, what):
     return text.replace(full, "")
 
 
+# --- Patch 23: no error letters by e-mail ----------------------------------------------------------------------
+# Found 2026-10-16 while closing patch 8: EqExceptionMonitor.handleException (an EQ error) calls sendExceptionEmail, which
+# mails the phone's MANUFACTURER + MODEL, the Android version, the saved e-mail and the latest log file over SMTP
+# (smtp.163.com:465) - outside OkHttp, so krinik.Gate never sees it. Owner 2026-10-16 10:52 +03:00: «мы ПРОТИВ
+# отслеживания метрик через Фаербейз и сервер Трибит»; 09:21 the error-log upload went with the support form (patch 20).
+# Fix: sendExceptionEmail returns at once; the local copy (saveExceptionToLocal) stays on the phone.
+# TWINS: searched `mail.smtp` in their code (decompiled/) - 1 site, this one.
+# [NOT-TESTED]
+def patch_no_error_mail():
+    p = smali("com.thousandshores.tribit.utils.audio.EqExceptionMonitor")
+    h = ".method public final sendExceptionEmail(Lcom/thousandshores/tribit/utils/audio/EqExceptionMonitor$ExceptionInfo;)V"
+    replace_method(p, h, h + "\n" + EMPTY_VOID)
+    print("ok 23 no error mail: EqExceptionMonitor.sendExceptionEmail returns at once")
+
+
 # --- Patch 22: the device base inside the APK ------------------------------------------------------------------
 # Owner 2026-10-16 ≈ 11:00 +03:00: «скачай БД из ГУГЛ телефонов, кладемм внутрь АПК» · «но чтобы не больше 1 мб файл весил»
 # (MASTER_PLAN decision journal). patches/assets/krinik_devices.txt (`Brand|Model` per line, built by
 # tools/devices/make_device_base.py from Google Play's supported-devices list) goes to assets/krinik/devices.txt; the
-# request rewriting that picks a random device from it once per install is the next step (plans/01 §5).
+# request rewriting that picks a random device from it once per install is krinik.Anon (patch 8).
 # [TESTED: 2026-10-16 · build: assets/krinik/devices.txt in the APK, byte-equal to the source (cmp); A51 launch to MainNewActivity, no crash]
 DEVICE_BASE = pathlib.Path(__file__).resolve().parent / "assets" / "krinik_devices.txt"
 DEVICE_BASE_MAX = 1_000_000
@@ -933,6 +888,26 @@ def patch_device_base():
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(data)
     print(f"ok 22 device base: {data.count(b'\n')} devices, {len(data)} bytes -> assets/krinik/devices.txt")
+
+
+# --- Dex room: classes5 is full ---------------------------------------------------------------------------------
+# Their classes5.dex sits at the 65 536 method-reference limit of one dex: the four new calls of patch 8/20 (krinik.Anon,
+# krinik.Gate) made apktool fail with «Unsigned short value out of range: 65536» (2026-10-16 11:37). Android loads every
+# classesN.dex of the APK (multidex), so a class may live in any of them. Fix: kotlin-reflect (self-contained, ~thousands
+# of methods) moves from smali_classes5 to a new smali_classes6 - room for our patches for a long time.
+# [TESTED: 2026-10-16 · build 11:40 passed, our code as classes7.dex; the app ran its whole path on the A51 · testcases/reports/2026-10-16_patch8_anon.md]
+DEX_MOVE = ("smali_classes5", "smali_classes6", "kotlin/reflect")
+
+
+def make_dex_room():
+    src = ROOT / DEX_MOVE[0] / DEX_MOVE[2]
+    dst = ROOT / DEX_MOVE[1] / DEX_MOVE[2]
+    if not src.is_dir() or (ROOT / DEX_MOVE[1]).exists():
+        sys.exit(f"FAIL: dex room - {src} missing or {DEX_MOVE[1]} already exists")
+    dst.parent.mkdir(parents=True)
+    src.rename(dst)
+    n = sum(1 for _ in dst.rglob("*.smali"))
+    print(f"ok  dex room: {n} classes of {DEX_MOVE[2]} moved {DEX_MOVE[0]} -> {DEX_MOVE[1]}")
 
 
 # --- Variant: debug — «Debug Krinik Tribit», its own package beside the original ---------------------------
@@ -1009,13 +984,15 @@ if __name__ == "__main__":
     # of a fresh install turned English - their Russian texts come only from that dictionary. It waits for our values-ru
     # (wave 2, plans/01 §3); a failed request already goes on (onHttpFail sets 1), only a slow server holds the logo.
     # patch_splash_no_dictionary_wait()
-    # patch_no_account()  # breaks the speaker page without a token - see its marker; needs a local catalog first
+    patch_no_account()
     patch_no_account_ui()
     patch_no_relogin()
     patch_no_forced_update()
     patch_firebase_off()
     patch_no_cloud()
+    patch_no_error_mail()
     patch_device_base()
+    make_dex_room()
     if "--debug" in sys.argv[2:]:
         variant_debug()
     print("all patches applied")
