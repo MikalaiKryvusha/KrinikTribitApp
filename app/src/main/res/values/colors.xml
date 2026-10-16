@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="krinik_bg">#FF0D0D0D</color>
+    <!-- Launcher icon background: Krinik's pink (owner's rule R3, design/icon.svg). -->
+    <color name="krinik_icon_bg">#FFFF1A8C</color>
+</resources>

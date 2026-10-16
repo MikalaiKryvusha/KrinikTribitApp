@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Русские строки; английский оригинал — values/strings.xml. -->
+<resources>
+    <string name="back">Назад</string>
+    <string name="settings">Настройки</string>
+
+    <string name="home_no_speaker">Колонка не подключена</string>
+    <string name="home_no_speaker_hint">Включите колонку Tribit и держите её рядом. Krinik Tribit находит её по Bluetooth при выключенной геолокации.</string>
+    <string name="home_find_soon">Поиск колонки появится в следующей сборке</string>
+    <string name="home_promise_title">От людей для людей</string>
+    <string name="home_promise">Без геолокации, без аккаунта, без сервера Tribit. Громкость, эквалайзер и заряд на экране любого размера.</string>
+
+    <string name="about">О приложении</string>
+    <string name="about_sub">Версия, автор, исходный код</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_text">Приложение с открытым кодом для Bluetooth-колонок Tribit.</string>
+    <string name="about_author">Автор: Николай Кривуша (Krinik)</string>
+    <string name="about_repo">Исходный код на GitHub</string>
+    <string name="about_author_github">Автор на GitHub</string>
+    <string name="about_legal">Krinik Tribit не связан с Tribit и Thousandshores. Tribit — их товарный знак.</string>
+
+    <string name="debug">Отладка</string>
+    <string name="debug_sub">Сборка, устройство и экран</string>
+</resources>
