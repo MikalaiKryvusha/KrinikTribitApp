@@ -109,6 +109,57 @@ charge → battery with 100/100/50 ms gaps (`J/bluetoothlib/BtClient$deviceInfo$
 `EqUtil.getEqPre`). Server only: firmware and DSP update check (`api-app/api/checkFirmwareUpgrade`), the firmware file, the
 product catalog and pictures, device bind/sync (where their «rename» goes), FAQ, cloud EQ.
 
+**3.6 EQ, light, notifications, settings, pacing — the Blast 2 path** (delegated code recon 2026-10-16 ≈ 16:40, read-only;
+J, S, B as above; V = quoted line read, I = inferred). Our speaker: DSP 88 = 98 → 10098, firmware «11.4» — «new» and «new EQ».
+
+*Firmware flags* (`Bts56ControlActivity.java:519–529`, V): unsolicited 88 payload[0] → `dsp = v + 10000` (47 ignored);
+«new» = name «Tribit StormBox Blast 2» and (dsp > 10074 or BTS56C); «new EQ» = dsp > 10095; BTS56C = reply 101 payload[0] == 1.
+
+*Preset* (`Eq56SettingActivity.sendEqData` J:2505–2559, smali agrees, V): cmd 4 [id, 10 gains] (`eqSetNew`, B:104–118),
+gains are wire values, dB = wire − 12; Default via `eqDefault()` → `eqSetNew(1, MusicGainsN)` on new firmware, `eqSet(1)` =
+`EA 05 04 01 F4` on old. Gains from `J/tribit/constant/Bts56Constant.java`:
+
+| id | name | gains sent («new») |
+|---|---|---|
+| 1 | TRIBIT Signature (Default) | 12×10 (:65); old firmware MusicGainsO (:64) |
+| 2 | XBass | 18,24,16,12,12,12,12,12,12,12 (:56); not «new EQ» → XBassGainsO (:55) |
+| 3 | Audiobook | 4,8,12,18,12,22,14,4,8,0 (:68) |
+| 4 | Classical («X-3D») | 12×10 (:74) |
+| 5 | Rock | 22,18,8,4,6,18,24,20,14,12 (:71) |
+| 6 | Jazz | 8,18,20,12,14,16,12,20,22,18 (:77) |
+| 8 | Blast traditional | 6,8,18,12,8,20,22,18,20,16 (:60) — READ back as 9 by `PageUtil.bts56Eq` (J:280–329): check on the speaker |
+| 10 | Live | 12×10 |
+| 11 | Podcast | 12×10 |
+
+*Custom EQ* (V): cmd 11 with exactly 10 gain bytes, no id (`customEqSet1`, B:138–141; `customEqSet` is broken — builds an
+id array and sends raw gains); wire = dB + 12 («new» or BTS56C) else dB + 8 (`EqUtil.java:3240–3243`, smali :11756/:11769);
+slider ±12 / ±8 (smali `Eq56DetailActivity` .line 131–135 — jadx swaps it); bands low → high 40, 62, 125, 250, 500, 1K, 2K,
+4K, 8K, 16K (`Bts56Constant.java:45`). Flat custom on new firmware: `EA 0E 0B 0C×10 7B` (I).
+
+*EQ state* — reply 21 and unsolicited 82: [id, 10 gains]; for id 7 gains decode wire − 12 / − 8 (`ViewModelDeviceBts.java:776–780,1112`, V).
+
+*EQ button* (cmds 71/72, the «XBass Button» screen — which EQs the speaker's physical button cycles, up to 3): set 71
+[count, slot, type, 10 gains], one packet per slot; type: custom 0xFE, Default 0, Blast traditional 6, others types − 3 (I);
+get 72 → one 17-byte packet per slot (V).
+
+*Light* (V unless marked): 12 [1/2/3 mode, 4 off] (main-screen toggle sends the saved mode or 4); 20 get / 85 unsolicited
+[mode], 4 = off — **our 85 [4] = the light is off**; 54/55/56 [mode, R, G, B] bar / mid horn / side horn; 57/58/59 [mode,
+0–100] brightness; 53 [mode, zone 1/2/3, rhythm 1 low / 2 high / 3 both / 4 stay]; 62 [mode, 0 custom / 1 rotate / 2
+rainbow] bar colour mode; 68/69 [mode, 0 custom / 1 rotate] horns; 73 [mode] reset (reply 1 = OK). Reads: 61 = 3 × [mode,
+R, G, B, brightness]; 60, 63, 67, 70 — layouts in the recon (`LightCustom56Activity.java:2191–2374`).
+
+*Unsolicited* (smali `ViewModelDeviceBts.smali:1922–1926` packed-switch 0x52 — jadx drops it, V): 82 EQ state, 83 play
+state, 84 volume, 85 light mode — the same handlers as 21/19/18/20; 88 DSP version; 80 battery (as 6); 96 partner battery;
+89 DSP OTA ready.
+
+*Settings* (`Bts56InfoActivity`, V): auto shutdown 3 [1 on / 2 off], reply 16 — 0 means ON; sleep timer always the «new»
+form: 14 [hour, minute], off = [255, 255], reply 15 «h,m»; voice prompts 48 [5 × 1/0: power on/off, Bluetooth pairing, low
+battery, max volume, TWS pairing], reply 49 «a,b,c,d,e»; volume indicator 52 [1/0], get 51; mic boost 97 [1/0], get 98 and
+anti-howl 99 [1/0], get 100 — shown only on «new».
+
+*Pacing* (V): their app never waits for an echo (`BlueFlowIO.send` writes at once); query bursts with 100–150 ms gaps
+(main: 18, 19, 21, 20); sliders send on release only (volume, EQ bands, brightness); clicks debounced 100 ms.
+
 ## 4. Industry
 
 Collected by a delegated web sweep 2026-10-16; the four lines marked ✔ were re-read on developer.android.com by me.
