@@ -49,6 +49,14 @@ class SpeakerFramesTest {
         assertEquals(listOf(10, 6, -4, -8, -6, 6, 12, 8, 2, 0), rock.db)
     }
 
+    @Test fun `custom eq with 1K at +6 dB`() {
+        // plans/06 criterion 2, A51 17:22:15: the speaker's state after our cmd 11 with band 6 = 18 (wire = dB + 12)
+        val s = Eq.state(Framer().feed(hex("EA 0F 15 07 0C 0C 0C 0C 0C 12 0C 0C 0C 0C 93")).single(), true)!!
+        assertTrue(s.custom)
+        assertEquals(listOf(0, 0, 0, 0, 0, 6, 0, 0, 0, 0), s.db)
+        assertEquals("EA 0E 0B 0C 0C 0C 0C 0C 12 0C 0C 0C 0C 81", Eq.setCustom(s.db!!, true).hex())
+    }
+
     @Test fun `light on - echo, notice and state in one read`() {
         // A51 16:53:18 after «1»: three packets in one read.
         val frames = Framer().feed(hex("EA 05 0C 01 FC EA 05 55 01 45 EA 05 14 01 04"))
