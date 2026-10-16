@@ -24,9 +24,15 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/shared_files" />
         </provider>
+        <!-- FORK: options <configChanges | recreate and reconnect | lock portrait> · price of error: a recreated activity
+             runs onStop/onStart, the speaker's channel closes and reopens on every turn of the phone (the full-screen EQ
+             editor turns to landscape - owner 2026-10-16 ≈ 19:30) · consulted developer.android.com «Handle configuration
+             changes» (Compose: opt out with these four values; ViewModel and rememberSaveable still keep the state; do not
+             lock the orientation). -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:configChanges="screenSize|smallestScreenSize|orientation|screenLayout"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

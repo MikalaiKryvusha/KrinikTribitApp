@@ -55,9 +55,9 @@
     <string name="file_save">Сохранить в файл</string>
     <string name="file_open">Открыть файл</string>
     <string name="file_share">Поделиться файлом</string>
-    <string name="file_saved">Файл настроек сохранён.</string>
-    <string name="file_not_saved">Файл настроек не сохранён. Нажмите «Сохранить в файл» и выберите другую папку.</string>
-    <string name="file_applied">Файл настроек прочитан. Krinik Tribit отправит на колонку эквалайзер и подсветку из файла, когда подключится к колонке.</string>
+    <string name="file_saved">Файл эквалайзера сохранён.</string>
+    <string name="file_not_saved">Файл эквалайзера не сохранён. Нажмите «Сохранить в файл» и выберите другую папку.</string>
+    <string name="file_applied">Файл прочитан. Krinik Tribit поставит на колонку эквалайзер из файла (и подсветку, если она есть в файле), когда подключится к колонке.</string>
     <string name="file_not_profile">Выбранный файл — не файл настроек Krinik Tribit. Выберите файл, сохранённый кнопкой «Сохранить в файл».</string>
     <string name="file_other_model">Выбранный файл хранит настройки другой модели колонки. Krinik Tribit открывает файлы настроек Tribit StormBox Blast 2.</string>
     <string name="file_broken">Файл настроек повреждён: в нём есть значения, которые колонка не принимает. Выберите другой файл.</string>
@@ -81,4 +81,30 @@
 
     <string name="debug">Отладка</string>
     <string name="debug_sub">Билд, устройство и экран</string>
+    <!-- Phase 3 screens (plans/07, mock-ups A + A, interviews/interview_003). -->
+    <string name="home_connected">Подключена</string>
+    <string name="speaker_settings_sub">Автоматическое выключение, индикатор громкости, таймер сна, голосовые подсказки, микрофон</string>
+    <string name="track_previous">Предыдущий трек</string>
+    <string name="track_next">Следующий трек</string>
+    <string name="battery_percent">%1$d %%</string>
+    <string name="eq_now">Сейчас на колонке</string>
+    <string name="eq_edit_hint">Передвиньте точку полосы и отпустите её. Колонка поставит полосу так, как она показана на графике.</string>
+    <string name="eq_edit_hint_named">Передвиньте точку полосы и отпустите её. Колонка поставит полосу так, как она показана на графике, и эквалайзер «%1$s» сохранит новое положение полосы.</string>
+    <string name="eq_rotate_hint">Поверните телефон горизонтально: имя и кнопки встанут слева, график займёт остальную ширину экрана.</string>
+    <string name="eq_full_screen">Полный экран</string>
+    <string name="eq_exit_full_screen">Выйти из полного экрана</string>
+    <string name="eq_new">Новый эквалайзер</string>
+    <string name="eq_new_hint">Введите имя эквалайзера и нажмите «Создать». Колонка переключится на новый эквалайзер: все десять полос стоят на 0 дБ.</string>
+    <string name="eq_name_field">Имя эквалайзера</string>
+    <string name="eq_name_counter">%1$d / %2$d</string>
+    <string name="eq_create">Создать</string>
+    <string name="eq_rename">Переименовать</string>
+    <string name="eq_rename_title">Имя эквалайзера</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="eq_import">Импорт</string>
+    <string name="eq_export">Экспорт</string>
+    <string name="eq_export_title">Экспорт эквалайзера</string>
+    <string name="eq_export_hint">Файл хранит эквалайзер, который сейчас стоит на колонке. Кнопка «Импорт» в Krinik Tribit открывает этот файл и ставит эквалайзер из него на колонку.</string>
+    <string name="light_mode">Режим %1$d</string>
 </resources>

@@ -31,6 +31,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.kriniks.tribit.BuildConfig
 import com.kriniks.tribit.R
@@ -50,25 +53,49 @@ private val MAX_CONTENT_WIDTH = 640.dp
  * [NOT-TESTED]
  */
 @Composable
-fun Page(title: String, onBack: (() -> Unit)? = null, content: @Composable ColumnScope.() -> Unit) {
+fun Page(
+    title: String, onBack: (() -> Unit)? = null, logo: Boolean = false, trailing: (@Composable () -> Unit)? = null,
+    bottom: (@Composable () -> Unit)? = null, content: @Composable ColumnScope.() -> Unit,
+) {
     Box(
         Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).systemBarsPadding(),
         contentAlignment = Alignment.TopCenter,
     ) { CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onBackground) {
-        Column(
-            Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (onBack != null) {
-                    TextButton(onClick = onBack) { Text(stringResource(R.string.back), color = MaterialTheme.colorScheme.primary) }
+        Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth()) {
+            Column(
+                Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                // The head of every screen (.top): a round back button and the title, or the logo with a pink K; the
+                // screen's own button on the right - the gear on the home screen (the owner ≈ 19:31: «кнопку настроен
+                // вверху справа на главном экране не забудь добавить»).
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (onBack != null) RoundIconButton(R.drawable.ic_back, stringResource(R.string.back), onBack)
+                    if (logo) Logo(title, Modifier.weight(1f))
+                    else Text(title, Modifier.weight(1f), style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground)
+                    trailing?.invoke()
                 }
-                Text(title, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+                content()
             }
-            content()
+            // A row pinned under the scrolling content (.pinned): «Импорт» / «Экспорт» of the EQ screen.
+            if (bottom != null) Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp)) { bottom() }
         }
     } }
+}
+
+/** «Krinik Tribit» with the pink K (.logo) - KARTUN's logo with its pink first letter. */
+@Composable
+private fun Logo(text: String, modifier: Modifier = Modifier) {
+    val pink = MaterialTheme.colorScheme.primary
+    Text(
+        buildAnnotatedString {
+            withStyle(SpanStyle(color = pink)) { append(text.take(1)) }
+            append(text.drop(1))
+        },
+        modifier, style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.onBackground,
+    )
 }
 
 /**
@@ -136,16 +163,15 @@ fun <T> Choices(options: List<Pair<T, String>>, selected: T?, enabled: Boolean, 
 }
 
 /**
- * Home: the speaker card (`SpeakerCard.kt`) and Settings. The promise card «Без геолокации, без аккаунта…» is gone - the
- * owner, 2026-10-16 ≈ 16:12 +03:00, on «Геолокация не нужна.»: «НАХУЙ ТАКОЕ ПИСАТЬ?»; app texts follow his portrait
- * (HOUSE_RULES.md R10). [NOT-TESTED]
+ * Home, mock-up A-home: the logo, the gear to the app's settings, the speaker part (`SpeakerCard.kt`). App texts follow
+ * the owner's portrait (HOUSE_RULES.md R10). [NOT-TESTED]
  */
 @Composable
 fun HomeScreen(link: Link, speaker: SpeakerState, act: SpeakerActions, onSettings: () -> Unit) {
-    Page(stringResource(R.string.app_title)) {
-        SpeakerCard(link, speaker, act)
-        SettingsRow(stringResource(R.string.settings), onClick = onSettings)
-    }
+    Page(
+        stringResource(R.string.app_title), logo = true,
+        trailing = { RoundIconButton(R.drawable.ic_gear, stringResource(R.string.settings), onSettings) },
+    ) { SpeakerHome(link, speaker, act) }
 }
 
 /** Settings: «О приложении» for everyone, «Отладка» in the debug build only (owner's rule R6). [NOT-TESTED] */

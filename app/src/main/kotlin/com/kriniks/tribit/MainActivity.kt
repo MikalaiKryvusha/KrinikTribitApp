@@ -28,6 +28,8 @@ import androidx.compose.runtime.setValue
 import com.kriniks.tribit.link.Link
 import com.kriniks.tribit.link.SpeakerViewModel
 import com.kriniks.tribit.ui.AboutScreen
+import com.kriniks.tribit.ui.EqActions
+import com.kriniks.tribit.ui.EqFullScreen
 import com.kriniks.tribit.ui.EqScreen
 import com.kriniks.tribit.ui.HomeScreen
 import com.kriniks.tribit.ui.SettingsActions
@@ -38,10 +40,10 @@ import com.kriniks.tribit.ui.theme.KrinikTheme
 
 /** The screens of the app; the back stack is this enum's parent chain (Home ← Settings ← About / Debug). */
 enum class Screen(val parent: Screen?) {
-    HOME(null), EQ(HOME), SPEAKER_SETTINGS(HOME), SETTINGS(HOME), ABOUT(SETTINGS), DEBUG(SETTINGS);
+    HOME(null), EQ(HOME), EQ_FULL(EQ), SPEAKER_SETTINGS(HOME), SETTINGS(HOME), ABOUT(SETTINGS), DEBUG(SETTINGS);
 
     /** Screens that talk to the speaker - left for home when the speaker's link ends. */
-    val needsSpeaker get() = this == EQ || this == SPEAKER_SETTINGS
+    val needsSpeaker get() = this == EQ || this == EQ_FULL || this == SPEAKER_SETTINGS
 }
 
 /**
@@ -103,11 +105,17 @@ class MainActivity : ComponentActivity() {
     private fun toast(text: Int) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
     /**
-     * «Поделиться файлом» (`ideas/01`, criterion 4): writes the speaker's EQ and light to cache/shared/ and hands the file
-     * to Android's share menu (messenger, mail). [NOT-TESTED]
+     * The file «Экспорт» writes: the speaker's EQ only - the owner, 2026-10-16 ≈ 19:30: «кнопки импорта и экспорта
+     * эквалайзаре JSON файлом» (`interviews/interview_003`). «Импорт» still reads older files with the light in them.
+     */
+    private fun eqProfile(): Profile? = Profile.of(speakerVm.speaker.value)?.copy(light = null)
+
+    /**
+     * «Поделиться файлом» (`ideas/01`, criterion 4): writes the speaker's EQ to cache/shared/ and hands the file to
+     * Android's share menu (messenger, mail). [NOT-TESTED]
      */
     private fun shareProfile() {
-        val profile = Profile.of(speakerVm.speaker.value) ?: return toast(R.string.file_not_saved)
+        val profile = eqProfile() ?: return toast(R.string.file_not_saved)
         lifecycleScope.launch {
             val file = withContext(Dispatchers.IO) {
                 runCatching {
@@ -140,6 +148,8 @@ class MainActivity : ComponentActivity() {
             retry = speakerVm::start,
             setVolume = speakerVm::setVolume,
             togglePlay = speakerVm::togglePlay,
+            previous = speakerVm::previousTrack,
+            next = speakerVm::nextTrack,
             openEq = { openEq() },
             setLight = speakerVm::setLight,
             openSettings = { openSpeakerSettings() },
@@ -148,6 +158,22 @@ class MainActivity : ComponentActivity() {
             autoOff = speakerVm::setAutoOff, sleep = speakerVm::setSleep, voice = speakerVm::setVoice,
             indicator = speakerVm::setIndicator, mic = speakerVm::setMic, howl = speakerVm::setHowl,
         )
+        var openFullEq: () -> Unit = {}
+        val eqActions = EqActions(
+            onPreset = speakerVm::selectPreset,
+            onCustomSlot = speakerVm::selectCustomSlot,
+            onUserPreset = speakerVm::selectUserPreset,
+            onEdit = speakerVm::editCustom,
+            onCreate = speakerVm::createPreset,
+            onRename = speakerVm::renamePreset,
+            onFullScreen = { openFullEq() },
+            onImport = { openFile.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
+            onSaveFile = {
+                profileToSave = eqProfile()
+                if (profileToSave != null) saveFile.launch(PROFILE_FILE_NAME) else toast(R.string.file_not_saved)
+            },
+            onShareFile = ::shareProfile,
+        )
         setContent {
             KrinikTheme {
                 var screen by rememberSaveable { mutableStateOf(Screen.HOME) }
@@ -155,24 +181,22 @@ class MainActivity : ComponentActivity() {
                 val link by speakerVm.link.collectAsState()
                 val speaker by speakerVm.speaker.collectAsState()
                 val speakerSettings by speakerVm.settings.collectAsState()
+                val presets by speakerVm.presets.collectAsState()
+                val activePreset by speakerVm.activePreset.collectAsState()
                 openEq = { screen = Screen.EQ }
+                openFullEq = { screen = Screen.EQ_FULL }
                 openSpeakerSettings = { screen = Screen.SPEAKER_SETTINGS }
                 BackHandler(enabled = screen.parent != null) { back() }
                 // Speaker screens need a live link; when the speaker leaves, the app returns home to its card. A reconnect
                 // (Connecting) keeps the screen: Android's save dialog stops the app and the link reopens on return - on the
                 // A51 2026-10-16 17:11 the EQ screen jumped home there.
                 if (screen.needsSpeaker && link !is Link.Connected && link !is Link.Connecting) screen = Screen.HOME
+                // The full-screen editor edits a custom EQ only (the owner ≈ 19:5x); a preset on the speaker sends it back.
+                if (screen == Screen.EQ_FULL && link is Link.Connected && speaker.eq?.custom == false) screen = Screen.EQ
                 when (screen) {
                     Screen.HOME -> HomeScreen(link, speaker, actions, onSettings = { screen = Screen.SETTINGS })
-                    Screen.EQ -> EqScreen(
-                        speaker, onBack = back, onPreset = speakerVm::selectPreset, onCustom = speakerVm::setCustom,
-                        onSaveFile = {
-                            profileToSave = Profile.of(speakerVm.speaker.value)
-                            if (profileToSave != null) saveFile.launch(PROFILE_FILE_NAME) else toast(R.string.file_not_saved)
-                        },
-                        onOpenFile = { openFile.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
-                        onShareFile = ::shareProfile,
-                    )
+                    Screen.EQ -> EqScreen(speaker, presets, activePreset, onBack = back, act = eqActions)
+                    Screen.EQ_FULL -> EqFullScreen(speaker, presets, activePreset, onBack = back, act = eqActions)
                     Screen.SPEAKER_SETTINGS ->
                         SpeakerSettingsScreen(speakerSettings, speaker.newFirmware, onBack = back, act = settingsActions)
                     Screen.SETTINGS -> SettingsScreen(

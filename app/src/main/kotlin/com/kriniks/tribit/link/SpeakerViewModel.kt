@@ -26,6 +26,7 @@ import com.kriniks.tribit.protocol.Profile
 import com.kriniks.tribit.protocol.Settings
 import com.kriniks.tribit.protocol.SpeakerSettings
 import com.kriniks.tribit.protocol.SpeakerState
+import com.kriniks.tribit.protocol.UserPreset
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -284,18 +285,84 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Selects a preset; the speaker's EQ state 21 read after it is what the screen shows. */
-    fun selectPreset(p: Eq.Preset) = commands {
-        send(Eq.setPreset(p))
-        send(Eq.queryState())
+    fun selectPreset(p: Eq.Preset) {
+        _activePreset.value = null
+        commands {
+            send(Eq.setPreset(p))
+            send(Eq.queryState())
+        }
     }
 
-    /** Sends the custom EQ (10 bands, dB); called on slider release only (their app does the same, §3.6 «Pacing»). */
+    /** Sends the custom EQ (10 bands, dB); called on release only (their app does the same, §3.6 «Pacing»). */
     fun setCustom(db: List<Int>) {
         val nf = _speaker.value.newFirmware ?: return
         commands {
             send(Eq.setCustom(db, nf))
             send(Eq.queryState())
         }
+    }
+
+    /** Previous / next track (cmd 2 [1] / [2], `Blast2.kt`); the speaker echoes cmd 2. */
+    fun previousTrack() = commands { send(Blast2.play(Blast2.PREVIOUS)) }
+    fun nextTrack() = commands { send(Blast2.play(Blast2.NEXT)) }
+
+    // ---- The user's custom presets (`PresetStore`, plans/07 E3–E8) ----
+
+    private val store = PresetStore { app.filesDir }
+
+    private val _presets = MutableStateFlow<List<UserPreset>>(emptyList())
+    /** The presets made with «+», in the order they were made. */
+    val presets: StateFlow<List<UserPreset>> = _presets
+
+    private val _activePreset = MutableStateFlow<String?>(null)
+    /**
+     * The id of the named preset last sent to the speaker's custom slot, or null. The speaker reports only «custom»
+     * (id 7), never which named preset - so this is the app's own memory, valid while the speaker reports custom
+     * (plans/07, risk b); after a restart «Пользовательский» is marked.
+     */
+    val activePreset: StateFlow<String?> = _activePreset
+
+    init { viewModelScope.launch { _presets.value = store.list() } }
+
+    /** «+» → «Создать»: a new preset at 0 dB on every band, saved as a file and sent to the speaker. */
+    fun createPreset(name: String) {
+        if (!UserPreset.validName(name)) return
+        val p = UserPreset.new(System.currentTimeMillis().toString(), name)
+        viewModelScope.launch {
+            if (store.save(p)) _presets.value = _presets.value + p
+            selectUserPreset(p)
+        }
+    }
+
+    /** Sends a named preset's bands to the speaker's custom slot and remembers which one it is. */
+    fun selectUserPreset(p: UserPreset) {
+        _activePreset.value = p.id
+        setCustom(p.db)
+    }
+
+    /** The speaker's own custom slot («Пользовательский»): its bands as they are, no named preset. */
+    fun selectCustomSlot() {
+        _activePreset.value = null
+        _speaker.value.eq?.takeIf { it.custom }?.db?.let(::setCustom) ?: setCustom(List(Eq.BANDS) { 0 })
+    }
+
+    /** A band moved on the editor: the speaker gets all ten bands; the named preset on the speaker keeps them too. */
+    fun editCustom(db: List<Int>) {
+        setCustom(db)
+        val id = _activePreset.value ?: return
+        update(id) { it.copy(db = db) }
+    }
+
+    /** Renames a named preset (the pencil); a name over [UserPreset.NAME_MAX] characters is refused by the dialog. */
+    fun renamePreset(id: String, name: String) {
+        if (UserPreset.validName(name)) update(id) { it.copy(name = name.trim()) }
+    }
+
+    private fun update(id: String, change: (UserPreset) -> UserPreset) {
+        val old = _presets.value.firstOrNull { it.id == id } ?: return
+        val new = change(old)
+        _presets.value = _presets.value.map { if (it.id == id) new else it }
+        viewModelScope.launch { store.save(new) }
     }
 
     /**

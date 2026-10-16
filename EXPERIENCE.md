@@ -87,6 +87,31 @@
 
 ## Entries
 
+### EXP-0015 · 2026-10-16 · ❌ · #a51 #stand #rotation
+class: stand-state-not-read
+none-cheap: `tools/screen_profile.py apply … --land` saves the native rotation before it turns the phone and `reset` restores it; a bare `wm user-rotation lock 1` saves nothing
+**Context:** testing the full-screen EQ editor in landscape on the A51.
+**Tried / did:** turned the phone with `wm user-rotation lock 1` without reading the mode first; `screen_profile.py reset` had
+no saved mode and left it «lock 1». The native mode (auto-rotate on) was found in `testcases/reports/2026-10-16_a51_stand.md`.
+**Lesson:** read the stand's state before changing it - or change it only through the tool that saves it.
+**Repro:** `adb shell wm user-rotation` before and after.
+**Trigger:** any rotation, size or density change on the A51 or the Titan.
+**Not for:** the app's own orientation code.
+
+### EXP-0014 · 2026-10-16 · ❌ · #design #reference #inventory #owner
+class: reference-not-inventoried
+none-cheap: a parity inventory is a document of rows; whether every element of the reference app is in it is the agent's reading of the reference's code and screens - no tool knows the reference
+**Context:** the own app's screens for the Blast 2; the owner had asked to follow Tribit's app and KARTUN.
+**Tried / did:** phases 1–2 were built from the protocol recon only; the owner 19:05: «простой не интересный, не похож на
+оригинальное приложение»; then mock-ups and code A + A - and the owner 19:55: «x-3d где???» · «ты блять изучал оригинальное
+приложение Tribit как я тебя просил????????». Tribit names preset 4 «X-3D» and presets 10/11 «XBass Off/XBass (V8.6/V7.4)»
+for the Blast 2 (`EqButton56Activity.java:347–375`); our recon table had «X-3D» in a cell and the screens still said «Классика».
+**Lesson:** a reference app is read as a countable inventory of ITS screens (element · name as shown · behaviour) BEFORE the
+first mock-up; protocol recon is not screen recon. A fact in a recon cell is not applied until a row of the inventory carries it.
+**Repro:** `grep -n "X-3D" decompiled/jadx-base/sources/com/thousandshores/tribit/moduledevice/bts56/*.java`
+**Trigger:** «ориентируйся на <app>», «как в оригинале», a mock-up of a screen that a reference app already has.
+**Not for:** screens the reference app does not have.
+
 ### EXP-0013 · 2026-10-16 · ❌→✅ · #claims #judge #android #lifecycle
 class: claim-before-evidence
 none-cheap: the judge pass is the check - a plan tick or a verdict line names a behaviour no tool can see; the run reports carry «Не проверено» lines, the judge compares them with the verdict

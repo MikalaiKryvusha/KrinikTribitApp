@@ -57,9 +57,9 @@
     <string name="file_save">Save to file</string>
     <string name="file_open">Open file</string>
     <string name="file_share">Share file</string>
-    <string name="file_saved">Settings file saved.</string>
-    <string name="file_not_saved">The settings file was not saved. Tap «Save to file» and pick another folder.</string>
-    <string name="file_applied">Settings file read. Krinik Tribit sends its equalizer and light to the speaker when it connects to the speaker.</string>
+    <string name="file_saved">Equalizer file saved.</string>
+    <string name="file_not_saved">The equalizer file was not saved. Tap «Save to file» and pick another folder.</string>
+    <string name="file_applied">File read. Krinik Tribit puts the equalizer from the file on the speaker (and the light, if the file has it) when it connects to the speaker.</string>
     <string name="file_not_profile">The chosen file is not a Krinik Tribit settings file. Pick a file saved with «Save to file».</string>
     <string name="file_other_model">The chosen file holds settings of another speaker model. Krinik Tribit opens settings files of the Tribit StormBox Blast 2.</string>
     <string name="file_broken">The settings file is damaged: it has values the speaker does not take. Pick another file.</string>
@@ -83,4 +83,30 @@
 
     <string name="debug">Debug</string>
     <string name="debug_sub">Build, device and screen</string>
+    <!-- Phase 3 screens (plans/07, mock-ups A + A, interviews/interview_003). -->
+    <string name="home_connected">Connected</string>
+    <string name="speaker_settings_sub">Auto power-off, volume indicator, sleep timer, voice prompts, microphone</string>
+    <string name="track_previous">Previous track</string>
+    <string name="track_next">Next track</string>
+    <string name="battery_percent">%1$d%%</string>
+    <string name="eq_now">On the speaker now</string>
+    <string name="eq_edit_hint">Drag the point of a band and release it. The speaker sets the band as the graph shows it.</string>
+    <string name="eq_edit_hint_named">Drag the point of a band and release it. The speaker sets the band as the graph shows it, and the equalizer «%1$s» keeps the new position of the band.</string>
+    <string name="eq_rotate_hint">Turn the phone sideways: the name and the buttons move to the left, the graph takes the rest of the screen width.</string>
+    <string name="eq_full_screen">Full screen</string>
+    <string name="eq_exit_full_screen">Exit full screen</string>
+    <string name="eq_new">New equalizer</string>
+    <string name="eq_new_hint">Enter a name for the equalizer and tap «Create». The speaker switches to the new equalizer: all ten bands stand at 0 dB.</string>
+    <string name="eq_name_field">Equalizer name</string>
+    <string name="eq_name_counter">%1$d / %2$d</string>
+    <string name="eq_create">Create</string>
+    <string name="eq_rename">Rename</string>
+    <string name="eq_rename_title">Equalizer name</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="eq_import">Import</string>
+    <string name="eq_export">Export</string>
+    <string name="eq_export_title">Export the equalizer</string>
+    <string name="eq_export_hint">The file holds the equalizer that is on the speaker now. The Import button of Krinik Tribit opens this file and puts its equalizer on the speaker.</string>
+    <string name="light_mode">Mode %1$d</string>
 </resources>
