@@ -734,6 +734,125 @@ def patch_no_forced_update():
     print("ok 10 no forced update: both checkUpdate return at once")
 
 
+# --- Patch 20: no cloud copy of EQ and sound profiles, no support form and no error-log upload -------------------
+# Owner 2026-10-16 ≈ 09:21 +03:00: «копия эквалайзеров в облаке и форма поддержки - не нужно это нахуй». Their gateway
+# has 10 such endpoints under three paths: api-equip/thirdApi/equalizer/... (get, sync, sort, remove), .../persound/...
+# (the same four for hearing profiles), api-app/api/userFeedback/... (the support form and autoReportErrorLogTribit, the
+# silent log upload). Fixed by form, in ONE place: an OkHttp interceptor in the app's only client (TribitApp, EasyConfig)
+# fails these requests on the phone with an IOException - EasyHttp's onHttpFail path, which the app already handles;
+# presets stay in the local database. Every cut is logged under the tag KrinikNoCloud (observable on the device).
+# [NOT-TESTED]
+NO_CLOUD_SMALI = """
+.class public final Lkrinik/NoCloud;
+.super Ljava/lang/Object;
+.source "NoCloud.smali"
+
+# implements
+.implements Lokhttp3/Interceptor;
+
+
+.method public constructor <init>()V
+    .locals 0
+
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+
+    return-void
+.end method
+
+.method private static cut(Ljava/lang/String;)Z
+    .locals 1
+
+    const-string v0, "/equalizer/"
+
+    invoke-virtual {p0, v0}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result v0
+
+    if-nez v0, :yes
+
+    const-string v0, "/persound/"
+
+    invoke-virtual {p0, v0}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result v0
+
+    if-nez v0, :yes
+
+    const-string v0, "/userFeedback/"
+
+    invoke-virtual {p0, v0}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+
+    move-result v0
+
+    return v0
+
+    :yes
+    const/4 v0, 0x1
+
+    return v0
+.end method
+
+.method public intercept(Lokhttp3/Interceptor$Chain;)Lokhttp3/Response;
+    .locals 3
+
+    invoke-interface {p1}, Lokhttp3/Interceptor$Chain;->request()Lokhttp3/Request;
+
+    move-result-object v0
+
+    invoke-virtual {v0}, Lokhttp3/Request;->url()Lokhttp3/HttpUrl;
+
+    move-result-object v1
+
+    invoke-virtual {v1}, Lokhttp3/HttpUrl;->toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    invoke-static {v1}, Lkrinik/NoCloud;->cut(Ljava/lang/String;)Z
+
+    move-result v2
+
+    if-nez v2, :blocked
+
+    invoke-interface {p1, v0}, Lokhttp3/Interceptor$Chain;->proceed(Lokhttp3/Request;)Lokhttp3/Response;
+
+    move-result-object v0
+
+    return-object v0
+
+    :blocked
+    const-string v2, "KrinikNoCloud"
+
+    invoke-static {v2, v1}, Landroid/util/Log;->i(Ljava/lang/String;Ljava/lang/String;)I
+
+    new-instance v0, Ljava/io/IOException;
+
+    const-string v2, "Krinik Tribit: cloud request cut on the phone"
+
+    invoke-direct {v0, v2}, Ljava/io/IOException;-><init>(Ljava/lang/String;)V
+
+    throw v0
+.end method
+"""
+
+
+def patch_no_cloud():
+    target = ROOT / "smali_classes5" / "krinik" / "NoCloud.smali"
+    if target.exists():
+        sys.exit("FAIL: krinik/NoCloud.smali already exists")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(NO_CLOUD_SMALI.lstrip("\n"), encoding="utf-8")
+    p = smali("com.thousandshores.tribit.TribitApp")
+    t = p.read_text(encoding="utf-8")
+    old = "    new-instance v2, Lokhttp3/OkHttpClient$Builder;\n\n    invoke-direct {v2}, Lokhttp3/OkHttpClient$Builder;-><init>()V\n"
+    if t.count(old) != 1:
+        sys.exit("FAIL: OkHttpClient.Builder anchor in TribitApp")
+    p.write_text(t.replace(old, old +
+        "\n    new-instance v3, Lkrinik/NoCloud;\n\n    invoke-direct {v3}, Lkrinik/NoCloud;-><init>()V\n\n"
+        "    invoke-virtual {v2, v3}, Lokhttp3/OkHttpClient$Builder;->addInterceptor(Lokhttp3/Interceptor;)Lokhttp3/OkHttpClient$Builder;\n"),
+        encoding="utf-8")
+    print("ok 20 no cloud: equalizer/, persound/, userFeedback/ requests cut on the phone (log tag KrinikNoCloud)")
+
+
 # --- Patch 21: Firebase out - no analytics with the advertising ID, no Crashlytics, no pushes ------------------
 # Owner 2026-10-16 ≈ 09:21 +03:00: «Firebase: аналитика с рекламным идентификатором (разрешение AD_ID), Crashlytics,
 # пуши - выпиливаем нахуй» (MASTER_PLAN decision journal). The libraries stay in the APK (their registrars are looked up
@@ -875,6 +994,7 @@ if __name__ == "__main__":
     patch_no_relogin()
     patch_no_forced_update()
     patch_firebase_off()
+    patch_no_cloud()
     if "--debug" in sys.argv[2:]:
         variant_debug()
     print("all patches applied")
