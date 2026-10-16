@@ -3,7 +3,7 @@
 > **Created:** 2026-10-16 (the owner, chat 15:24 +03:00: «Сворачиваем план на суть C» · «Делаем по плану C») ·
 > **Parent:** `MASTER_PLAN.md` phases 2–3, `researches/03` (protocol notes), `researches/08` (beauty), `researches/10`
 > (tools for reading their code) · **Status:** rung 1 of `/plan-epic` for `plans/04_EPIC_own_app.md`; requirements and local
-> state written 2026-10-16 ≈ 15:35 +03:00; protocol recon and industry sweep delegated, pending; KARTUN's answer pending ·
+> state 15:35, industry 15:36, the Blast 2 protocol 15:40 (24 of 24 quotes checked) — rung 1 complete except KARTUN's answer ·
 > **Outbound:** forks → `interviews/`; questions to the KARTUN session (sent 15:29)
 
 ## 1. Requirements — the owner's words
@@ -36,7 +36,7 @@
 3. **Protocol notes** (`researches/03` §«Что известно про протокол колонки», from `Bts52Util`): packet `EA <len> <cmd>
    <data…> <sum>`, len = data + 4, sum = low byte of the sum of the previous bytes; commands 1 version · 4 EQ (preset + 10
    bands) · 6 battery · 11 custom EQ · 12 light mode · 13 volume · 18 volume query · 21 EQ state · 52 brightness; EQ gains
-   shifted +12; RFCOMM `0CF12D31-FAC3-4553-BD80-D6832E7B3119`; BLE `0000ffa0`/`ffa1`/`ffa2`. To be verified for bts56.
+   shifted +12; RFCOMM `0CF12D31-FAC3-4553-BD80-D6832E7B3119`; BLE `0000ffa0`/`ffa1`/`ffa2` — for Blast 2 corrected in §3.1 (SPP `00001101-…`).
 4. **Stand:** A51 (Android 13) on USB with StormBox Blast 2 bonded and connected; the Titan belongs to KARTUN's session
    (`HOUSE_RULES.md` §3).
 5. **Their behaviour observed on the A51** (reports of 2026-10-16): speaker page, settings rows, EQ «New Custom», firmware
@@ -44,7 +44,70 @@
 
 ## 3. The speaker protocol of Blast 2 (bts56)
 
-Pending — delegated code recon with verbatim quotes, mechanically checked before use.
+Recovered from the decompiled code 2026-10-16 by a delegated recon; 24 key quotes checked mechanically against the files
+(`python -I work/spike/check_quotes.py`: 24 of 24 stand where cited). Paths: **J** = `decompiled/jadx-base/sources/com/thousandshores/`,
+**S** = smali of `work/base/` (used where jadx broke), **B** = `J/bluetoothlib/spaker/Bts52Util.java` (Blast and Blast 2 share
+it; there is no Bts56Util). VERIFIED = quote present; INFERRED = reasoned.
+
+**3.1 Family and transport.**
+- The family is chosen by the exact Bluetooth name: `J/tribit/MainNewActivity.java:1074` `if (blueName.equals("Tribit
+  StormBox Blast 2")) {`. A second spelling `"TRIBIT StormBox Blast 2"` exists (`J/bluetoothlib/utils/DeviceConstant.java:62`)
+  and goes down other paths — match both, case-insensitively.
+- **Control channel: Classic RFCOMM on the standard SPP UUID** `00001101-0000-1000-8000-00805f9b34fb` (`S/…/BtClient.smali:11533`;
+  `J/bluetoothlib/BtClient.java:590`) — NOT `0CF12D31-…` from `researches/03`. Opened by
+  `createRfcommSocketToServiceRecord(uuid)` + `connect()` after cancelling discovery (`BtClient.java:686–692`).
+- Reading: one `read()` of up to 1 024 bytes is taken as one packet (`J/bluetoothlib/ReadThread.java:36,43`); no framing, no
+  checksum check — two replies in one read are parsed as one. On a socket error a fake packet of 10 zero bytes is injected
+  and the screen reads it as «disconnected» (`ReadThread.java:88`, `Bts56ControlActivity.java:2083`).
+- Finding: classic discovery + the bonded list (`DeviceSearchNewActivity.java:573` `bondedDevices()`); no BLE scan for Blast 2
+  (BLE scan only for the Jieli models). «Connected» = A2DP/Headset profile connected for a bonded device named «Tribit…»
+  (`J/bluetoothlib/BlueToothReceiver.java:220`); SPP is opened only then (`Bts56ControlActivity.java:1270`).
+- Reconnect: not bonded → `createBond()`; bonded → connect after 200 ms; budget 3 retries (`Bts56ControlActivity.java:2109–2184`);
+  a repeat connect within 5 s is ignored (`BtClient.java:189` `this.CONNECT_DEBOUNCE_MS = 5000L;`).
+- BLE GATT (`0000ffa0`/`ffa1` write/`ffa2` notify) only for the DSP firmware update (`BtClient.java:1347,1570`).
+
+**3.2 Packet.** `EA <len> <cmd> <payload…> <sum>`; `len` = payload + 4 (the whole packet); `sum` = low byte of the sum of all
+previous bytes (`B:318–338`). A command without payload still carries one 0x00 byte, `len` = 5 (`B:311–312`); e.g. volume query
+= `EA 05 12 00 01` (INFERRED by arithmetic). Reply: byte 2 = command, payload = bytes 3…len-2 (`B:373–376`); dispatch needs
+byte 0 = 0xEA (`Bts56ControlActivity.java:2015`). Version string `p1/p2/p3_<p0/10.0>` — a DOUBLE division in smali
+(`S/…/Bts52Util.smali:2191` `div-double/2addr`), jadx shows an integer one.
+
+**3.3 Commands** (decimal; send built by **B**; every row VERIFIED unless marked):
+
+| Feature | Send | Reply / meaning |
+|---|---|---|
+| Firmware version | 1 [0] (`B:37`) | string, see 3.2 (`ViewModelDeviceBts.java:708`) |
+| BTS56C sub-variant | 101 (`B:307`) | payload[0] == 1 → BTS56C (`B:454`) |
+| Battery % | 6 [1] (`B:41`) | 0–100 shown (`Bts56ControlActivity.java:1569`) |
+| Charging state | 8 [1] (`B:45`) | value meaning not found |
+| Partner (TWS) battery | 96 [0] (`B:49`) | shown when > 0 |
+| Volume get / set | 18 [0] (`B:53`) / 13 [v] (`B:57`) | range 0..31 (`Bts56ControlActivity.java:1269` `setMax(31)`) |
+| Play / pause / prev / next | 2 [4/3/1/2] (`B:66`; `Bts56ControlActivity.java:1054–1111`) | 3 = pause, 4 = play INFERRED; state get 19 |
+| EQ preset | 4 [id, 10 gains] (`B:111–118`) | presets: 1 default, 2 XBass, 3 Audiobook, 4 Classical, 5 Rock, 6 Jazz, 7 custom, 9 Blast trad, 10 Live, 11 Podcast (`PageUtil.java:280+`); id 8 vs 9 for «Blast trad» disagrees between send and read — check on the speaker |
+| EQ state get | 21 (`B:97`) | payload[0] = preset id, then gains |
+| Custom EQ | 11 [10 gains] (`B:140`) | bands 40, 62, 125, 250, 500, 1K, 2K, 4K, 8K, 16K (`Bts56Constant`); wire = dB + 12 (±12 dB, new firmware) or dB + 8 (±8 dB, old) (`EqUtil.java:3241,3243`; smali `Eq56DetailActivity.smali:4621,4634` — jadx swaps them) |
+| EQ button | set 71 [count, index, type, 10 gains] (`B:275`), get 72 (`B:259`) | custom slot type 0xFE |
+| Light mode | 12 [1/2/3 on, 4 off] (`B:78–80`) | get 20; unsolicited 85 |
+| Light colour bar/left/right | 54/55/56 [mode, R, G, B] | read 61: 3 × [mode, R, G, B, brightness] |
+| Light brightness | 57/58/59 [mode, value] | value range not found |
+| Light rhythm / colour mode / reset | 53 / 62, 68, 69 (1 single, 2 rotation, 3 seven-colour) / 73 | reads 67, 63, 70 |
+| Auto shutdown | 3 [1 on / 2 off] (`B:158,160`) | get 16; reply 0 means ON (`Bts56InfoActivity.java:1189`) |
+| Sleep timer | 14 [hour, min] (`B:148`) | off = 255, 255; get 15 |
+| Voice prompts | 48 [5 flags] (`B:183`) | get 49 → «a,b,c,d,e» |
+| Volume indicator | 52 [0/1] (`B:92`) | get 51 |
+| Mic boost / anti-howl | 97 [0/1] / 99 [0/1] | get 98 / 100 |
+| Shutdown | 50 (`B:191`) | — |
+| Factory reset | 7 [1] (`B:170`) | — |
+| Rename | **no Bluetooth command** | their app keeps the name in its database and syncs it to their server (`Bts56InfoActivity.java:2749`) |
+| DSP version | request not found | reply 88 (`Bts56ControlActivity.java:524`) |
+
+**3.4 Firmware generations.** «New» Blast 2 = DSP version > 10074 or BTS56C (`Bts56ControlActivity.java:527`): ±12 dB EQ, full
+preset gains, mic/anti-howl rows; «old» = ±8 dB, presets as flat values. Startup sequence of their app: version → BTS56C →
+charge → battery with 100/100/50 ms gaps (`J/bluetoothlib/BtClient$deviceInfo$3.java`).
+
+**3.5 Server vs Bluetooth.** Over Bluetooth: everything in 3.3 and the preset list itself (local constants,
+`EqUtil.getEqPre`). Server only: firmware and DSP update check (`api-app/api/checkFirmwareUpgrade`), the firmware file, the
+product catalog and pictures, device bind/sync (where their «rename» goes), FAQ, cloud EQ.
 
 ## 4. Industry
 
@@ -79,4 +142,31 @@ Collected by a delegated web sweep 2026-10-16; the four lines marked ✔ were re
 
 ## 5. Findings → implications → forks
 
-Pending.
+**Findings.**
+1. Blast 2 is controlled entirely over Classic SPP with a small, now documented packet format; nothing on the main path needs
+   Tribit's server (§3.5). Only firmware does.
+2. Their Bluetooth layer has defects our app must not copy: no framing and no checksum check (§3.1, §3.2), the 10-zero packet
+   used as a disconnect signal, discovery on a path that needs location.
+3. Location: on Android 12+ a `neverForLocation` scan; on 8–11 only bonded devices work without location (§4.1). Blast 2 is
+   an A2DP speaker — the user pairs it in the phone's Bluetooth settings anyway, and their app opens SPP only for a
+   bonded, A2DP-connected device (§3.1).
+4. The architecture of the mature open apps (§4.4): transport · protocol codec · device model · UI as separate layers, a
+   fake transport and byte-exact tests on the JVM.
+
+**Implications for the epic.**
+1. Layers: `transport` (SPP socket on its own coroutine, reader that frames by `len`, writer queue, `close()` always) ·
+   `protocol` (pure Kotlin codec of §3.2–3.3, JVM tests with byte fixtures) · `device` (Blast 2 model: firmware generation,
+   EQ ±12/±8, presets) · `ui` (Compose on the scaffold, KARTUN's tokens).
+2. The main path: list bonded «Tribit StormBox Blast 2» devices (both spellings) → open SPP when A2DP is connected → the
+   startup queries of §3.4 → the speaker page. No location permission on any API level; a Blast 2 that is not paired gets
+   a hint to pair it in Bluetooth settings (Android 8–11) or a `neverForLocation` scan (12+).
+3. Fixtures from the real speaker: their debug app on the A51 logs speaker answers (EXP-0009), and our own app logs every
+   frame in debug — captured frames become the protocol tests.
+4. Rename: there is no speaker command — a name in our app is a local label only (fork below).
+5. Speed: R8 release, Baseline/Startup Profiles, nothing heavy at start — measured like KARTUN (its answer pending).
+
+**Open forks for the owner** (→ `interviews/`):
+1. Rename: a local label in our app only (the speaker keeps its own Bluetooth name) — or drop the rename row.
+2. Android 8–11 without location: bonded devices only (pair in system settings) — accepted, or also offer the CDM path
+   that needs the system Location toggle on.
+3. The scaffold's «От людей для людей» title against the owner's earlier «сделано людьми для людей - убрать».
