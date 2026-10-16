@@ -132,9 +132,46 @@
   .a-preset { height: 92px; border-radius: 22px; background: var(--card); position: relative; overflow: hidden; padding: 14px; border: 1.5px solid transparent; }
   .a-preset svg { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 44px; }
   .a-preset span { position: relative; font: 700 14px/1.25 var(--font); z-index: 1; display: block; max-width: 120px; }
-  .a-preset.custom { border: 1.5px dashed var(--pink-line); }
-  .a-preset .edit { position: absolute; right: 10px; top: 10px; width: 30px; height: 30px; border-radius: 10px; background: var(--pink-soft); color: var(--pink); display: grid; place-items: center; z-index: 2; }
-  .a-preset .edit .ic { width: 17px; height: 17px; }
+  /* The custom EQ is set apart by colour (owner 19:30): a pink-violet fill, white text, the «+» that creates a preset. */
+  .a-preset.custom { background: linear-gradient(140deg, #FF1A8C, #9b2cff); }
+  .a-preset.custom svg.art { opacity: .9; mix-blend-mode: screen; }
+  .a-preset.custom span { max-width: none; }
+  .a-preset.custom.on { background: linear-gradient(140deg, #FF1A8C, #9b2cff); border-color: #fff; }
+  .plus { position: absolute; right: 10px; bottom: 10px; width: 32px; height: 32px; border-radius: 50%; background: #fff; color: var(--pink); display: grid; place-items: center; z-index: 2; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+  .plus .ic { width: 18px; height: 18px; stroke-width: 2.6; }
+  .pinned.io { display: flex; gap: 10px; }
+  .pinned.io .btn { flex: 1; }
+  .btn.soft { background: var(--card2); color: var(--text); }
+  .btn.soft .ic { color: var(--pink); }
+  .btn.ghost { border: 1.5px solid var(--line); color: var(--text); }
+  /* ---- landscape canvas 860x390 (full-screen editor) ---- */
+  .screen.land { width: 860px; height: 390px; flex-direction: row; }
+  .land-side { width: 250px; flex: none; padding: 22px 0 22px 26px; display: flex; flex-direction: column; gap: 14px; }
+  .land-main { flex: 1; padding: 18px 22px 18px 18px; display: flex; }
+  .land-main .ed { flex: 1; background: var(--card); border-radius: 26px; padding: 10px 10px 4px; }
+  .ed svg { width: 100%; height: 100%; display: block; }
+  .name-row { display: flex; align-items: center; gap: 10px; }
+  .name-row h3 { font: 700 22px var(--head); }
+  .graph .name-row { padding-right: 52px; }
+  .graph .name-row h3 { font-size: 19px; }
+  .land-side .name-row h3 { font-size: 17px; }
+  .name-row .ic { color: var(--sub); width: 20px; height: 20px; }
+  .graph .tools { position: absolute; right: 14px; top: 14px; display: flex; gap: 8px; }
+  .graph .tools .icon-btn { width: 40px; height: 40px; background: var(--card2); }
+  .graph .tools .ic { width: 19px; height: 19px; }
+  .hint { display: flex; gap: 10px; align-items: center; color: var(--sub); font-size: 13px; line-height: 1.4; }
+  .hint .ic { color: var(--pink); width: 20px; height: 20px; }
+  /* ---- centred dialog (KARTUN: dialogs stand in the centre) ---- */
+  .dim { position: absolute; inset: 0; background: rgba(0,0,0,.62); z-index: 7; display: grid; place-items: center; padding: 0 22px; }
+  .dialog { background: var(--card); border-radius: 28px; padding: 22px 20px 18px; width: 100%; display: flex; flex-direction: column; gap: 14px; }
+  .dialog h3 { font: 700 19px var(--head); }
+  .field { background: var(--bg); border: 1.5px solid var(--pink); border-radius: 16px; height: 54px; display: flex; align-items: center; padding: 0 16px; font: 500 16px var(--font); color: var(--mute); }
+  .field b { width: 2px; height: 22px; background: var(--pink); margin-right: 2px; }
+  .counter { text-align: right; font: 600 12px var(--font); color: var(--sub); margin-top: -8px; }
+  .dialog .btns { display: flex; gap: 10px; }
+  .dialog .btns .btn { flex: 1; height: 52px; font-size: 16px; }
+  .dialog .stack .btn { height: 54px; font-size: 16px; justify-content: flex-start; padding: 0 18px; }
+  .dialog .stack { display: flex; flex-direction: column; gap: 10px; }
   .a-preset.on { border-color: var(--pink); background: linear-gradient(160deg, rgba(255,26,140,.18), var(--card) 70%); }
   .tick { position: absolute; right: 12px; top: 12px; width: 24px; height: 24px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; z-index: 2; }
   .tick .ic { width: 15px; height: 15px; stroke-width: 2.6; }
@@ -245,6 +282,15 @@
   <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 16v-5M12 8h.01"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></symbol>
+  <symbol id="i-shrink" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></symbol>
+  <symbol id="i-rotate" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="16" rx="2"/><path d="M3 15a9 9 0 0 0 9 7l-2-2M21 9a9 9 0 0 0-6-6.5"/></symbol>
   <symbol id="i-speaker" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="12" rx="6"/><path d="M8 7c0-3 8-3 8 0"/><circle cx="12" cy="13" r="2"/></symbol>
 </svg>
 
@@ -257,7 +303,7 @@
     <li>Кривые пресетов — полосы из таблицы приложения Tribit. У пресетов TRIBIT Signature, Классика, Концерт и Подкаст в этой таблице все десять полос стоят на 0 дБ.</li>
     <li>Колонка нарисована для Krinik Tribit. Фото и картинки приложения Tribit в макетах не используются.</li>
     <li>Кнопки «Назад» и «Вперёд» переключают трек. Команда для них есть в протоколе колонки, в Krinik Tribit этих кнопок пока нет.</li>
-    <li>Главный экран и эквалайзер можно взять из разных вариантов.</li>
+    <li>Выбор владельца 2026-10-16 ≈ 19:30: главный экран A и эквалайзер A («Макеты А А приняты», интервью 003); ряд 3 — пользовательский эквалайзер по его правкам.</li>
   </ul>
 </div>
 
@@ -401,7 +447,7 @@
             <div class="bands"><span>40</span><span>62</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
           </div>
           <div class="a-presets">
-            <div class="a-preset custom"><span>Пользовательский</span><svg class="art" data-db="0,0,0,0,0,6,0,0,0,0"></svg></div>
+            <div class="a-preset custom"><span>Пользовательский</span><div class="plus"><svg class="ic"><use href="#i-plus"/></svg></div><svg class="art" data-db="0,0,0,0,0,6,0,0,0,0"></svg></div>
             <div class="a-preset on"><span>Рок</span><div class="tick"><svg class="ic"><use href="#i-check"/></svg></div><svg class="art" data-db="10,6,-4,-8,-6,6,12,8,2,0"></svg></div>
             <div class="a-preset"><span>XBass</span><svg class="art" data-db="6,12,4,0,0,0,0,0,0,0"></svg></div>
             <div class="a-preset"><span>Джаз</span><svg class="art" data-db="-4,6,8,0,2,4,0,8,10,6"></svg></div>
@@ -409,7 +455,8 @@
             <div class="a-preset"><span>Аудиокнига</span><svg class="art" data-db="-8,-4,0,6,0,10,2,-8,-4,-12"></svg></div>
             <div class="a-preset"><span>TRIBIT Signature</span><svg class="art" data-db="0,0,0,0,0,0,0,0,0,0"></svg></div>
           </div>
-          <div class="fade"></div>
+          <div class="fade" style="height:170px"></div>
+          <div class="pinned io"><div class="btn soft"><svg class="ic"><use href="#i-import"/></svg>Импорт</div><div class="btn soft"><svg class="ic"><use href="#i-export"/></svg>Экспорт</div></div>
         </div>
         <div class="gesture"></div>
       </div>
@@ -458,6 +505,107 @@
 
   </div>
 </section>
+<!-- ======================= ROW 3: CUSTOM EQ (owner 19:30) ======================= -->
+<section class="row">
+  <h2>Пользовательский эквалайзер</h2>
+  <div class="phones">
+
+    <!-- A-custom: the EQ screen with the custom EQ chosen; its graph is the editor -->
+    <div class="phone-wrap" data-id="A-custom">
+      <div class="cap"><b>1</b><span>Выбран пользовательский</span><p>График и есть редактор: точку полосы тянут вверх или вниз. Карандаш — имя, стрелки — полный экран.</p></div>
+      <div class="screen">
+        <div class="status"><span>17:03</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="icon-btn"><svg class="ic"><use href="#i-back"/></svg></div><div class="title">Эквалайзер</div></div>
+        <div class="body">
+          <div class="graph">
+            <div class="name-row"><h3>Пользовательский</h3><svg class="ic"><use href="#i-pencil"/></svg></div>
+            <div class="muted">Сейчас на колонке</div>
+            <div class="tools"><div class="icon-btn"><svg class="ic"><use href="#i-expand"/></svg></div></div>
+            <svg class="editor" data-db="0,0,0,0,0,6,0,0,0,0" data-active="5" viewBox="0 0 340 230" preserveAspectRatio="none" style="height:230px;margin-top:8px"></svg>
+          </div>
+          <div class="hint"><svg class="ic"><use href="#i-eq"/></svg>Передвиньте точку полосы и отпустите её. Колонка поставит полосу так, как она показана на графике.</div>
+          <div class="a-presets">
+            <div class="a-preset custom on"><span>Пользовательский</span><div class="plus"><svg class="ic"><use href="#i-plus"/></svg></div><svg class="art" data-db="0,0,0,0,0,6,0,0,0,0"></svg></div>
+            <div class="a-preset"><span>Рок</span><svg class="art" data-db="10,6,-4,-8,-6,6,12,8,2,0"></svg></div>
+          </div>
+          <div class="fade" style="height:170px"></div>
+          <div class="pinned io"><div class="btn soft"><svg class="ic"><use href="#i-import"/></svg>Импорт</div><div class="btn soft"><svg class="ic"><use href="#i-export"/></svg>Экспорт</div></div>
+        </div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+    <!-- A-full-port: the editor on the full screen, portrait -->
+    <div class="phone-wrap" data-id="A-full-port">
+      <div class="cap"><b>2</b><span>Полный экран</span><p>Весь экран — график. Телефон можно повернуть, график станет шире (кадр 3).</p></div>
+      <div class="screen">
+        <div class="status"><span>17:03</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="name-row" style="flex:1"><h3>Пользовательский</h3><svg class="ic"><use href="#i-pencil"/></svg></div><div class="icon-btn"><svg class="ic"><use href="#i-shrink"/></svg></div></div>
+        <div class="body">
+          <div class="card ed" style="flex:1;padding:10px 8px 4px"><svg class="editor" data-db="0,0,0,0,0,6,0,0,0,0" data-active="5" data-labels="1" viewBox="0 0 340 640" preserveAspectRatio="none"></svg></div>
+          <div class="hint"><svg class="ic"><use href="#i-rotate"/></svg>Поверните телефон, и график растянется на всю ширину экрана.</div>
+        </div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+    <!-- A-new: «+» creates a preset - a centred dialog for its name (up to 15 characters, interview 002 Q4) -->
+    <div class="phone-wrap" data-id="A-new">
+      <div class="cap"><b>4</b><span>«+» — новый эквалайзер</span><p>Окно имени в центре экрана. Имя эквалайзера — до 15 символов, как у Tribit (интервью 002, Q4).</p></div>
+      <div class="screen">
+        <div class="status"><span>17:04</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="icon-btn"><svg class="ic"><use href="#i-back"/></svg></div><div class="title">Эквалайзер</div></div>
+        <div class="body"><div class="graph" style="opacity:.6"><h3>Рок</h3><svg class="big" data-db="10,6,-4,-8,-6,6,12,8,2,0" viewBox="0 0 340 190" preserveAspectRatio="none"></svg></div></div>
+        <div class="dim"><div class="dialog">
+          <h3>Новый эквалайзер</h3>
+          <div class="muted">Введите имя эквалайзера. Новый эквалайзер начинается с полос, которые сейчас стоят на колонке.</div>
+          <div class="field"><b></b>Имя эквалайзера</div>
+          <div class="counter">0 / 15</div>
+          <div class="btns"><div class="btn ghost">Отмена</div><div class="btn primary">Создать</div></div>
+        </div></div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+    <!-- A-export: «Экспорт» - save the JSON file or share it -->
+    <div class="phone-wrap" data-id="A-export">
+      <div class="cap"><b>5</b><span>Экспорт</span><p>Экспорт файлом JSON: сохранить в папку на телефоне или отправить через «Поделиться».</p></div>
+      <div class="screen">
+        <div class="status"><span>17:04</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="icon-btn"><svg class="ic"><use href="#i-back"/></svg></div><div class="title">Эквалайзер</div></div>
+        <div class="body"><div class="graph" style="opacity:.6"><h3>Рок</h3><svg class="big" data-db="10,6,-4,-8,-6,6,12,8,2,0" viewBox="0 0 340 190" preserveAspectRatio="none"></svg></div></div>
+        <div class="dim"><div class="dialog">
+          <h3>Экспорт эквалайзера</h3>
+          <div class="muted">Файл JSON хранит эквалайзер. Его открывает кнопка «Импорт» в Krinik Tribit на другом телефоне.</div>
+          <div class="stack">
+            <div class="btn soft"><svg class="ic"><use href="#i-save"/></svg>Сохранить в файл</div>
+            <div class="btn soft"><svg class="ic"><use href="#i-share"/></svg>Поделиться файлом</div>
+          </div>
+          <div class="btns"><div class="btn ghost">Отмена</div></div>
+        </div></div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="phones" style="margin-top:36px">
+    <!-- A-full-land: the same editor, the phone turned to landscape -->
+    <div class="phone-wrap" data-id="A-full-land">
+      <div class="cap"><b>3</b><span>Полный экран, телефон повёрнут</span><p>Слева имя и кнопки, справа график на всю высоту экрана.</p></div>
+      <div class="screen land">
+        <div class="land-side">
+          <div class="icon-btn"><svg class="ic"><use href="#i-shrink"/></svg></div>
+          <div class="name-row"><h3>Пользовательский</h3></div>
+          <div class="muted">Сейчас на колонке</div>
+          <div style="flex:1"></div>
+          <div class="btn soft" style="height:48px;font-size:15px"><svg class="ic"><use href="#i-pencil"/></svg>Имя</div>
+          <div class="btn soft" style="height:48px;font-size:15px"><svg class="ic"><use href="#i-export"/></svg>Экспорт</div>
+        </div>
+        <div class="land-main"><div class="ed"><svg class="editor" data-db="0,0,0,0,0,6,0,0,0,0" data-active="5" data-labels="1" viewBox="0 0 580 350" preserveAspectRatio="none"></svg></div></div>
+      </div>
+    </div>
+  </div>
+</section>
 <div style="height:40px"></div>
 
 <script>
@@ -467,12 +615,23 @@ const RANGE = 12;
 const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
 const dbOf = s => s.dataset.db.split(',').map(Number);
 
-// Smooth path through the points (Catmull-Rom turned into cubic Bezier).
+// Smooth path through the points by monotone cubic interpolation (Fritsch-Carlson): between two bands the curve never
+// goes above or below both of them, so the chart never shows a gain the speaker does not have (Catmull-Rom did: a dip
+// under 0 dB beside a +6 band, a peak over +12).
 function smooth(pts) {
+  const n = pts.length, dx = [], dl = [], m = [];
+  for (let i = 0; i < n - 1; i++) { dx[i] = pts[i + 1][0] - pts[i][0]; dl[i] = (pts[i + 1][1] - pts[i][1]) / dx[i]; }
+  m[0] = dl[0]; m[n - 1] = dl[n - 2];
+  for (let i = 1; i < n - 1; i++) m[i] = dl[i - 1] * dl[i] <= 0 ? 0 : (dl[i - 1] + dl[i]) / 2;
+  for (let i = 0; i < n - 1; i++) {
+    if (dl[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+    const a = m[i] / dl[i], b = m[i + 1] / dl[i], s = a * a + b * b;
+    if (s > 9) { const t = 3 / Math.sqrt(s); m[i] = t * a * dl[i]; m[i + 1] = t * b * dl[i]; }
+  }
   let d = `M${pts[0][0]},${pts[0][1]}`;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
-    d += ` C${p1[0] + (p2[0] - p0[0]) / 6},${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6},${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]},${p2[1]}`;
+  for (let i = 0; i < n - 1; i++) {
+    const [x0, y0] = pts[i], [x1, y1] = pts[i + 1], h = dx[i] / 3;
+    d += ` C${x0 + h},${y0 + m[i] * h} ${x1 - h},${y1 - m[i + 1] * h} ${x1},${y1}`;
   }
   return d;
 }
@@ -487,6 +646,34 @@ document.querySelectorAll('svg.resp').forEach(s => {
   el('path', { d: `${d} L${p[p.length - 1][0]},${h} L${p[0][0]},${h} Z`, fill: 'url(#fillPink)' }, s);
   el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 6, opacity: .35, filter: 'url(#glow)' }, s);
   el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 2.5, 'stroke-linecap': 'round' }, s);
+});
+
+// The custom EQ editor: a grid every 6 dB with labels, the curve, a big knob on every band with its value;
+// [data-active] marks the band under the finger, [data-labels] draws the band names inside the svg. [NOT-TESTED]
+document.querySelectorAll('svg.editor').forEach(s => {
+  const [, , w, h] = s.getAttribute('viewBox').split(' ').map(Number);
+  const db = dbOf(s), active = +(s.dataset.active ?? -1), withLabels = s.dataset.labels === '1';
+  const top = 30, bot = h - (withLabels ? 30 : 14), left = 34, right = 16, mid = (top + bot) / 2;
+  const yOf = v => mid - v / RANGE * (mid - top), xOf = i => left + i * (w - left - right) / 9;
+  const names = ['40','62','125','250','500','1K','2K','4K','8K','16K'];
+  [12, 6, 0, -6, -12].forEach(v => {
+    el('line', { x1: left - 6, x2: w - 4, y1: yOf(v), y2: yOf(v), stroke: v === 0 ? '#45454b' : '#2a2a2e', 'stroke-dasharray': v ? '3 4' : '' }, s);
+    const t = el('text', { x: 4, y: yOf(v) + 4, fill: '#6E6E73', 'font-family': 'Manrope', 'font-weight': 600, 'font-size': 11 }, s);
+    t.textContent = (v > 0 ? '+' : '') + v;
+  });
+  db.forEach((_, i) => el('line', { x1: xOf(i), x2: xOf(i), y1: top, y2: bot, stroke: i === active ? 'rgba(255,26,140,.35)' : '#232326', 'stroke-width': i === active ? 2 : 1 }, s));
+  const p = db.map((v, i) => [xOf(i), yOf(v)]), d = smooth(p);
+  el('path', { d: `${d} L${p[9][0]},${bot} L${p[0][0]},${bot} Z`, fill: 'url(#fillPink)' }, s);
+  el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 8, opacity: .35, filter: 'url(#glow)' }, s);
+  el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 3, 'stroke-linecap': 'round' }, s);
+  p.forEach(([x, y], i) => {
+    const on = i === active;
+    if (on) el('circle', { cx: x, cy: y, r: 20, fill: 'rgba(255,26,140,.22)' }, s);
+    el('circle', { cx: x, cy: y, r: on ? 11 : 8, fill: on ? '#FF1A8C' : '#0D0D0D', stroke: '#fff', 'stroke-width': on ? 3 : 2.2 }, s);
+    const val = el('text', { x, y: top - 12, 'text-anchor': 'middle', fill: on ? '#FF1A8C' : (db[i] ? '#F5F5F7' : '#A1A1A6'), 'font-family': 'Manrope', 'font-weight': 700, 'font-size': on ? 14 : 12 }, s);
+    val.textContent = (db[i] > 0 ? '+' : '') + db[i];
+    if (withLabels) { const l = el('text', { x, y: h - 8, 'text-anchor': 'middle', fill: '#6E6E73', 'font-family': 'Manrope', 'font-weight': 600, 'font-size': 11 }, s); l.textContent = names[i]; }
+  });
 });
 
 // Small sparkline (tiles, list rows).

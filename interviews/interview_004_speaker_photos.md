@@ -1,0 +1,39 @@
+# Interview #004 — откуда берётся изображение колонки на главном экране
+
+> Topic: фото колонок Tribit из сети или свой рисунок колонки на главном экране Krinik Tribit
+> Source of the idea: ваши слова 2026-10-16 ≈ 19:31 +03:00 «а изображения колонок Трибит нужно будет найти в сети и скачать» (`ideas/02_tribit_speaker_photos.md`)
+> Created: 2026-10-16 19:33 +03:00
+> Status: ❓ waiting for the owner
+
+## Context / что уже найдено
+
+На принятом макете A главного экрана стоит колонка StormBox Blast 2, нарисованная для Krinik Tribit
+(`design/mockups-v1/A-home.webp`). Фото колонок Tribit сделала и опубликовала компания Tribit (Thousandshores): права на
+эти фото у их автора. Репозиторий `KrinikTribitApp` публичный, APK выходит в GitHub Releases: фото внутри APK получает
+каждый, кто скачал APK. В README и в «О приложении» стоит строка «Krinik Tribit — независимый проект. Tribit — товарный
+знак компании Thousandshores».
+
+## QUESTIONS
+
+### Q1. Какое изображение колонки стоит на главном экране?
+<!-- archaeology: search "изображен|колон|фото|главн|экран" → 200 hits · read: ideas/02, interview_003, GOAL.md, AGENT_GUIDE.md RULE «no proprietary Tribit code or APK enters git», HOUSE_RULES R2 · prior: unrelated — the rule covers Tribit code and APK; no prior word on Tribit product photos -->
+
+![Макет A: колонка, нарисованная для Krinik Tribit](../design/mockups-v1/A-home.webp)
+
+**Answer target:** `app/src/main/res/drawable*/` (изображение колонки), `ideas/02_tribit_speaker_photos.md`.
+
+- **A) (recommended) Свой рисунок каждой модели, как на макете A.**
+  - Ситуация: к телефону подключена StormBox Blast 2.
+  - Действие: человек открывает Krinik Tribit.
+  - Результат: в центре экрана колонка, нарисованная для Krinik Tribit в стиле приложения (тёмный корпус, розовый свет рупоров).
+  - Проверка: файл рисунка лежит в `app/src/main/res/drawable/` и в git; снимок главного экрана A51.
+  - Почему: рисунок наш, его можно класть в публичный репозиторий и в APK.
+- **B) Фото Tribit из сети: скачать, положить в APK, в публичный git не класть.**
+  - Результат: на главном экране настоящее фото колонки с сайта Tribit; фото не лежит в публичном git, но лежит в каждом
+    APK из GitHub Releases.
+  - Проверка: путь фото в `.gitignore`; снимок главного экрана A51.
+- **C) Фото Tribit из сети в APK и в публичном git.**
+  - Результат: так же, как B; фото ещё и в публичном репозитории.
+- **D) your own answer** —
+
+**Answer:**
