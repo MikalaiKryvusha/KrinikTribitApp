@@ -707,7 +707,8 @@ document.querySelectorAll('svg.big').forEach(s => {
   el('path', { d: `${d} L${p[p.length - 1][0]},${h} L${p[0][0]},${h} Z`, fill: 'url(#fillPink)' }, s);
   el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 8, opacity: .35, filter: 'url(#glow)' }, s);
   el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 3, 'stroke-linecap': 'round' }, s);
-  p.forEach(([x, y]) => el('circle', { cx: x, cy: y, r: 4.5, fill: '#0D0D0D', stroke: '#fff', 'stroke-width': 2 }, s));
+  // A preset's graph only shows (owner ≈ 19:5x: the graph edits custom presets only): small dots, no knobs to drag.
+  p.forEach(([x, y]) => el('circle', { cx: x, cy: y, r: 2.6, fill: '#ff7cbf' }, s));
 });
 
 // Faders: ten vertical tracks, pink fill from the 0 dB line, a knob with its value, the curve through the knobs.
