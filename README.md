@@ -65,8 +65,8 @@ that the Tribit server cannot identify a person.
 - Done and checked on a Samsung A51: the app talks to the Tribit server only as an anonymous guest. The guest ID, the
   phone model and the Android version in its requests are random, picked once at install; no real value of the phone
   reached a request in the check. Only four kinds of requests go to the Tribit server: the guest sign-in, the speaker
-  catalog, the firmware check (on the user's tap) and the language dictionary. Cloud copies of EQ presets, the support
-  form and every link to Tribit's site are gone.
+  catalog, the firmware check (on the user's tap) and the language dictionary. Cloud copies of EQ presets and the support
+  form are gone; the screens a user reaches no longer link to Tribit's site.
 
 <a name="en-2"></a>
 
@@ -212,8 +212,8 @@ Tribit, которые знает официальное приложение, �
 - Сделано и проверено на Samsung A51: приложение обращается к серверу Tribit только анонимным гостем. ID гостя, модель
   телефона и версия Android в его запросах случайные, выбираются один раз при установке; ни одно настоящее значение
   телефона в проверке в запросы не попало. К серверу Tribit уходят только четыре вида запросов: вход гостя, каталог
-  колонок, проверка прошивки (по нажатию пользователя) и словарь языка. Облачных копий пресетов эквалайзера, формы
-  поддержки и переходов на сайт Tribit больше нет.
+  колонок, проверка прошивки (по нажатию пользователя) и словарь языка. Облачных копий пресетов эквалайзера и формы
+  поддержки больше нет; экраны, до которых доходит пользователь, не ведут на сайт Tribit.
 
 <a name="ru-2"></a>
 
@@ -346,7 +346,7 @@ adb install-multiple out/signed/*.apk
 **隐私。** Krinik Tribit 尊重个人数据隐私和 GDPR。我们反对通过 Firebase 和 Tribit 服务器追踪使用数据。Tribit 服务器不应知道谁在使用本应用，我们正在让 Tribit 服务器无法识别用户身份。
 
 - 已完成并在 Samsung A51 上验证：Firebase 已关闭，应用中没有 Firebase 分析、广告标识符和推送。
-- 已完成，并已在 Samsung A51 上验证：应用只以匿名访客身份访问 Tribit 服务器。请求中的访客 ID、手机型号和 Android 版本均为随机值，在安装时选定一次；验证中没有任何真实的手机数据进入请求。发往 Tribit 服务器的请求只有四类：访客登录、音箱目录、固件检查（由用户点击触发）和语言词典。均衡器预设的云端副本、反馈表单以及所有跳转到 Tribit 网站的链接都已移除。
+- 已完成，并已在 Samsung A51 上验证：应用只以匿名访客身份访问 Tribit 服务器。请求中的访客 ID、手机型号和 Android 版本均为随机值，在安装时选定一次；验证中没有任何真实的手机数据进入请求。发往 Tribit 服务器的请求只有四类：访客登录、音箱目录、固件检查（由用户点击触发）和语言词典。均衡器预设的云端副本和反馈表单已移除；用户能打开的界面不再跳转到 Tribit 网站。
 
 <a name="zh-2"></a>
 
