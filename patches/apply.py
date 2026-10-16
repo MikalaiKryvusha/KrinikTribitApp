@@ -557,7 +557,8 @@ def patch_splash_no_dictionary_wait():
 # LoginNewActivity (researches/06 З2, З3). Fix: checkToken always ends in ViewModelFirst.startMainActivity (a stored
 # token still goes into the Authorization header, as before); START marks the agreement and calls checkToken instead
 # of opening the login screen. Requests without a token are answered «Full authentication» - patch 9 keeps the user.
-# [TESTED: 2026-10-16 · A51: clean install -> START -> main screen, no login screen, no visitorLogin/getUserOf* requests, no crash · testcases/reports/2026-10-16_wave1.md]
+# [TESTED: 2026-10-16 · A51: START -> main screen without login - BUT the speaker page never opens: their gateway answers
+# «Full authentication» to the device catalog without a token (Found 0 of testcases/reports/2026-10-16_wave1.md). NOT applied.]
 CHECK_TOKEN = """
 .method private final checkToken()V
     .locals 4
@@ -678,6 +679,26 @@ START_HANDLER = """
     return-void
 .end method
 """
+
+
+# --- Patch 19: no account in the interface - the profile has no «Register/Log in» row ---------------------------
+# Owner 2026-10-16 ≈ 09:19 +03:00: «выпиливаем НАХУЙ аккаунты». MineActivity.afterCreate shows rlRegister («Зарегистрироваться/
+# Войти») when DialogDefault.checkLoginType says «not logged in» and rlName otherwise; with patch 8 nobody logs in, so the
+# row would invite to the screens we removed. Fix: that branch hides rlRegister the way the logged-in branch does (v0 = 8,
+# GONE). Other entries to the login screens (DeviceFragment, MainNewActivity, «forgot password») - next step of plan 01 §4б.
+# [TESTED: 2026-10-16 · A51: profile shows neither «Зарегистрироваться/Войти» nor «Установите псевдоним» · testcases/reports/2026-10-16_wave1.md]
+def patch_no_account_ui():
+    p = smali("com.thousandshores.tribit.modulemine.activity.MineActivity")
+    replace_in_method(p, ".method public afterCreate(Landroid/os/Bundle;)V",
+        "->rlRegister:Landroid/widget/RelativeLayout;\n\n    invoke-virtual {p1, v3}, Landroid/view/View;->setVisibility(I)V",
+        "->rlRegister:Landroid/widget/RelativeLayout;\n\n    invoke-virtual {p1, v0}, Landroid/view/View;->setVisibility(I)V")
+    # Without an account login_type keeps its default "1" (DialogDefault.checkLoginType: "1" = registered, "2" = guest
+    # with «register» dialogs), so the profile takes the logged-in branch and shows rlName «Установите псевдоним» - an
+    # account entry too (observed on the A51). That branch hides rlName as well.
+    replace_in_method(p, ".method public afterCreate(Landroid/os/Bundle;)V",
+        "->rlName:Landroid/widget/RelativeLayout;\n\n    invoke-virtual {p1, v3}, Landroid/view/View;->setVisibility(I)V",
+        "->rlName:Landroid/widget/RelativeLayout;\n\n    invoke-virtual {p1, v0}, Landroid/view/View;->setVisibility(I)V")
+    print("ok 19 no account UI: profile without 'Register/Log in' and nickname rows")
 
 
 # --- Patch 9: their server never throws the user out to the login screen -----------------------------------
@@ -849,7 +870,8 @@ if __name__ == "__main__":
     # of a fresh install turned English - their Russian texts come only from that dictionary. It waits for our values-ru
     # (wave 2, plans/01 §3); a failed request already goes on (onHttpFail sets 1), only a slow server holds the logo.
     # patch_splash_no_dictionary_wait()
-    patch_no_account()
+    # patch_no_account()  # breaks the speaker page without a token - see its marker; needs a local catalog first
+    patch_no_account_ui()
     patch_no_relogin()
     patch_no_forced_update()
     patch_firebase_off()
