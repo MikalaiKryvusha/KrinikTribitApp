@@ -89,6 +89,20 @@
 **Lesson:** capture lessons at the level of *approach* (what worked / what to avoid), not defect detail
 (that lives in `bugs/`); one short entry beats a long story.   → link: (none)
 
+### EXP-0007 · 2026-10-16 · ❌ · #escaping #python #heredoc
+class: escaping-layer
+mechanized: tools/check_ctrl_chars.py (proved red on \f and \a, green on all tracked text files)
+**Context:** Windows paths written into files through Python strings inside bash heredocs: `C:\adb` → `C:` + BEL,
+`testcases\firebase_check.py` → `testcases` + form feed. Exit codes green, the text silently broken; found only by reading back.
+**Tried / did:** fixed by a script FILE that writes the lines with explicit `\\`; the first guard missed form feed because
+`str.splitlines()` treats it as a line break.
+**Result:** ❌ two broken lines in one session (after EXP-0003 named the class) → the guard.
+**Lesson:** backslash paths go through the Write/Edit tools, never through a Python string in a heredoc; before a commit run
+`python tools/check_ctrl_chars.py`; a scanner splits on `"\n"` only.
+**Repro:** `printf 'a\fb\n' > x.md && python tools/check_ctrl_chars.py x.md` exits 1.
+**Trigger:** writing a Windows path or any backslash into a file by a script → Write/Edit tool instead; commit → the guard.
+**Not for:** binary files (the guard skips them by extension).
+
 ### EXP-0006 · 2026-10-16 · ❌ · #adb #powershell #a51 #titan
 class: shell-lied
 mechanized: tools/screen_profile.py, testcases/snap.py, testcases/run_fork_titan.py (ADB = full SDK path)
