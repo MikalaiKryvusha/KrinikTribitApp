@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Krinik Tribit manifest. No permissions yet: the speaker search (roadmap step 4) adds the Bluetooth ones
-     (BLUETOOTH_SCAN with neverForLocation, BLUETOOTH_CONNECT) - and never location (GOAL.md, success line 2). -->
+<!-- Krinik Tribit manifest. One permission: BLUETOOTH_CONNECT («Устройства поблизости») - enough to list the bonded
+     Blast 2 and open its SPP channel (plans/05 step 4). No scan, so no location on any Android (GOAL.md, success line 2);
+     BLUETOOTH_SCAN with neverForLocation comes only if in-app pairing is ever wanted. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="true" />
 
     <application
         android:icon="@mipmap/ic_launcher"

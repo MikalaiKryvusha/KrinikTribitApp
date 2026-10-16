@@ -9,23 +9,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kriniks.tribit.BuildConfig
 import com.kriniks.tribit.R
+import com.kriniks.tribit.link.Link
+import com.kriniks.tribit.protocol.SpeakerState
 
 /** GitHub of the project and of the author - the «О приложении» links (owner's rule R5, HOUSE_RULES.md). */
 const val REPO_URL = "https://github.com/MikalaiKryvusha/KrinikTribitApp"
@@ -51,7 +49,7 @@ fun Page(title: String, onBack: (() -> Unit)? = null, content: @Composable Colum
     Box(
         Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).systemBarsPadding(),
         contentAlignment = Alignment.TopCenter,
-    ) {
+    ) { CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onBackground) {
         Column(
             Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 16.dp),
@@ -65,18 +63,24 @@ fun Page(title: String, onBack: (() -> Unit)? = null, content: @Composable Colum
             }
             content()
         }
-    }
+    } }
 }
 
-/** A flat dark card, KARTUN's shape. */
+/**
+ * A flat dark card, KARTUN's shape. It sets the content colour itself: a Text without a colour outside a Surface is
+ * black, and the A51 run of 2026-10-16 showed «Колонка не подключена» black on the dark card
+ * (`testcases/reports/2026-10-16_two_packages.md`, Found 1) - fixed here once for every card. [NOT-TESTED]
+ */
 @Composable
 fun Card(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Column(
-        modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.large)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        content = content,
-    )
+    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
+        Column(
+            modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.large)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            content = content,
+        )
+    }
 }
 
 /** One tappable row of a settings list. */
@@ -92,31 +96,14 @@ fun SettingsRow(title: String, subtitle: String? = null, onClick: () -> Unit) {
 }
 
 /**
- * Home: the speaker card. The search itself is roadmap step 4; until then the button says so instead of pretending.
- * [NOT-TESTED]
+ * Home: the speaker card (`SpeakerCard.kt`) and Settings. The promise card «Без геолокации, без аккаунта…» is gone - the
+ * owner, 2026-10-16 ≈ 16:12 +03:00, on «Геолокация не нужна.»: «НАХУЙ ТАКОЕ ПИСАТЬ?»; app texts follow his portrait
+ * (HOUSE_RULES.md R10). [NOT-TESTED]
  */
 @Composable
-fun HomeScreen(onSettings: () -> Unit) {
+fun HomeScreen(link: Link, speaker: SpeakerState, act: SpeakerActions, onSettings: () -> Unit) {
     Page(stringResource(R.string.app_title)) {
-        Card {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(10.dp).background(MaterialTheme.colorScheme.outlineVariant, CircleShape))
-                Spacer(Modifier.size(10.dp))
-                Text(stringResource(R.string.home_no_speaker), style = MaterialTheme.typography.titleMedium)
-            }
-            Text(stringResource(R.string.home_no_speaker_hint), style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Button(
-                onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth().height(52.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-            ) { Text(stringResource(R.string.home_find_soon)) }
-        }
-        // No «От людей для людей» title in the app - the owner, 2026-10-16 ≈ 15:45 +03:00: «убрать, оставить только как
-        // слоган в РИДМИ гитхаба».
-        Card {
-            Text(stringResource(R.string.home_promise), style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
+        SpeakerCard(link, speaker, act)
         SettingsRow(stringResource(R.string.settings), onClick = onSettings)
     }
 }

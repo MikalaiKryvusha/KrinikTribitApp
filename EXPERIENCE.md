@@ -56,7 +56,8 @@
 > <!-- classes: question-already-answered, guard-not-proven-against-threat, shown-as-link,
 >      claim-before-evidence, owner-decision-not-applied, text-in-agents-world,
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
->      field-dropped-in-rebuild, renamed-package-identity, own-work-not-recalled, dex-reference-limit -->
+>      field-dropped-in-rebuild, renamed-package-identity, own-work-not-recalled, dex-reference-limit,
+>      owner-text-past-portrait -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -74,6 +75,7 @@
 | `renamed-package-identity` | a renamed application package breaks code that looks things up by the package name |
 | `own-work-not-recalled` | a tool or recipe the owner's projects already have was not looked up before the work |
 | `dex-reference-limit` | a patch adds method references to a dex that is already at 65 536 and apktool refuses to build |
+| `owner-text-past-portrait` | text the owner or the app's user reads was written without the owner's voice portrait loaded |
 >
 > <!-- class-ok: claim-before-evidence — its machine-checkable part (a ☑ «tested» in plans/02 without a run report) is mechanized by tools/check_tested_ticks.py (EXP-0008); what stays (which observation a sentence in a chat rests on: a probe, a screen, a device log line) lives in replies no tool sees — /fable-judge's claim-wider-than-observation hunt is its check -->
 >
@@ -84,6 +86,20 @@
 > Skill: `/experience` (capture a lesson · recall relevant lessons).
 
 ## Entries
+
+### EXP-0012 · 2026-10-16 · ❌→✅ · #texts #voice #ui #owner
+class: owner-text-past-portrait
+none-cheap: the machine half runs (`kaif-voice-lint check` on strings.xml, HOUSE_RULES R10); whether a line talks about what is absent is the §7B judgement - the lint was green on «Геолокация не нужна.»
+**Context:** the own app's home card strings were written straight into `strings.xml` without loading `AUTHOR_STYLOMETRY.md`.
+**Tried / did:** «Геолокация не нужна.» and a card «Без геолокации, без аккаунта, без сервера Tribit…» reached the A51; the owner
+16:12: «НАХУЙ ТАКОЕ ПИСАТЬ?» · «ЭТО СКАЗАНО В МОЕМ СТИЛОМЕТРИЧЕСКОМ ЯДРЕ». Rewritten by the portrait (laws З1, З2, З6, ДК4),
+lint 0 hits, §7B by a subagent found 5 more (a false «connects by itself», a calque, a claim wider than the code).
+**Result:** ✅ strings rewritten; HOUSE_RULES R10 makes app strings owner text.
+**Lesson:** UI strings are the owner's text: load the portrait before the first word, say what IS and what to DO; a §7B pass
+also checks each string against the code (a hint that promises behaviour the code does not have is a false claim).
+**Repro:** `node .kaif/tools/kaif-voice-lint.mjs load` before editing `app/src/main/res/values-ru/strings.xml`, then `check` on it.
+**Trigger:** editing `strings.xml` or any text a user of the app reads → load the portrait first.
+**Not for:** log tags and code comments.
 
 ### EXP-0001 · 2026-01-01 · ✅ · #example #meta
 **Context:** first task after KAIF was deployed into this project (example entry — replace with real ones).

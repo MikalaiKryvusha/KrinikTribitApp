@@ -1,23 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Русские строки; английский оригинал — values/strings.xml. -->
+<!-- Русские строки; английский оригинал — values/strings.xml. Тексты пишутся по портрету владельца AUTHOR_STYLOMETRY.md
+     (HOUSE_RULES.md R10): что есть и что сделать человеку, имя предмета, повелительное наклонение в инструкции. -->
 <resources>
     <string name="back">Назад</string>
     <string name="settings">Настройки</string>
 
-    <string name="home_no_speaker">Колонка не подключена</string>
-    <string name="home_no_speaker_hint">Включите колонку Tribit и держите её рядом. Krinik Tribit находит её по Bluetooth при выключенной геолокации.</string>
-    <string name="home_find_soon">Поиск колонки появится в следующей сборке</string>
-    <string name="home_promise">Без геолокации, без аккаунта, без сервера Tribit. Громкость, эквалайзер и заряд на экране любого размера.</string>
+    <string name="link_permission">Доступ к колонке</string>
+    <string name="link_permission_hint">Дайте Krinik Tribit разрешение «Устройства поблизости». С этим разрешением Krinik Tribit видит колонку, сопряжённую с телефоном.</string>
+    <string name="link_permission_button">Разрешить</string>
+    <string name="link_bt_off">Bluetooth выключен</string>
+    <string name="link_bt_off_hint">Включите Bluetooth и вернитесь в Krinik Tribit. При возвращении Krinik Tribit подключится к колонке.</string>
+    <string name="link_bt_settings">Настройки Bluetooth</string>
+    <string name="link_not_paired">Сопряжение колонки</string>
+    <string name="link_not_paired_hint">Сопрягите %1$s с телефоном в настройках Bluetooth. Сопряжённая колонка играет звук телефона, и Krinik Tribit к ней подключается.</string>
+    <string name="link_connecting">Подключение…</string>
+    <string name="link_failed_hint">Связь с колонкой не установлена или прервалась. Включите колонку и поставьте её рядом с телефоном. Если на телефоне открыто другое приложение для колонки Tribit, закройте его.</string>
+    <string name="link_retry">Подключить</string>
+    <string name="value_unknown">—</string>
+    <string name="speaker_battery">Заряд: %1$s</string>
+    <string name="speaker_volume">Громкость: %1$s из %2$d</string>
+    <string name="speaker_play">Играть</string>
+    <string name="speaker_pause">Пауза</string>
 
     <string name="about">О приложении</string>
     <string name="about_sub">Версия, автор, исходный код</string>
     <string name="about_version">Версия %1$s</string>
-    <string name="about_text">Приложение с открытым кодом для Bluetooth-колонок Tribit.</string>
+    <string name="about_text">Krinik Tribit — приложение с открытым кодом для Bluetooth-колонки Tribit StormBox Blast 2.</string>
     <string name="about_author">Автор: Николай Кривуша (Krinik)</string>
     <string name="about_repo">Исходный код на GitHub</string>
     <string name="about_author_github">Автор на GitHub</string>
-    <string name="about_legal">Krinik Tribit не связан с Tribit и Thousandshores. Tribit — их товарный знак.</string>
+    <string name="about_legal">Krinik Tribit — независимый проект. Tribit — товарный знак компании Thousandshores.</string>
 
     <string name="debug">Отладка</string>
-    <string name="debug_sub">Сборка, устройство и экран</string>
+    <string name="debug_sub">Билд, устройство и экран</string>
 </resources>
