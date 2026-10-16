@@ -3,7 +3,7 @@
 > Topic: что нужно решить, чтобы патч 8 («аккаунт не нужен») включился и колонка открывалась без входа
 > Source of the idea: ваши слова 2026-10-16 ≈ 09:16 «аккаунт не нужен» · «запросы проверки прошивки делаем БЕЗ аккаунта»; прогон на A51 с колонкой
 > Created: 2026-10-16 10:03 +03:00
-> Status: **🟡 awaiting the owner's answers**
+> Status: **✅ answered 2026-10-16 10:45 +03:00 — Q1 = C + слова владельца, Q2 = A; не применено (переходит в новый чат, `STATUS.md` → «Где продолжить» п. 1)**
 
 ## Context / что уже найдено
 
@@ -40,7 +40,7 @@
   - Почему: новые модели без нашего обновления; минус — запрос к Tribit при каждом подключении и больше кода.
 - **D) your own answer** —
 
-**Answer:**
+**Answer:** C) — работаем с сервером трибит анонимным аккаунтом без передачи им данных о пользователе, девайс ид и прочее, только сообщаем, какая колонка просит прошивку и настроек <!-- owner-review: by Mikalai Kryvusha · 16 октября 2026, 10:45 (+03:00) -->
 
 ### Q2. Когда проверять, нет ли новой прошивки для колонки?
 <!-- archaeology: LC_ALL=C.UTF-8 grep -rniE "проверя|новой|прошив|колон" interviews/ GOAL.md MASTER_PLAN.md plans/ → 30 hits · read: MASTER_PLAN.md:79, plans/01 §4б п.6 and §5, plans/02 row 23 · prior: "запросы проверки прошивки делаем БЕЗ аккаунта" (MASTER_PLAN.md:79) - the check stays; WHEN it runs (button / every open / weekly) - not decided -->
@@ -61,7 +61,7 @@ Tribit (`checkFirmwareUpgrade`) при каждом открытии стран�
   - Результат: обновление видно с задержкой до недели, запросов в разы меньше.
 - **D) your own answer** —
 
-**Answer:**
+**Answer:** A) <!-- owner-review: by Mikalai Kryvusha · 16 октября 2026, 10:45 (+03:00) -->
 
 ## Proposed implementation plan (after answers)
 

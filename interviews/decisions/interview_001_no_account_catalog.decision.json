@@ -1,0 +1,22 @@
+{
+  "kind": "interview",
+  "document": "interviews/interview_001_no_account_catalog.md",
+  "by": "Mikalai Kryvusha",
+  "at": "2026-10-16T07:45:19.577Z",
+  "atHuman": "16 октября 2026, 10:45 (+03:00)",
+  "comment": "",
+  "answers": {
+    "Q1": {
+      "choice": "C",
+      "text": "работаем с сервером трибит анонимным аккаунтом без передачи им данных о пользователе, девайс ид и прочее, только сообщаем, какая колонка просит прошивку и настроек",
+      "comment": ""
+    },
+    "Q2": {
+      "choice": "A",
+      "text": "",
+      "comment": ""
+    }
+  },
+  "rev": "ddd0e8d2c3b727f14a3e3688431da80cda3fc31e89940aefdee129cba86f7d07",
+  "revAfter": "681f7242dd378b5de2e140a9f0441a27c1ffd11af8eaac7cb67ad3a7ba25fedb"
+}

@@ -58,3 +58,5 @@ gateway answers «Full authentication» (fallback; local data needed only for th
 another Tribit model loses the speaker page; B: their catalog in a public repository; C: more smali, still needs the data of
 A or B for the substitution> · consulted <recon of the app's own answers above; owner's word on accounts - the choice of
 which models the fork supports is the owner's (asked in the next session's chat, not decided here)>
+
+**Fork closed 2026-10-16 10:45 +03:00 by the owner** (`interviews/interview_001` Q1 = C, his words: «работаем с сервером трибит анонимным аккаунтом без передачи им данных о пользователе, девайс ид и прочее, только сообщаем, какая колонка просит прошивку и настроек»): talk to their server with an anonymous account, send no user data and no device id, tell it only which speaker asks for firmware and settings. Q2 = A: the firmware check runs on a button.
