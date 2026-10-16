@@ -915,6 +915,26 @@ def _drop_line(text, line, what):
     return text.replace(full, "")
 
 
+# --- Patch 22: the device base inside the APK ------------------------------------------------------------------
+# Owner 2026-10-16 ≈ 11:00 +03:00: «скачай БД из ГУГЛ телефонов, кладемм внутрь АПК» · «но чтобы не больше 1 мб файл весил»
+# (MASTER_PLAN decision journal). patches/assets/krinik_devices.txt (`Brand|Model` per line, built by
+# tools/devices/make_device_base.py from Google Play's supported-devices list) goes to assets/krinik/devices.txt; the
+# request rewriting that picks a random device from it once per install is the next step (plans/01 §5).
+# [TESTED: 2026-10-16 · build: assets/krinik/devices.txt in the APK, byte-equal to the source (cmp); A51 launch to MainNewActivity, no crash]
+DEVICE_BASE = pathlib.Path(__file__).resolve().parent / "assets" / "krinik_devices.txt"
+DEVICE_BASE_MAX = 1_000_000
+
+
+def patch_device_base():
+    data = DEVICE_BASE.read_bytes()
+    if not data or len(data) > DEVICE_BASE_MAX:
+        sys.exit(f"FAIL: device base size {len(data)} (must be 1..{DEVICE_BASE_MAX})")
+    target = ROOT / "assets" / "krinik" / "devices.txt"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(data)
+    print(f"ok 22 device base: {data.count(b'\n')} devices, {len(data)} bytes -> assets/krinik/devices.txt")
+
+
 # --- Variant: debug — «Debug Krinik Tribit», its own package beside the original ---------------------------
 # Owner's rule R6 (HOUSE_RULES.md): two builds, debug named «Debug Krinik Tribit», release «Krinik Tribit», different
 # signing keys. The debug build gets its own package so it installs next to the owner's original Tribit and the agent
@@ -995,6 +1015,7 @@ if __name__ == "__main__":
     patch_no_forced_update()
     patch_firebase_off()
     patch_no_cloud()
+    patch_device_base()
     if "--debug" in sys.argv[2:]:
         variant_debug()
     print("all patches applied")

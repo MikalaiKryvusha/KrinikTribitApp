@@ -1,0 +1,1134 @@
+Google|Pixel 10
+Google|Pixel 10 Pro
+Google|Pixel 10 Pro Fold
+Google|Pixel 10 Pro XL
+Google|Pixel 10a
+Google|Pixel 7
+Google|Pixel 7 Pro
+Google|Pixel 7a
+Google|Pixel 8
+Google|Pixel 8 Pro
+Google|Pixel 8a
+Google|Pixel 9
+Google|Pixel 9 Pro
+Google|Pixel 9 Pro Fold
+Google|Pixel 9 Pro XL
+Google|Pixel 9a
+Google|Pixel Fold
+Honor|ABR-LX1
+Honor|ABR-LX2
+Honor|ABR-LX3
+Honor|ABR-NX1
+Honor|ABR-NX3
+Honor|ALI-NX1
+Honor|ALI-NX3
+Honor|ALI-NX3P
+Honor|ALT-LX1
+Honor|ALT-LX2
+Honor|ALT-LX3
+Honor|ALT-NX1
+Honor|ALT-NX3
+Honor|ANY-LX1
+Honor|ANY-LX2
+Honor|ANY-LX3
+Honor|ANY-NX1
+Honor|BRC-NX1
+Honor|BRP-NX1
+Honor|BRP-NX1M
+Honor|BRP-NX3
+Honor|BSN-NX1
+Honor|BVL-AN00
+Honor|BVL-AN16
+Honor|BVL-N49
+Honor|CLK-LX1
+Honor|CLK-LX2
+Honor|CLK-LX3
+Honor|CLK-NX1
+Honor|CLK-NX2
+Honor|CLK-NX3
+Honor|CMA-LX1
+Honor|CMA-LX2
+Honor|CMA-LX3
+Honor|CRT-LX1
+Honor|CRT-LX2
+Honor|CRT-LX3
+Honor|CRT-NX1
+Honor|CRT-NX3
+Honor|DNP-NX9
+Honor|DNY-NX9
+Honor|ELI-AN00
+Honor|ELI-NX9
+Honor|ELP-AN00
+Honor|ELP-NX9
+Honor|FNE-NX9
+Honor|GFY-LX2
+Honor|GFY-LX2P
+Honor|GFY-LX3
+Honor|JDY-LX1
+Honor|JDY-LX2
+Honor|JDY-LX3
+Honor|JDY-LX3P
+Honor|LAB-LX1
+Honor|LAB-LX2
+Honor|LAB-LX3
+Honor|LBU-LX1
+Honor|LBU-LX2
+Honor|LBU-LX3
+Honor|LGE-NX9
+Honor|LGN-LX1
+Honor|LGN-LX2
+Honor|LGN-LX3
+Honor|LGN-NX1
+Honor|LGN-NX3
+Honor|LLY-LX1
+Honor|LLY-LX2
+Honor|LLY-LX3
+Honor|LLY-NX1
+Honor|LLY-NX3
+Honor|LNA-LX2
+Honor|LNA-LX3
+Honor|MAG-AN00
+Honor|MLD-LX2
+Honor|MRK-LX1
+Honor|MRK-LX2
+Honor|MRK-LX3
+Honor|MTN-NX1
+Honor|MTN-NX3
+Honor|NAA-LX2
+Honor|NAA-LX2P
+Honor|NAA-LX3
+Honor|NIC-LX1
+Honor|NIC-LX2
+Honor|NIC-LX3
+Honor|NLA-LX1
+Honor|NLA-LX2
+Honor|NLA-LX2P
+Honor|NLA-LX3
+Honor|NLA-NX1
+Honor|NLA-NX3
+Honor|PGT-N09
+Honor|PGT-N19
+Honor|PTP-N29
+Honor|PTP-N49
+Honor|RBN-NX1
+Honor|RBN-NX3
+Honor|REA-NX9
+Honor|RKY-LX1
+Honor|RKY-LX2
+Honor|RKY-LX3
+Honor|RMO-NX1
+Honor|RMO-NX3
+Honor|TFY-LX1
+Honor|TFY-LX2
+Honor|TFY-LX3
+Honor|VNA-LX2
+Honor|VNA-LX3
+Honor|VNE-LX1
+Honor|VNE-LX2
+Honor|VNE-LX3
+Honor|VNE-N41
+Honor|WDY-LX1
+Honor|WDY-LX2
+Honor|WDY-LX3
+Honor|WOD-LX1
+Honor|WOD-LX2
+Honor|WOD-LX3
+Infinix|Infinix X6528
+Infinix|Infinix X6528B
+Infinix|Infinix X6531
+Infinix|Infinix X6531B
+Infinix|Infinix X663C
+Infinix|Infinix X669
+Infinix|Infinix X669C
+Infinix|Infinix X669D
+Infinix|Infinix X671
+Infinix|Infinix X6711
+Infinix|Infinix X671B
+Infinix|Infinix X6720
+Infinix|Infinix X6720B
+Infinix|Infinix X676B
+Infinix|Infinix X676C
+Infinix|Infinix X6819
+Infinix|Infinix X6826
+Infinix|Infinix X6826B
+Infinix|Infinix X6826C
+Infinix|Infinix X6833B
+Infinix|Infinix X6835
+Infinix|Infinix X6835B
+Infinix|Infinix X6836
+Infinix|Infinix X6837
+Infinix|Infinix X6838
+Infinix|Infinix X6850
+Infinix|Infinix X6850B
+Infinix|Infinix X6851
+Infinix|Infinix X6852
+Infinix|Infinix X6853
+Infinix|Infinix X6881
+Infinix|Infinix X6882
+Infinix|Infinix X6882B
+Motorola|lamu_g
+Motorola|Lenovo K15 Plus
+Motorola|lion
+Motorola|M-51G
+Motorola|moto g - 2025
+Motorola|moto g 5G (2022)
+Motorola|moto g 5G - 2023
+Motorola|moto g 5G - 2024
+Motorola|moto g max
+Motorola|moto g play - 2024
+Motorola|moto g power - 2025
+Motorola|moto g power 5G - 2024
+Motorola|moto g stylus 5G (2022)
+Motorola|moto g stylus 5G - 2023
+Motorola|moto g(100)
+Motorola|moto g(40) fusion
+Motorola|moto g(50)
+Motorola|moto g(50) 5G
+Motorola|moto g04
+Motorola|moto g04s
+Motorola|moto g05
+Motorola|moto g06
+Motorola|moto g06 power
+Motorola|moto g200 5G
+Motorola|moto g22
+Motorola|moto g23
+Motorola|moto g24
+Motorola|moto g24 power
+Motorola|moto g31
+Motorola|moto g31(w)
+Motorola|moto g32
+Motorola|moto g34 5G
+Motorola|moto g34 5GP
+Motorola|moto g35 5G
+Motorola|moto g37
+Motorola|moto g37 power
+Motorola|moto g41
+Motorola|moto g42
+Motorola|moto g45 5G
+Motorola|moto g47
+Motorola|moto g51 5G
+Motorola|moto g52
+Motorola|moto g52j 5G
+Motorola|moto g53 5G
+Motorola|moto g53j 5G
+Motorola|moto g53s 5G
+Motorola|moto g53y 5G
+Motorola|moto g54 5G
+Motorola|moto g55 5G
+Motorola|moto g56 5G
+Motorola|moto g57
+Motorola|moto g57 power
+Motorola|moto g62 5G
+Motorola|moto g64 5G
+Motorola|moto g64y 5G
+Motorola|moto g66j 5G
+Motorola|moto g66y 5G
+Motorola|moto g67
+Motorola|moto g67 power 5G
+Motorola|moto g71 5G
+Motorola|moto g72
+Motorola|moto g73 5G
+Motorola|moto g75 5G
+Motorola|moto g77
+Motorola|moto g77 power
+Motorola|moto g82 5G
+Motorola|moto g84 5G
+Motorola|moto g85 5G
+Motorola|moto g86 5G
+Motorola|moto g86 power 5G
+Motorola|moto g87
+Motorola|moto g96 5G
+Motorola|motorola
+Motorola|motorola edge
+Motorola|motorola edge (2022)
+Motorola|motorola edge 2023
+Motorola|motorola edge 2024
+Motorola|motorola edge 30
+Motorola|motorola edge 30 fusion
+Motorola|motorola edge 30 neo
+Motorola|motorola edge 30 pro
+Motorola|motorola edge 30 ultra
+Motorola|motorola edge 40
+Motorola|motorola edge 40 neo
+Motorola|motorola edge 40 pro
+Motorola|motorola edge 50
+Motorola|motorola edge 50 fusion
+Motorola|motorola edge 50 neo
+Motorola|motorola edge 50 pro
+Motorola|motorola edge 50 ultra
+Motorola|motorola edge 60
+Motorola|motorola edge 60 fusion
+Motorola|motorola edge 60 neo
+Motorola|motorola edge 60 pro
+Motorola|motorola edge 60 stylus
+Motorola|motorola edge 60s pro
+Motorola|motorola edge plus
+Motorola|motorola razr 40
+Motorola|XT2169-2
+Motorola|XT2171-3
+Motorola|XT2225-2
+Motorola|XT2335-3
+Motorola|XT2343-3
+Motorola|XT2363-4
+Motorola|XT2427-4
+Motorola|XT2533-4
+Nothing|A024
+Nothing|A059
+Nothing|A059P
+Nothing|A063
+Nothing|A065
+Nothing|A142
+Nothing|A142P
+Nothing|AIN065
+OnePlus|CPH2381
+OnePlus|CPH2399
+OnePlus|CPH2401
+OnePlus|CPH2409
+OnePlus|CPH2411
+OnePlus|CPH2413
+OnePlus|CPH2415
+OnePlus|CPH2417
+OnePlus|CPH2419
+OnePlus|CPH2423
+OnePlus|CPH2447
+OnePlus|CPH2449
+OnePlus|CPH2451
+OnePlus|CPH2459
+OnePlus|CPH2465
+OnePlus|CPH2467
+OnePlus|CPH2487
+OnePlus|CPH2491
+OnePlus|CPH2493
+OnePlus|CPH2513
+OnePlus|CPH2515
+OnePlus|CPH2573
+OnePlus|CPH2581
+OnePlus|CPH2583
+OnePlus|CPH2585
+OnePlus|CPH2605
+OnePlus|CPH2609
+OnePlus|CPH2611
+OnePlus|CPH2613
+OnePlus|CPH2619
+OnePlus|CPH2621
+OnePlus|CPH2645
+OnePlus|CPH2647
+OnePlus|CPH2649
+OnePlus|CPH2653
+OnePlus|CPH2655
+OnePlus|CPH2661
+OnePlus|CPH2663
+OnePlus|CPH2691
+OnePlus|CPH2723
+OnePlus|DE2117
+OnePlus|DE2118
+OnePlus|GN2200
+OnePlus|IV2201
+OnePlus|NE2210
+OnePlus|NE2211
+OnePlus|NE2213
+OnePlus|NE2215
+OnePlus|NE2217
+OnePlus|PHB110
+OnePlus|PJD110
+OnePlus|PJZ110
+OnePlus|PKX110
+Oppo|A301OP
+Oppo|A302OP
+Oppo|A303OP
+Oppo|A401OP
+Oppo|A501OP
+Oppo|CPH1919
+Oppo|CPH1919RU
+Oppo|CPH1921
+Oppo|CPH2339
+Oppo|CPH2357
+Oppo|CPH2359
+Oppo|CPH2385
+Oppo|CPH2387
+Oppo|CPH2407
+Oppo|CPH2471
+Oppo|CPH2477
+Oppo|CPH2481
+Oppo|CPH2483
+Oppo|CPH2495
+Oppo|CPH2505
+Oppo|CPH2521
+Oppo|CPH2523
+Oppo|CPH2525
+Oppo|CPH2531
+Oppo|CPH2541
+Oppo|CPH2553
+Oppo|CPH2557
+Oppo|CPH2565
+Oppo|CPH2577
+Oppo|CPH2579
+Oppo|CPH2591
+Oppo|CPH2599
+Oppo|CPH2603
+Oppo|CPH2607
+Oppo|CPH2625
+Oppo|CPH2629
+Oppo|CPH2631
+Oppo|CPH2637
+Oppo|CPH2639
+Oppo|CPH2683
+Oppo|CPH2687
+Oppo|CPH2689
+Oppo|CPH2697
+Oppo|CPH2699
+Oppo|CPH2701
+Oppo|CPH3669
+Oppo|OPG05
+Oppo|OPPO A57
+Oppo|OPPO A57t
+Oppo|OPPO A77
+Oppo|OPPO A77t
+Oppo|OPPO A79
+Oppo|OPPO A79k
+Oppo|OPPO A79kt
+Oppo|OPPO A79t
+Oppo|PCCM00
+Oppo|PCCT00
+Oppo|PGX110
+Oppo|PHU110
+Oppo|PHV110
+Oppo|PHW110
+Oppo|PJH110
+Oppo|PJJ110
+Oppo|PJV110
+Oppo|PJW110
+Oppo|PKK110
+Oppo|PKM110
+Oppo|RMX3830
+POCO|21121210G
+POCO|22021211RG
+POCO|22021211RI
+POCO|2207117BPG
+POCO|22071219CG
+POCO|22071219CI
+POCO|22101320G
+POCO|22101320I
+POCO|23049PCD8G
+POCO|23049PCD8I
+POCO|23076PC4BI
+POCO|23113RKC6G
+POCO|2311DRK48G
+POCO|2311DRK48I
+POCO|23122PCD1G
+POCO|23122PCD1I
+POCO|2312FPCA6G
+POCO|2404APC5FG
+POCO|24066PC95I
+POCO|24069PC21G
+POCO|24069PC21I
+POCO|24095PCADG
+POCO|24095PCADI
+POCO|2409FPCC4G
+POCO|2409FPCC4I
+POCO|24108PCE2I
+POCO|24117RK2CG
+POCO|24122RKC7G
+POCO|2412DPC0AG
+POCO|2412DPC0AI
+POCO|25053PC47G
+POCO|25053PC47I
+POCO|25057PC09I
+POCO|25062PC34E
+POCO|25062PC34G
+Realme|RMX2202
+realme|RMX3301
+realme|RMX3312
+realme|RMX3511
+realme|RMX3512
+realme|RMX3513
+realme|RMX3615
+realme|RMX3617
+realme|RMX3624
+realme|RMX3627
+realme|RMX3630
+realme|RMX3636
+realme|RMX3660
+realme|RMX3661
+realme|RMX3663
+realme|RMX3686
+realme|RMX3687
+realme|RMX3709
+realme|RMX3710
+realme|RMX3740
+realme|RMX3741
+realme|RMX3751
+realme|RMX3760
+realme|RMX3762
+realme|RMX3765
+realme|RMX3771
+realme|RMX3780
+realme|RMX3785
+realme|RMX3820
+realme|RMX3823
+realme|RMX3840
+realme|RMX3842
+realme|RMX3851
+realme|RMX3853
+realme|RMX3867
+realme|RMX3871
+realme|RMX3888
+realme|RMX3890
+realme|RMX3910
+realme|RMX3921
+realme|RMX3930
+realme|RMX3939
+realme|RMX3941
+realme|RMX3943
+realme|RMX3950
+realme|RMX3951
+realme|RMX3963
+realme|RMX3988
+realme|RMX3997
+realme|RMX3999
+realme|RMX5000
+realme|RMX5011
+realme|RMX5020
+realme|RMX5051
+realme|RMX5054
+realme|RMX5056
+realme|RMX5057
+realme|RMX5070
+realme|RMX5074
+realme|RMX5078
+realme|RMX5085
+realme|RMX5303
+Redmi|21091116AC
+Redmi|21091116AI
+Redmi|21091116C
+Redmi|21091116UC
+Redmi|21091116UG
+Redmi|21121119SC
+Redmi|2201116SC
+Redmi|2201116SG
+Redmi|2201116SI
+Redmi|2201116SR
+Redmi|2201116TG
+Redmi|2201116TI
+Redmi|2201117SG
+Redmi|2201117SI
+Redmi|2201117SL
+Redmi|2201117SY
+Redmi|2201117TG
+Redmi|2201117TI
+Redmi|2201117TL
+Redmi|2201117TY
+Redmi|22031116BG
+Redmi|22041216C
+Redmi|22041216UC
+Redmi|22041219C
+Redmi|220733SFG
+Redmi|220733SG
+Redmi|220733SI
+Redmi|220733SL
+Redmi|220743FI
+Redmi|22087RA4DI
+Redmi|2209116AG
+Redmi|22101316C
+Redmi|22101316G
+Redmi|22101316I
+Redmi|22101316UC
+Redmi|22101316UCP
+Redmi|22101316UG
+Redmi|22101316UP
+Redmi|22101317C
+Redmi|22101320C
+Redmi|22120RN86G
+Redmi|22120RN86I
+Redmi|22126RN91Y
+Redmi|2212ARNC4L
+Redmi|23021RAA2Y
+Redmi|23021RAAEG
+Redmi|23026RN54G
+Redmi|23027RAD4I
+Redmi|23028RA60L
+Redmi|23028RN4DG
+Redmi|23028RNCAG
+Redmi|23030RAC7Y
+Redmi|2303CRA44A
+Redmi|2303ERA42L
+Redmi|23049RAD8C
+Redmi|23053RN02A
+Redmi|23053RN02I
+Redmi|23053RN02L
+Redmi|23053RN02Y
+Redmi|23054RA19C
+Redmi|23076RA4BR
+Redmi|23076RN8DY
+Redmi|23090RA98C
+Redmi|23090RA98G
+Redmi|23090RA98I
+Redmi|23100RN82L
+Redmi|23106RN0DA
+Redmi|23108RN04Y
+Redmi|23117RA68G
+Redmi|2311DRN14I
+Redmi|2311FRAFDC
+Redmi|23124RA7EO
+Redmi|23124RN87G
+Redmi|23124RN87I
+Redmi|23129RA5FL
+Redmi|23129RAA4G
+Redmi|23129RN51H
+Redmi|23129RN51X
+Redmi|2312CRAD3C
+Redmi|2312CRNCCL
+Redmi|2312DRA50C
+Redmi|2312DRA50G
+Redmi|2312DRA50I
+Redmi|2312DRAABC
+Redmi|2312DRAABG
+Redmi|2312DRAABI
+Redmi|24040RA98R
+Redmi|24040RN64Y
+Redmi|24044RN32L
+Redmi|24048RN6CG
+Redmi|24048RN6CI
+Redmi|24049RN28L
+Redmi|2404ARN45A
+Redmi|2406ERN9CC
+Redmi|2406ERN9CI
+Redmi|24090RA29C
+Redmi|24090RA29G
+Redmi|24090RA29I
+Redmi|24094RAD4C
+Redmi|24094RAD4G
+Redmi|24094RAD4I
+Redmi|2409BRN2CA
+Redmi|2409BRN2CG
+Redmi|2409BRN2CL
+Redmi|2409BRN2CY
+Redmi|24115RA8EC
+Redmi|24115RA8EG
+Redmi|24115RA8EI
+Redmi|24116RACCG
+Redmi|24117RN76E
+Redmi|24117RN76G
+Redmi|24117RN76L
+Redmi|24117RN76O
+Redmi|2411DRN47I
+Redmi|2502FRA65G
+Redmi|25057RN09E
+Redmi|25057RN09G
+Redmi|25057RN09I
+Redmi|25057RN09R
+Redmi|25062RN2DE
+Redmi|25062RN2DL
+Redmi|25062RN2DY
+Redmi|25078RA3EA
+Redmi|25078RA3EE
+Redmi|25078RA3EL
+Redmi|25078RA3EY
+Redmi|2508CRN2BE
+Redmi|2508CRN2BI
+Redmi|2602BRNA4I
+Redmi|A401XM
+Redmi|A501XM
+Redmi|M2101K7BI
+Redmi|XIG03
+Redmi|XIG05
+Samsung|SC-51C
+Samsung|SC-51D
+Samsung|SC-51E
+Samsung|SC-51F
+Samsung|SC-52C
+Samsung|SC-52D
+Samsung|SC-52E
+Samsung|SC-52F
+Samsung|SC-53C
+Samsung|SC-53D
+Samsung|SC-53E
+Samsung|SC-53F
+Samsung|SC-54C
+Samsung|SC-54D
+Samsung|SC-54E
+Samsung|SC-54F
+Samsung|SC-55C
+Samsung|SC-55D
+Samsung|SC-55E
+Samsung|SC-55F
+Samsung|SC-56C
+Samsung|SC-56F
+Samsung|SCG04
+Samsung|SCG13
+Samsung|SCG14
+Samsung|SCG15
+Samsung|SCG16
+Samsung|SCG17
+Samsung|SCG18
+Samsung|SCG19
+Samsung|SCG20
+Samsung|SCG21
+Samsung|SCG22
+Samsung|SCG23
+Samsung|SCG24
+Samsung|SCG25
+Samsung|SCG26
+Samsung|SCG27
+Samsung|SCG28
+Samsung|SCG29
+Samsung|SCG30
+Samsung|SCG31
+Samsung|SCG32
+Samsung|SCG33
+Samsung|SCG34
+Samsung|SCG35
+Samsung|SM-A135F
+Samsung|SM-A135M
+Samsung|SM-A135N
+Samsung|SM-A135U
+Samsung|SM-A135U1
+Samsung|SM-A136B
+Samsung|SM-A136M
+Samsung|SM-A136S
+Samsung|SM-A136U
+Samsung|SM-A136U1
+Samsung|SM-A136W
+Samsung|SM-A137F
+Samsung|SM-A145F
+Samsung|SM-A145FB
+Samsung|SM-A145M
+Samsung|SM-A145MB
+Samsung|SM-A145P
+Samsung|SM-A145R
+Samsung|SM-A146B
+Samsung|SM-A146M
+Samsung|SM-A146P
+Samsung|SM-A146U
+Samsung|SM-A146U1
+Samsung|SM-A146W
+Samsung|SM-A155F
+Samsung|SM-A155M
+Samsung|SM-A155N
+Samsung|SM-A1560
+Samsung|SM-A156B
+Samsung|SM-A156E
+Samsung|SM-A156M
+Samsung|SM-A156U
+Samsung|SM-A156U1
+Samsung|SM-A156W
+Samsung|SM-A165F
+Samsung|SM-A165M
+Samsung|SM-A165N
+Samsung|SM-A1660
+Samsung|SM-A166B
+Samsung|SM-A166E
+Samsung|SM-A166M
+Samsung|SM-A166P
+Samsung|SM-A166U
+Samsung|SM-A166U1
+Samsung|SM-A166W
+Samsung|SM-A175F
+Samsung|SM-A175N
+Samsung|SM-A1760
+Samsung|SM-A176B
+Samsung|SM-A176U
+Samsung|SM-A176U1
+Samsung|SM-A176W
+Samsung|SM-A233C
+Samsung|SM-A235F
+Samsung|SM-A235M
+Samsung|SM-A235N
+Samsung|SM-A2360
+Samsung|SM-A236B
+Samsung|SM-A236E
+Samsung|SM-A236M
+Samsung|SM-A236U
+Samsung|SM-A236U1
+Samsung|SM-A236V
+Samsung|SM-A245F
+Samsung|SM-A245M
+Samsung|SM-A245N
+Samsung|SM-A253C
+Samsung|SM-A253Q
+Samsung|SM-A253Z
+Samsung|SM-A2560
+Samsung|SM-A256B
+Samsung|SM-A256E
+Samsung|SM-A256N
+Samsung|SM-A256U
+Samsung|SM-A256U1
+Samsung|SM-A266B
+Samsung|SM-A266M
+Samsung|SM-A266U
+Samsung|SM-A266U1
+Samsung|SM-A3360
+Samsung|SM-A336B
+Samsung|SM-A336E
+Samsung|SM-A336M
+Samsung|SM-A336N
+Samsung|SM-A3460
+Samsung|SM-A346B
+Samsung|SM-A346E
+Samsung|SM-A346M
+Samsung|SM-A346N
+Samsung|SM-A3560
+Samsung|SM-A356B
+Samsung|SM-A356E
+Samsung|SM-A356N
+Samsung|SM-A356U
+Samsung|SM-A356U1
+Samsung|SM-A356W
+Samsung|SM-A3660
+Samsung|SM-A366B
+Samsung|SM-A366E
+Samsung|SM-A366N
+Samsung|SM-A366Q
+Samsung|SM-A366U
+Samsung|SM-A366U1
+Samsung|SM-A366W
+Samsung|SM-A5360
+Samsung|SM-A536B
+Samsung|SM-A536E
+Samsung|SM-A536N
+Samsung|SM-A536U
+Samsung|SM-A536U1
+Samsung|SM-A536V
+Samsung|SM-A536W
+Samsung|SM-A5460
+Samsung|SM-A546B
+Samsung|SM-A546E
+Samsung|SM-A546U
+Samsung|SM-A546U1
+Samsung|SM-A546V
+Samsung|SM-A546W
+Samsung|SM-A5560
+Samsung|SM-A556B
+Samsung|SM-A556E
+Samsung|SM-A5660
+Samsung|SM-A566B
+Samsung|SM-A566E
+Samsung|SM-A566U1
+Samsung|SM-A566W
+Samsung|SM-A736B
+Samsung|SM-F7070
+Samsung|SM-F707B
+Samsung|SM-F707N
+Samsung|SM-F707U
+Samsung|SM-F707U1
+Samsung|SM-F707W
+Samsung|SM-F7210
+Samsung|SM-F721B
+Samsung|SM-F721C
+Samsung|SM-F721N
+Samsung|SM-F721U
+Samsung|SM-F721U1
+Samsung|SM-F721W
+Samsung|SM-F7310
+Samsung|SM-F731B
+Samsung|SM-F731N
+Samsung|SM-F731Q
+Samsung|SM-F731U
+Samsung|SM-F731U1
+Samsung|SM-F731W
+Samsung|SM-F7410
+Samsung|SM-F741B
+Samsung|SM-F741N
+Samsung|SM-F741Q
+Samsung|SM-F741U
+Samsung|SM-F741U1
+Samsung|SM-F741W
+Samsung|SM-F7610
+Samsung|SM-F761B
+Samsung|SM-F761N
+Samsung|SM-F761U
+Samsung|SM-F761U1
+Samsung|SM-F7660
+Samsung|SM-F766B
+Samsung|SM-F766N
+Samsung|SM-F766Q
+Samsung|SM-F766U
+Samsung|SM-F766U1
+Samsung|SM-F766W
+Samsung|SM-F766Z
+Samsung|SM-F9360
+Samsung|SM-F936B
+Samsung|SM-F936N
+Samsung|SM-F936U
+Samsung|SM-F936U1
+Samsung|SM-F936W
+Samsung|SM-F9460
+Samsung|SM-F946B
+Samsung|SM-F946N
+Samsung|SM-F946Q
+Samsung|SM-F946U
+Samsung|SM-F946U1
+Samsung|SM-F946W
+Samsung|SM-F9560
+Samsung|SM-F956B
+Samsung|SM-F956N
+Samsung|SM-F956Q
+Samsung|SM-F956U
+Samsung|SM-F956U1
+Samsung|SM-F956W
+Samsung|SM-F9660
+Samsung|SM-F966B
+Samsung|SM-F966N
+Samsung|SM-F966Q
+Samsung|SM-F966U
+Samsung|SM-F966U1
+Samsung|SM-F966W
+Samsung|SM-F966Z
+Samsung|SM-M145F
+Samsung|SM-M146B
+Samsung|SM-M156B
+Samsung|SM-M346B
+Samsung|SM-M346B1
+Samsung|SM-M346B2
+Samsung|SM-M356B
+Samsung|SM-M546B
+Samsung|SM-M556B
+Samsung|SM-M556E
+Samsung|SM-M558B
+Samsung|SM-S136DL
+Samsung|SM-S146VL
+Samsung|SM-S156V
+Samsung|SM-S166V
+Samsung|SM-S176V
+Samsung|SM-S236DL
+Samsung|SM-S237VL
+Samsung|SM-S256VL
+Samsung|SM-S266V
+Samsung|SM-S356V
+Samsung|SM-S366V
+Samsung|SM-S536DL
+Samsung|SM-S546VL
+Samsung|SM-S7110
+Samsung|SM-S711B
+Samsung|SM-S711N
+Samsung|SM-S711U
+Samsung|SM-S711U1
+Samsung|SM-S711W
+Samsung|SM-S7210
+Samsung|SM-S721B
+Samsung|SM-S721N
+Samsung|SM-S721Q
+Samsung|SM-S721U
+Samsung|SM-S721U1
+Samsung|SM-S721W
+Samsung|SM-S731B
+Samsung|SM-S731N
+Samsung|SM-S731U
+Samsung|SM-S731U1
+Samsung|SM-S731W
+Samsung|SM-S9010
+Samsung|SM-S901B
+Samsung|SM-S901E
+Samsung|SM-S901N
+Samsung|SM-S901U
+Samsung|SM-S901U1
+Samsung|SM-S901W
+Samsung|SM-S9060
+Samsung|SM-S906B
+Samsung|SM-S906E
+Samsung|SM-S906N
+Samsung|SM-S906U
+Samsung|SM-S906U1
+Samsung|SM-S906W
+Samsung|SM-S9080
+Samsung|SM-S908B
+Samsung|SM-S908E
+Samsung|SM-S908N
+Samsung|SM-S908U
+Samsung|SM-S908U1
+Samsung|SM-S908W
+Samsung|SM-S9110
+Samsung|SM-S911B
+Samsung|SM-S911C
+Samsung|SM-S911N
+Samsung|SM-S911U
+Samsung|SM-S911U1
+Samsung|SM-S911W
+Samsung|SM-S9160
+Samsung|SM-S916B
+Samsung|SM-S916N
+Samsung|SM-S916U
+Samsung|SM-S916U1
+Samsung|SM-S916W
+Samsung|SM-S9180
+Samsung|SM-S918B
+Samsung|SM-S918N
+Samsung|SM-S918Q
+Samsung|SM-S918U
+Samsung|SM-S918U1
+Samsung|SM-S918W
+Samsung|SM-S9210
+Samsung|SM-S921B
+Samsung|SM-S921E
+Samsung|SM-S921N
+Samsung|SM-S921Q
+Samsung|SM-S921U
+Samsung|SM-S921U1
+Samsung|SM-S921W
+Samsung|SM-S9260
+Samsung|SM-S926B
+Samsung|SM-S926N
+Samsung|SM-S926U
+Samsung|SM-S926U1
+Samsung|SM-S926W
+Samsung|SM-S9280
+Samsung|SM-S928B
+Samsung|SM-S928N
+Samsung|SM-S928Q
+Samsung|SM-S928U
+Samsung|SM-S928U1
+Samsung|SM-S928W
+Samsung|SM-S9310
+Samsung|SM-S931B
+Samsung|SM-S931N
+Samsung|SM-S931Q
+Samsung|SM-S931U
+Samsung|SM-S931U1
+Samsung|SM-S931W
+Samsung|SM-S931Z
+Samsung|SM-S9360
+Samsung|SM-S936B
+Samsung|SM-S936N
+Samsung|SM-S936U
+Samsung|SM-S936U1
+Samsung|SM-S936W
+Samsung|SM-S9370
+Samsung|SM-S937B
+Samsung|SM-S937N
+Samsung|SM-S937U
+Samsung|SM-S937U1
+Samsung|SM-S937W
+Samsung|SM-S9380
+Samsung|SM-S938B
+Samsung|SM-S938N
+Samsung|SM-S938Q
+Samsung|SM-S938U
+Samsung|SM-S938U1
+Samsung|SM-S938W
+Samsung|SM-S938Z
+Tecno|TECNO BG7
+Tecno|TECNO BG7n
+Tecno|TECNO CH6i
+Tecno|TECNO CH6IS
+Tecno|TECNO CK6
+Tecno|TECNO CK6n
+Tecno|TECNO CK6ns
+Tecno|TECNO CK8nB
+Tecno|TECNO CK9n
+Tecno|TECNO CL6
+Tecno|TECNO CL6k
+Tecno|TECNO CL6s
+Tecno|TECNO CL7
+Tecno|TECNO CL7k
+Tecno|TECNO CL7s
+Tecno|TECNO CL8
+Tecno|TECNO CL9
+Tecno|TECNO CLA5
+Tecno|TECNO CLA6
+Tecno|TECNO KI5k
+Tecno|TECNO KI5m
+Tecno|TECNO KI5n
+Tecno|TECNO KI5q
+Tecno|TECNO KI5qs
+Tecno|TECNO KI7
+Tecno|TECNO KI7s
+Tecno|TECNO KJ5
+Tecno|TECNO KJ5n
+Tecno|TECNO KJ5s
+Tecno|TECNO KJ6
+Tecno|TECNO KJ7
+Tecno|TECNO KJ7s
+Tecno|TECNO KJ8
+Tecno|TECNO KL5
+Tecno|TECNO KL5n
+Tecno|TECNO KL5s
+Tecno|TECNO KL6
+Tecno|TECNO KL7
+Tecno|TECNO KL8
+Tecno|TECNO KL8h
+Tecno|TECNO KL8hs
+Tecno|TECNO KL8s
+Tecno|TECNO Mobile CLA6
+Vivo|V2183A
+Vivo|V2185A
+Vivo|V2186A
+Vivo|V2207
+Vivo|V2227A
+Vivo|V2238
+Vivo|V2241A
+Vivo|V2241HA
+Vivo|V2242A
+Vivo|V2357A
+Vivo|V2357EA
+Vivo|V2415
+Vivo|V2415A
+Vivo|V2419
+Vivo|V2419A
+Vivo|V2420
+Vivo|V2423
+Vivo|V2430
+Vivo|V2431
+Vivo|V2434
+Vivo|V2435
+Vivo|V2436
+Vivo|V2438
+Vivo|V2443
+Vivo|V2447
+Vivo|V2458A
+Vivo|V2531
+Vivo|V2547
+Vivo|vivo Y22
+Vivo|vivo Y28
+Xiaomi|2112123AC
+Xiaomi|2201122C
+Xiaomi|2201122G
+Xiaomi|2201123C
+Xiaomi|2201123G
+Xiaomi|2203121C
+Xiaomi|2203129G
+Xiaomi|2206122SC
+Xiaomi|2206123SC
+Xiaomi|22071212AG
+Xiaomi|2207122MC
+Xiaomi|22081212C
+Xiaomi|22081212R
+Xiaomi|22081212UG
+Xiaomi|2210129SG
+Xiaomi|2210132C
+Xiaomi|2210132G
+Xiaomi|2211133C
+Xiaomi|2211133G
+Xiaomi|22200414R
+Xiaomi|2304FPN6DC
+Xiaomi|2304FPN6DG
+Xiaomi|2306EPN60G
+Xiaomi|23078PND5G
+Xiaomi|23088PND5R
+Xiaomi|23116PN5BC
+Xiaomi|2311BPN23C
+Xiaomi|23127PN0CC
+Xiaomi|23127PN0CG
+Xiaomi|24030PN60G
+Xiaomi|24031PN0DC
+Xiaomi|24053PY09I
+Xiaomi|2406APNFAG
+Xiaomi|2407FPN8EG
+Xiaomi|2407FPN8ER
+Xiaomi|2410DPN6CC
+Xiaomi|24129PN74C
+Xiaomi|24129PN74G
+Xiaomi|24129PN74I
+Xiaomi|25010PN30C
+Xiaomi|25010PN30G
+Xiaomi|25010PN30I
+Xiaomi|25019PNF3C
+Xiaomi|25042PN24C
+Xiaomi|25069PTEBG
+Xiaomi|2506BPN68G
+Xiaomi|2506BPN68R
+Xiaomi|A201XM
+Xiaomi|A301XM
+Xiaomi|A402XM
+Xiaomi|Xiaomi for arm64
+Xiaomi|XIG04
+Xiaomi|XIG07

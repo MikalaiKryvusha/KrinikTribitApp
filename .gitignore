@@ -61,3 +61,6 @@ testcases/reports/shots/**/run.json
 
 # Claude Code local permissions of this machine (adb stand rules) - never shared
 .claude/settings.local.json
+
+# Raw Google Play supported-devices download (public, large) - only the compact base derived from it is tracked
+/tools/devices/raw/
