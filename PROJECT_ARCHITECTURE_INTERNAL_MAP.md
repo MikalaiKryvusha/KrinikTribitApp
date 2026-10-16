@@ -6,32 +6,45 @@
 
 ---
 
-## The core abstractions
+## Two products
 
-| Abstraction | What it *is* (essence) | Responsibility |
-|-------------|------------------------|----------------|
-| Their app (reference) | Tribit 5.0.0 `com.thousandshores.tribit`, decompiled | the reference behaviour and the source of the speaker protocol |
-| Patch | an anchored text edit of smali or resources | fixes one defect of their app; fails loudly when the anchor moved |
-| Fork build | their split APK set, patched base + untouched splits, one signing key | what goes on the Titan today |
-| Speaker | a Tribit speaker (StormBox Blast 2 on the stand) | the device both apps control |
-| Speaker protocol | packets `EA <len> <cmd> <data> <checksum>` over RFCOMM (UUID `0CF12D31-…`) or BLE (`0000ffa0`/`ffa1`) | EQ (cmds 4, 11), volume (13), light (12/52), battery (6); EQ gain shifted +12 |
-| Krinik Tribit | their app + our patches, signed by our key | the product: the owner chose to fix their app — «чиним ИХ приложение» (chat 2026-10-16) |
+1. **Our app** (`app/`, `com.kriniks.tribit`, debug `com.kriniks.tribit.debug`) — written from scratch, the owner's
+   decision «Делаем по плану C» (2026-10-16 15:24). The main line.
+2. **The fallback** (`native/`, «Old Krinik Tribit», `com.kriniks.tribit.old`) — Tribit 5.0.0 with our fixes, for models and
+   firmware our app does not handle yet; only blocking fixes.
 
-All protocol facts above are read from decompiled code (`researches/03_tribit_app_pains.md`), `[NOT-TESTED]` on a speaker.
+## Our app — the layers
+
+| Layer | Abstraction | Responsibility |
+|---|---|---|
+| `protocol/` (pure Kotlin, JVM tests) | `Packet` + `Framer` | the packet `EA <len> <cmd> <payload> <sum>`; a byte stream cut into packets by `len`, checksum flagged |
+| | `Blast2`, `Eq`, `Settings`, `SpeakerState`, `SpeakerSettings` | command builders and reply parsing of the Blast 2 (`researches/11` §3); the state = only what the speaker answered |
+| | `Profile` | the settings file (`ideas/01`): EQ + light as JSON |
+| `link/` | `SpeakerLink` | one SPP socket: open, send, read loop on `Dispatchers.IO`, close once; debug log `KT.Link` |
+| | `SpeakerViewModel` | the one owner of the connection: follows the speaker's link while the app is on screen, startup queries, one command in flight (each waits for the speaker's echo), state flows for the UI |
+| `ui/` | `Page`, `Card`, `SettingsRow`, `Choices`, `PinkButton`, theme | KARTUN's design scheme: one set of components everywhere (GOAL.md 11:18) |
+| | `HomeScreen` + `SpeakerCard`, `EqScreen`, `SpeakerSettingsScreen`, About, Debug | screens; a screen shows the speaker's answer, never a default |
+| `src/debug` | `DebugTools`, `EarActivity` | debug-only: device facts; the A51 microphone as the stand's ear |
 
 ## How they interact
 
 ```
-original-apk ──decode──▶ work/base ──patches──▶ fork build ──adb──▶ Titan ──BT──▶ Speaker
+Speaker ──SPP bytes──▶ SpeakerLink.readLoop ──Framer──▶ Frame ──▶ SpeakerState / SpeakerSettings ──StateFlow──▶ Compose
+   ▲                                                                                                          │
+   └──────── SpeakerLink.send ◀── exchange (lock, echo, retry) ◀── SpeakerViewModel actions ◀── user taps ◀───┘
+Android Bluetooth broadcasts (ACL, A2DP, adapter) ──▶ SpeakerViewModel.receiver (only while on screen)
 ```
 
 ## Invariants & rules of the model
 
-- A patch never edits by line number — only by an exact anchor that must occur exactly once.
-- The fork's split set is signed by ONE key; a mixed set does not install.
+- The screen shows only what the speaker answered; an unanswered value is «—» (EXP-0009).
+- One command in flight; a set waits for its echo (500 ms × attempt, 3 attempts).
+- No location permission, no scan: the bonded Blast 2 and `BLUETOOTH_CONNECT` only.
+- The link lives only while the app is on screen (`onStart`/`onStop`); a cancelled link sets no state.
 - No component of ours talks to Tribit's servers (`HOUSE_RULES.md` R2).
+- App texts are the owner's text — written by `AUTHOR_STYLOMETRY.md` (`HOUSE_RULES.md` R10).
 
-## Key decisions embedded in the architecture
+## The fallback — how it is built
 
-- Their app is fixed by patches, not rewritten (the owner, 2026-10-16: «чиним ИХ приложение»). Texts that come from
-  their server are intercepted and replaced by ours; layouts are reworked as resources (researches 04–06).
+`native/` (Tribit's apktool tree + our fixes) ──`build.sh`──▶ variant step ──apktool──▶ signed APK. A patch edits by an exact
+anchor only; protocol facts for our app are read from its code (`decompiled/`), never linked.
