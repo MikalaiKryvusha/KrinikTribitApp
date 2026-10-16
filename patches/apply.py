@@ -713,6 +713,68 @@ def patch_no_forced_update():
     print("ok 10 no forced update: both checkUpdate return at once")
 
 
+# --- Patch 21: Firebase out - no analytics with the advertising ID, no Crashlytics, no pushes ------------------
+# Owner 2026-10-16 ≈ 09:21 +03:00: «Firebase: аналитика с рекламным идентификатором (разрешение AD_ID), Crashlytics,
+# пуши - выпиливаем нахуй» (MASTER_PLAN decision journal). The libraries stay in the APK (their registrars are looked up
+# by FirebaseApp; cutting them crashes getInstance() calls) - Firebase's own documented switches turn collection off:
+# analytics deactivated, ad-id collection off, Crashlytics off, messaging and in-app messaging auto-init off. The ad
+# permissions and the push entry points (our receiver of FCM, the FCM service, the instance-id receiver) leave the
+# manifest; the token request in MainNewActivity/MainActivity.onResume goes too (it would still register the phone).
+# [TESTED: 2026-10-16 · A51 vs control: FirebaseMessaging log lines 67 -> 0, «App measurement deactivated», «Sessions SDK disabled», no ad/push permissions, no crash · testcases/reports/2026-10-16_wave1.md]
+FIREBASE_OFF = (
+    '        <meta-data android:name="firebase_analytics_collection_deactivated" android:value="true"/>\n'
+    '        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false"/>\n'
+    '        <meta-data android:name="google_analytics_default_allow_ad_personalization_signals" android:value="false"/>\n'
+    '        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false"/>\n'
+    '        <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false"/>\n'
+    '        <meta-data android:name="firebase_inapp_messaging_auto_data_collection_enabled" android:value="false"/>\n')
+AD_PERMISSIONS = ["com.google.android.c2dm.permission.RECEIVE", "com.google.android.gms.permission.AD_ID",
+                  "android.permission.ACCESS_ADSERVICES_ATTRIBUTION", "android.permission.ACCESS_ADSERVICES_AD_ID"]
+PUSH_BLOCKS = [  # (opening line fragment, closing tag) - each removed whole, exactly once
+    ('<service android:exported="true" android:name="com.thousandshores.tribit.http.server.MyFirebaseMessagingService">', "</service>"),
+    ('<receiver android:exported="true" android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"', "</receiver>"),
+    ('<service android:directBootAware="true" android:exported="false" android:name="com.google.firebase.messaging.FirebaseMessagingService">', "</service>"),
+]
+FCM_TOKEN = re.compile(
+    r"    invoke-static \{\}, Lcom/google/firebase/messaging/FirebaseMessaging;->getInstance\(\)Lcom/google/firebase/messaging/FirebaseMessaging;\n"
+    r"(?:.*\n){1,16}?"
+    r"    invoke-virtual \{v0, v1\}, Lcom/google/android/gms/tasks/Task;->addOnCompleteListener\(Lcom/google/android/gms/tasks/OnCompleteListener;\)Lcom/google/android/gms/tasks/Task;\n")
+
+
+def patch_firebase_off():
+    m = ROOT / "AndroidManifest.xml"
+    t = m.read_text(encoding="utf-8")
+    for perm in AD_PERMISSIONS:
+        t = _drop_line(t, f'<uses-permission android:name="{perm}"/>', perm)
+    for opening, closing in PUSH_BLOCKS:
+        s = t.find(opening)
+        if s < 0 or t.find(opening, s + 1) >= 0:
+            sys.exit(f"FAIL: manifest block not found once: {opening[:70]}")
+        s = t.rfind("\n", 0, s) + 1
+        e = t.find(closing, s) + len(closing) + 1
+        t = t[:s] + t[e:]
+    anchor = '        <meta-data android:name="UMENG_CHANNEL"'
+    if t.count(anchor) != 1:
+        sys.exit("FAIL: UMENG_CHANNEL anchor for the Firebase switches")
+    t = t.replace(anchor, FIREBASE_OFF + anchor)
+    m.write_text(t, encoding="utf-8")
+    for cls in ("com.thousandshores.tribit.MainNewActivity", "com.thousandshores.tribit.MainActivity"):
+        p = smali(cls)
+        s = p.read_text(encoding="utf-8")
+        s2, n = FCM_TOKEN.subn("", s)
+        if n != 1:
+            sys.exit(f"FAIL: FCM token block in {cls}: {n}")
+        p.write_text(s2, encoding="utf-8")
+    print(f"ok 21 Firebase off: 6 switches, {len(AD_PERMISSIONS)} ad/push permissions and {len(PUSH_BLOCKS)} push entries removed, no FCM token")
+
+
+def _drop_line(text, line, what):
+    full = "    " + line + "\n"
+    if text.count(full) != 1:
+        sys.exit(f"FAIL: manifest line not found once: {what}")
+    return text.replace(full, "")
+
+
 # --- Variant: debug — «Debug Krinik Tribit», its own package beside the original ---------------------------
 # Owner's rule R6 (HOUSE_RULES.md): two builds, debug named «Debug Krinik Tribit», release «Krinik Tribit», different
 # signing keys. The debug build gets its own package so it installs next to the owner's original Tribit and the agent
@@ -790,6 +852,7 @@ if __name__ == "__main__":
     patch_no_account()
     patch_no_relogin()
     patch_no_forced_update()
+    patch_firebase_off()
     if "--debug" in sys.argv[2:]:
         variant_debug()
     print("all patches applied")
