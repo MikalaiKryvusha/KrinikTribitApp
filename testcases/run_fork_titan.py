@@ -15,13 +15,15 @@ import time
 sys.path.append(r"C:\Android\private\ui-agent")
 from ui import Agent  # noqa: E402
 
+# adb from the SDK, never from PATH: C:\adb 1.0.32 first in PATH kills the newer server (EXPERIENCE.md EXP-0006).
+ADB = r"C:\Android\Sdk\platform-tools\adb.exe"
 SERIAL = "192.168.1.3:5555"
 OUT = sys.argv[1]
 PKG = sys.argv[2] if len(sys.argv) > 2 else "com.kriniks.tribit.debug"
 
 
 def adb(*args):
-    return subprocess.run(["adb", "-s", SERIAL, *args], capture_output=True, text=True, encoding="utf-8").stdout.strip()
+    return subprocess.run([ADB, "-s", SERIAL, *args], capture_output=True, text=True, encoding="utf-8").stdout.strip()
 
 
 def top():
@@ -32,7 +34,7 @@ def top():
 def shot(name):
     png = f"{OUT}/{name}.png"
     with open(png, "wb") as f:
-        subprocess.run(["adb", "-s", SERIAL, "exec-out", "screencap", "-p"], stdout=f, check=True)
+        subprocess.run([ADB, "-s", SERIAL, "exec-out", "screencap", "-p"], stdout=f, check=True)
     subprocess.run(["magick", png, "-resize", "500x", "-quality", "80", f"{OUT}/{name}.webp"], check=True)
     subprocess.run(["cmd", "/c", "del", png.replace("/", "\\")], check=False)
 

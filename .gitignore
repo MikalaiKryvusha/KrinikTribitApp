@@ -58,3 +58,6 @@ __pycache__/
 
 # Raw device dumps of the test runs (status bar labels of the owner's tablet) - local only.
 testcases/reports/shots/**/run.json
+
+# Claude Code local permissions of this machine (adb stand rules) - never shared
+.claude/settings.local.json

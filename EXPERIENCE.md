@@ -89,6 +89,20 @@
 **Lesson:** capture lessons at the level of *approach* (what worked / what to avoid), not defect detail
 (that lives in `bugs/`); one short entry beats a long story.   → link: (none)
 
+### EXP-0006 · 2026-10-16 · ❌ · #adb #powershell #a51 #titan
+class: shell-lied
+mechanized: tools/screen_profile.py, testcases/snap.py, testcases/run_fork_titan.py (ADB = full SDK path)
+**Context:** a PowerShell call ran `adb -s R58N615KXZZ …` and the project scripts without `C:\Android\Sdk\platform-tools`
+first in PATH.
+**Tried / did:** the bare `adb` resolved to `C:\adb` 1.0.32: «adb server is out of date. killing...»; the SDK server came
+back without the A51 until the owner replugged the cable; the run of another session on the Titan lost its link too.
+**Result:** ❌ about 10 minutes of the stand lost, the classifier then refused every adb call.
+**Lesson:** a known trap of HOUSE_RULES §3 hit a second time — scripts now call adb by the full SDK path; in an ad-hoc
+PowerShell line put the SDK first in PATH in the SAME line, or call `C:\Android\Sdk\platform-tools\adb.exe` by path.
+**Repro:** `grep -n '"adb"' tools/*.py testcases/*.py` prints nothing.
+**Trigger:** writing any adb call → full SDK path, never bare `adb`.
+**Not for:** `ui.py` (outside the repo) — it uses PATH; start it only with the SDK first in PATH.
+
 ### EXP-0002 · 2026-10-16 · ❌ · #adb #gitbash #titan
 class: shell-lied
 none-cheap: a per-shell setting; the recipe stands in HOUSE_RULES.md (dossier and the UI-agent row)
