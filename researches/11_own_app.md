@@ -48,7 +48,34 @@ Pending — delegated code recon with verbatim quotes, mechanically checked befo
 
 ## 4. Industry
 
-Pending — delegated web sweep, a URL per claim.
+Collected by a delegated web sweep 2026-10-16; the four lines marked ✔ were re-read on developer.android.com by me.
+
+1. **Permissions without location.** Android 12+: `BLUETOOTH_SCAN` with `usesPermissionFlags="neverForLocation"` and
+   `BLUETOOTH_CONNECT`; «If you include `neverForLocation` …, some BLE beacons are filtered from the scan results» ✔. Android
+   11 and lower: «`ACCESS_FINE_LOCATION` is necessary because, on Android 11 and lower, a Bluetooth scan could potentially be
+   used to gather information about the location of the user» ✔. CompanionDeviceManager scans «without requiring the
+   location permission» ✔ — but «companion device pairing requires Location Services to be enabled» and «doesn't create
+   connections on its own» ✔ (https://developer.android.com/develop/connectivity/bluetooth/bt-permissions,
+   https://developer.android.com/develop/connectivity/bluetooth/companion-device-pairing). Already-paired devices come from
+   `getBondedDevices()` (https://developer.android.com/develop/connectivity/bluetooth/find-bluetooth-devices).
+2. **RFCOMM:** `cancelDiscovery()` before `connect()`; `connect()` blocks (≈ 12 s timeout) — off the main thread; always
+   `close()` (https://developer.android.com/develop/connectivity/bluetooth/connect-bluetooth-devices). No discovery while
+   connected (find-devices page). A2DP state through `getProfileProxy(…, BluetoothProfile.A2DP)`
+   (https://developer.android.com/develop/connectivity/bluetooth/profiles).
+3. **BLE GATT** (if a family needs it): one operation at a time, a queue (https://punchthrough.com/android-ble-operation-queue/);
+   Nordic Android-BLE-Library, BSD-3-Clause (https://github.com/NordicSemiconductor/Android-BLE-Library).
+4. **Prior art — reverse-engineered audio apps:** OpenSCQ30 (Soundcore; Rust core + Kotlin/Compose; protocol, connection
+   backends incl. a mock, device models — separate layers; GPL-3.0, https://github.com/Oppzippy/OpenSCQ30), Gadgetbridge
+   (AGPL-3.0, https://codeberg.org/Freeyourgadget/Gadgetbridge; JVM tests assert encoded requests as hex), FreeBuddy
+   (Apache-2.0, https://github.com/TheLastGimbus/FreeBuddy; fake transport + exact frame assertions). No public Tribit
+   protocol work was found (GitHub search «tribit»). Licences: we read their architecture, we copy no GPL code.
+5. **Compose speed:** release build with R8 (full mode default since AGP 8.0), Baseline + Startup Profiles («about 30%»
+   from the first launch), no heavy work in `Application.onCreate`, stable/immutable state, keyed lazy lists
+   (https://developer.android.com/develop/ui/compose/performance,
+   https://developer.android.com/topic/performance/baselineprofiles/overview,
+   https://developer.android.com/topic/performance/vitals/launch-time).
+6. **Anti-patterns:** connecting while discovery runs; socket I/O on the main thread; asking `ACCESS_FINE_LOCATION` on 12+;
+   GATT calls without a queue; not closing the socket or the profile proxy.
 
 ## 5. Findings → implications → forks
 
