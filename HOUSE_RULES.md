@@ -158,6 +158,8 @@
 | `bash build.sh` | собирает APK из `native/` (или, без него, из `original-apk/` патчами); классы Tribit из `native/src/` и наша Java — отдельным dex | якорь патча не найден (exit 1); смешанные подписи в наборе |
 | `python -I tools/native_src_guard.py native` | красный, если у класса из `native/src/` остался smali (с `$`-вложенными); `build.sh` зовёт его сам | Android берёт первую копию класса — старый smali тихо победил бы исходник |
 | `python -I tools/native_src_count.py native` | «source N of M (P %)» — сколько классов Tribit уже исходники (`plans/03`, критерий 3) | перенос «на глаз» |
+| `python -I tools/decompile_clean.py <app.jar> <файлы.java…\|@список>` | убирает из Java jadx вызовы Kotlin `foo$default(…)`: значения по умолчанию — из байт-кода APK (`tools/kotlin_defaults.py`), непонятное оставляет и печатает | заглушка jadx вместо значения по умолчанию (`null` вместо `EmptyCoroutineContext`); догадки |
+| `python -I tools/test_decompile_clean.py [app.jar]` | 10 случаев чистильщика на вызовах из кода Tribit | регресс чистильщика (доказан красным на копии без подстановки) |
 | `python -I tools/gen_r.py <public.xml> <dir> <пакеты…>` | R-классы Tribit из `public.xml` apktool — только для компиляции `native/src/` | в APK нет R (R8 вписал ID в код) |
 | `tools/dex2jar/dex-tools-2.4.38/` (вне git; `gh release download 2.4.38 -R ThexXTURBOXx/dex2jar`, sha256 `5d88e269…54e5c`) | dex → jar: classpath для компиляции `native/src/` | — |
 | `node researches/01_play_reviews/make-reviews-md.mjs` | пересобирает `researches/01_play_reviews.md` из сырых отзывов (вне git) | ручная правка сгенерированной таблицы |

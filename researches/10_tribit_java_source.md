@@ -59,6 +59,10 @@ are Kotlin's synthetic and name-mangled members: they exist in the bytecode, `ja
 source. **A mechanical rewrite closes this family:** `StringsKt.replace$default(s, a, b, false, 4, null)` →
 `StringsKt.replace(s, a, b, false)` (the mask argument says which defaults were used).
 
+After the phase-2 cleaner (`tools/decompile_clean.py`, defaults read from the APK's bytecode by
+`tools/kotlin_defaults.py`), 2026-10-16 15:21: **3 136 errors in 923 files** (−1 525); of the four top functions' 1 995
+`$default` calls 19 remain, all with a non-literal mask in code jadx failed to decompile.
+
 ## 4. Industry sweep
 
 Collected by a delegated web recon 2026-10-16; the three maintainer quotes were re-read by `gh issue view` (marked ✔).
