@@ -19,11 +19,15 @@
 |---|---|---|
 | `protocol/` (pure Kotlin, JVM tests) | `Packet` + `Framer` | the packet `EA <len> <cmd> <payload> <sum>`; a byte stream cut into packets by `len`, checksum flagged |
 | | `Blast2`, `Eq`, `Settings`, `SpeakerState`, `SpeakerSettings` | command builders and reply parsing of the Blast 2 (`researches/11` §3); the state = only what the speaker answered |
-| | `Profile` | the settings file (`ideas/01`): EQ + light as JSON |
+| | `Profile` | the settings file (`ideas/01`): EQ + light as JSON; «Экспорт» writes the EQ only |
+| | `UserPreset` | a custom preset made with «+»: name ≤ 15, ten bands, one JSON file each |
 | `link/` | `SpeakerLink` | one SPP socket: open, send, read loop on `Dispatchers.IO`, close once; debug log `KT.Link` |
-| | `SpeakerViewModel` | the one owner of the connection: follows the speaker's link while the app is on screen, startup queries, one command in flight (each waits for the speaker's echo), state flows for the UI |
-| `ui/` | `Page`, `Card`, `SettingsRow`, `Choices`, `PinkButton`, theme | KARTUN's design scheme: one set of components everywhere (GOAL.md 11:18) |
-| | `HomeScreen` + `SpeakerCard`, `EqScreen`, `SpeakerSettingsScreen`, About, Debug | screens; a screen shows the speaker's answer, never a default |
+| | `SpeakerViewModel` | the one owner of the connection: follows the speaker's link while the app is on screen, startup queries, one command in flight (each waits for the speaker's echo), state flows for the UI; the user's presets and which one is on the speaker |
+| | `PresetStore` | the user's presets as files `files/presets/<id>.json`, disk work on Dispatchers.IO |
+| `ui/` | `Page`, `Card`, `Strip`, `RoundIconButton`, `PrimaryButton`, `SoftButton`, `CenterDialog`, `Choices`, theme (`Kit.kt`, `Screens.kt`) | the accepted mock-ups A + A (`design/mockups-v1.html`) on native Material 3 (R11): one set of components everywhere |
+| | `CurveMath` + `Curve.kt` (`EqGraph`, `EqResponse`, `EqRibbon`, `EqEditor`) | one monotone curve through the bands for every EQ chart; the editor only for custom presets |
+| | `HomeScreen` + `SpeakerHome`, `EqScreen`, `EqFullScreen`, `SpeakerSettingsScreen`, About, Debug | screens; a screen shows the speaker's answer, never a default |
+| res | `speaker_blast2` | Tribit's photo from the private `native/krinik-app/res`; without `native/` a drawn stand-in of the same name |
 | `src/debug` | `DebugTools`, `EarActivity` | debug-only: device facts; the A51 microphone as the stand's ear |
 
 ## How they interact
@@ -41,7 +45,9 @@ Android Bluetooth broadcasts (ACL, A2DP, adapter) ──▶ SpeakerViewModel.rec
 - One command in flight; a set waits for its echo (500 ms × attempt, 3 attempts).
 - No location permission, no scan: the bonded Blast 2 and `BLUETOOTH_CONNECT` only.
 - The link lives only while the app is on screen (`onStart`/`onStop`); a cancelled link sets no state.
-- No component of ours talks to Tribit's servers (`HOUSE_RULES.md` R2).
+- No component of ours talks to Tribit's servers (`HOUSE_RULES.md` R2); their pictures come in once through the agent's
+  `tools/fetch_speaker_images.py` (R2, exception 2).
+- The activity handles rotation itself (`configChanges`): turning the phone never closes the speaker's channel.
 - App texts are the owner's text — written by `AUTHOR_STYLOMETRY.md` (`HOUSE_RULES.md` R10).
 
 ## The fallback — how it is built

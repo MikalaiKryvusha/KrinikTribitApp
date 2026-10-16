@@ -21,13 +21,17 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,6 +43,7 @@ import com.kriniks.tribit.link.Link
 import com.kriniks.tribit.protocol.Blast2
 import com.kriniks.tribit.protocol.Eq
 import com.kriniks.tribit.protocol.SpeakerState
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 /** Smallest height of a card button: the text may wrap to two lines on a narrow screen and is never cut (run 2026-10-16, Found 2). */
@@ -99,14 +104,44 @@ fun SpeakerHome(link: Link, speaker: SpeakerState, act: SpeakerActions) {
  */
 @Composable
 private fun Stage(lit: Boolean) {
-    val glow = Brush.radialGradient(
-        if (lit) listOf(Color(0x66FF1A8C), Color(0x1AFF1A8C), Color.Transparent)
-        else listOf(Color(0x40FF1A8C), Color(0x10FF1A8C), Color.Transparent),
-    )
-    Box(Modifier.fillMaxWidth().height(STAGE_HEIGHT).background(glow), contentAlignment = Alignment.Center) {
+    // The pink aura of mock-up A drawn behind the photo with an explicit radius: `Modifier.background(radialGradient(...))`
+    // without one spreads the gradient to an infinite radius and the pink all but vanished (the owner, 2026-10-16
+    // ≈ 21:1x +03:00: «ты тут делал красивую розовую ауру, я сейчас её не вижу … нужно сделать за картинками»).
+    val strength = if (lit) AURA_LIT else AURA
+    Box(
+        Modifier.fillMaxWidth().height(STAGE_HEIGHT).drawBehind {
+            // A dawn over the speaker (the owner ≈ 21:2x: «ты его сделай меньше вниз идущим, больше вверх» · «ассиметричным» ·
+            // «как рассвет над колонкой вверху»): a wide flat glow centred on the speaker's top edge - its lower half hides
+            // behind the body, the light rises above it. A round gradient squeezed into the oval fades to nothing exactly at
+            // its edge (an oval with a round gradient cut the light off: «ареол внизу обрезается, некрасиво»).
+            val c = Offset(size.width / 2f, size.height * DAWN_CENTER_Y)
+            val r = size.width * DAWN_RADIUS
+            scale(1f, DAWN_SQUEEZE, pivot = c) {
+                drawCircle(
+                    Brush.radialGradient(
+                        listOf(Color(0xFFFF1A8C).copy(alpha = strength), Color(0xFFFF1A8C).copy(alpha = strength * 0.3f), Color.Transparent),
+                        center = c, radius = r,
+                    ),
+                    radius = r, center = c,
+                )
+            }
+        },
+        contentAlignment = Alignment.Center,
+    ) {
         Image(painterResource(R.drawable.speaker_blast2), Blast2.NAME, Modifier.width(SPEAKER_WIDTH))
     }
 }
+
+/** Aura strength: the mock-up's 0.32 pink core; brighter while the speaker's light is on. */
+private const val AURA = 0.42f
+private const val AURA_LIT = 0.58f
+/** How long the volume slider holds the sent value waiting for the speaker's answer (exchange: 3 × 500 ms × attempt). */
+private const val VOLUME_WAIT_MS = 1500L
+
+/** The dawn: its centre (part of the stage height, near the speaker's top edge), radius (part of the width), height / width. */
+private const val DAWN_CENTER_Y = 0.36f
+private const val DAWN_RADIUS = 0.52f
+private const val DAWN_SQUEEZE = 0.50f
 
 private enum class Dot { Off, Wait, On }
 
@@ -189,16 +224,27 @@ private fun Player(s: SpeakerState, act: SpeakerActions) {
             .padding(horizontal = 18.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        // While the finger drags, the slider shows the finger; after release - the speaker's answer to the re-query.
+        // While the finger drags, the slider shows the finger; after release it holds the sent value until the speaker answers
+        // with it (echo 13 / notice 84) or VOLUME_WAIT_MS passes - then the speaker's own answer. Dropping the finger value at
+        // release threw the slider back to the old volume until the answer came, a visible jerk (the owner, 2026-10-16
+        // ≈ 21:2x: «ползунок гломкости дергается в момент передвижения и передачи на колонку значниния»).
         var dragging by remember { mutableStateOf<Float?>(null) }
-        val shown = dragging ?: (s.volume ?: 0).toFloat()
+        var sent by remember { mutableStateOf<Int?>(null) }
+        LaunchedEffect(sent, s.volume) {
+            if (sent != null && s.volume == sent) sent = null
+            else if (sent != null) { delay(VOLUME_WAIT_MS); sent = null }
+        }
+        val shown = dragging ?: (sent ?: s.volume ?: 0).toFloat()
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Icon(painterResource(R.drawable.ic_volume), stringResource(R.string.speaker_volume, s.volume?.toString() ?: "—", Blast2.VOLUME_MAX),
                 Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             Slider(
                 value = shown,
                 onValueChange = { dragging = it },
-                onValueChangeFinished = { dragging?.let { act.setVolume(it.roundToInt()) }; dragging = null },
+                onValueChangeFinished = {
+                    dragging?.roundToInt()?.let { v -> sent = v; act.setVolume(v) }
+                    dragging = null
+                },
                 valueRange = 0f..Blast2.VOLUME_MAX.toFloat(),
                 steps = Blast2.VOLUME_MAX - 1,
                 enabled = s.volume != null,
@@ -210,7 +256,7 @@ private fun Player(s: SpeakerState, act: SpeakerActions) {
                 ),
             )
             Text(
-                if (dragging != null) shown.roundToInt().toString() else s.volume?.toString() ?: stringResource(R.string.value_unknown),
+                if (dragging != null || sent != null) shown.roundToInt().toString() else s.volume?.toString() ?: stringResource(R.string.value_unknown),
                 Modifier.width(32.dp), style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.End,
             )
         }

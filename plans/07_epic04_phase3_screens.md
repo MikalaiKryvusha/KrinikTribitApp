@@ -24,7 +24,7 @@ the owner's later corrections (same interview, «Приёмка и следую�
 | # | Element (mock-up) | Behaviour | In the app now? | Step |
 |---|---|---|---|---|
 | H1 | Logo «Krinik Tribit» with a pink K, gear button right (owner ≈ 19:31) | gear opens app Settings | text title + a row | 2 |
-| H2 | Speaker drawing on a pink glow, light rings | drawn by us (`interviews/interview_004` open: photo or drawing) | no | 2 |
+| H2 | The speaker on a pink glow — the dawn over the speaker (owner ≈ 21:2x «сейчас красиво») | Tribit's Blast 2 photo (`interviews/interview_004` Q1 = D) from the private `native/krinik-app/res`; a stand-in without `native/` | done | 2 |
 | H3 | Name + pills «Подключена», battery icon + % | values from the speaker, «—» until answered | text lines | 2 |
 | H4 | Player card: volume slider 0..31 with the number; prev · big pink «Пауза/Играть» (from C) · next | prev/next = cmd 2 [1]/[2] | slider + outlined button | 2–3 |
 | H5 | EQ strip full width: icon, «Эквалайзер», preset name, response curve with ten band labels | opens EQ | a row | 2 |
@@ -45,7 +45,9 @@ the owner's later corrections (same interview, «Приёмка и следую�
 
 - [x] 1. Shared pieces: vector icons from the sheet (`res/drawable/ic_*.xml`), `PrimaryButton`, `RoundIconButton`,
       `Strip`, `CenterDialog`, the response curve (monotone cubic, `CurveMathTest`).
-- [x] 2. Home A (H1–H8) + the speaker drawing — seen on the A51 (`testcases/reports/2026-10-16_phase3_screens.md`).
+- [ ] 2. Home A — H1–H7 seen on the A51 (`testcases/reports/2026-10-16_phase3_screens.md`); H8 (the not-connected faces)
+      not walked; the speaker photo with the dawn glow seen on the A51 21:19; the volume slider holds the sent value (A51
+      21:21, screen recording: 7 after release, no jump back).
 - [ ] 3. Prev / next commands in `SpeakerViewModel` — written; not pressed (volume 9, sound only at 1–2).
 - [x] 4. EQ graph card + preset cards (E1, E2) — seen; preset names by Tribit's Blast 2 code (owner 19:55 «x-3d где???»).
 - [ ] 5. Custom presets (E3, E4, E8 seen; E6 rename not walked).

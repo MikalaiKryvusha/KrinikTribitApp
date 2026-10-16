@@ -57,7 +57,7 @@
 >      claim-before-evidence, owner-decision-not-applied, text-in-agents-world,
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
 >      field-dropped-in-rebuild, renamed-package-identity, own-work-not-recalled, dex-reference-limit,
->      owner-text-past-portrait -->
+>      owner-text-past-portrait, reference-not-inventoried, stand-state-not-read -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -76,6 +76,8 @@
 | `own-work-not-recalled` | a tool or recipe the owner's projects already have was not looked up before the work |
 | `dex-reference-limit` | a patch adds method references to a dex that is already at 65 536 and apktool refuses to build |
 | `owner-text-past-portrait` | text the owner or the app's user reads was written without the owner's voice portrait loaded |
+| `reference-not-inventoried` | screens copied from a reference app without first counting its elements row by row |
+| `stand-state-not-read` | the stand's state changed without reading it first, so it cannot be put back |
 >
 > <!-- class-ok: claim-before-evidence — its machine-checkable part (a ☑ «tested» in plans/02 without a run report) is mechanized by tools/check_tested_ticks.py (EXP-0008); what stays (which observation a sentence in a chat rests on: a probe, a screen, a device log line) lives in replies no tool sees — /fable-judge's claim-wider-than-observation hunt is its check -->
 >

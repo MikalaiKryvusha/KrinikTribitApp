@@ -35,7 +35,11 @@ KrinikTribit/
 | Path | What it is | Depends on / references |
 |------|-----------|-------------------------|
 | `app/` | OUR app (Kotlin + Compose, `com.kriniks.tribit`): `protocol/` codec, Blast 2 commands, EQ, settings, settings file (JVM tests in `app/src/test`), `link/` SPP socket + `SpeakerViewModel`, `ui/` screens; `src/debug` — debug tools and the ear | `researches/11` §3 (protocol), KARTUN's theme; `gradlew.bat assembleDebug` / `assembleRelease` (R8, key from `.env`) |
-| `native/` (private repo) | Tribit 5.0.0 decoded by apktool + our fixes; new fixes are commits here | `build.sh` copies it into `work/base/` |
+| `native/` (private repo) | Tribit 5.0.0 decoded by apktool + our fixes; new fixes are commits here; `krinik-app/` - Tribit's speaker photos for OUR app (`res/`, `photos/`) | `build.sh` copies it into `work/base/` without `krinik-app/`; `app/build.gradle.kts` takes `krinik-app/res` |
+| `app/src/photostub/` | the drawn stand-in of the speaker photo for a build without `native/` | `app/build.gradle.kts` |
+| `design/mockups-v1.html` | the mock-up sheet (A + A accepted, `interviews/interview_003`) | `tools/shoot-mockups.mjs` → `design/mockups-v1/*.webp` |
+| `tools/fetch_speaker_images.py` | anonymous new-device guest → Tribit's two catalogs → every picture into `design/photos/` (ignored) | `HOUSE_RULES.md` R2, exception 2 |
+| `researches/12_tribit_blast2_inventory.md` | the parity inventory of Tribit's Blast 2 screens, 110 rows | `decompiled/` |
 | `patches/apply.py` | patches 1–36 (how `native/` commit 2 was made) and the variant step `--variant` | `work/base/` (written by `build.sh`) |
 | `build.sh` | the fork's build | `original-apk/`, `tools/apktool.jar`, `patches/apply.py`, SDK build-tools 36.0.0 |
 | `researches/03_tribit_app_pains.md` | the pain list + protocol notes; code quotes point into `decompiled/` and `work/base/` | `01_play_reviews.md`, `diagnostics/` |
