@@ -155,7 +155,11 @@
 | `python tools/check_tested_ticks.py` | галочка «проверено» в `plans/02` называет существующий отчёт прогона; exit 1 со строкой | галочка шире наблюдения (EXP-0008) |
 | `python tools/check_ctrl_chars.py [файлы…]` | перед коммитом ищет управляющие символы (BEL, form feed…) в изменённых текстовых файлах; exit 1 с файлом и строкой | потерянный уровень экранирования, который превращает `\a`, `\f` пути Windows в байт и проходит с зелёным кодом (EXP-0007) |
 | `python testcases/splash_request_check.py · firebase_check.py <serial> <порт>` | проверки патчей 8а и 21 на устройстве: запросы словаря при старте; строки Firebase и рекламные разрешения | патч, проверенный только сборкой |
-| `bash build.sh` | собирает патченую сборку из `original-apk/` и подписывает набор сплитов одним ключом | якорь патча не найден (exit 1); смешанные подписи в наборе |
+| `bash build.sh` | собирает APK из `native/` (или, без него, из `original-apk/` патчами); классы Tribit из `native/src/` и наша Java — отдельным dex | якорь патча не найден (exit 1); смешанные подписи в наборе |
+| `python -I tools/native_src_guard.py native` | красный, если у класса из `native/src/` остался smali (с `$`-вложенными); `build.sh` зовёт его сам | Android берёт первую копию класса — старый smali тихо победил бы исходник |
+| `python -I tools/native_src_count.py native` | «source N of M (P %)» — сколько классов Tribit уже исходники (`plans/03`, критерий 3) | перенос «на глаз» |
+| `python -I tools/gen_r.py <public.xml> <dir> <пакеты…>` | R-классы Tribit из `public.xml` apktool — только для компиляции `native/src/` | в APK нет R (R8 вписал ID в код) |
+| `tools/dex2jar/dex-tools-2.4.38/` (вне git; `gh release download 2.4.38 -R ThexXTURBOXx/dex2jar`, sha256 `5d88e269…54e5c`) | dex → jar: classpath для компиляции `native/src/` | — |
 | `node researches/01_play_reviews/make-reviews-md.mjs` | пересобирает `researches/01_play_reviews.md` из сырых отзывов (вне git) | ручная правка сгенерированной таблицы |
 | `node tools/unwire-owner-word-hooks.mjs` | снимает хуки `pretool-owner-word` и `stop-owner-answer` из `.claude/settings.json` | возврат хуков ⏩ после обновления KAIF |
 | `node .kaif/tools/kaif-voice-lint.mjs check <файлы…>` | машинная проверка текста владельца по портрету `AUTHOR_STYLOMETRY.md` (вне git) | текст «не моим языком» в README и документах владельца |

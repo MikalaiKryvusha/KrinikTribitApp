@@ -45,12 +45,31 @@ else
 fi
 "$JAVA" -jar tools/apktool.jar b work/base -o out/unsigned.apk >/dev/null
 
-# Our own code (patches/java, e.g. krinik.ScrollFix of patch 16) -> one extra classesN.dex inside the APK.
+# Our own code (patches/java, e.g. krinik.ScrollFix of patch 16) and Tribit's classes rewritten as Java source
+# (native/src, plans/03_EPIC_java_source.md) -> one extra classesN.dex inside the APK.
 SDK="${ANDROID_SDK_KRINIK:-C:/Android/Sdk}"
 ANDROID_JAR="$SDK/platforms/android-36/android.jar"
-rm -rf work/java && mkdir -p work/java/classes work/java/dex
-"$JAVA_HOME/bin/javac" --release 11 -nowarn -classpath "$ANDROID_JAR" -d work/java/classes $(find patches/java -name '*.java')
-JAVA_HOME="$JAVA_HOME" "$BT/d8.bat" --min-api 26 --lib "$ANDROID_JAR" --output work/java/dex $(find work/java/classes -name '*.class')
+DEX2JAR="tools/dex2jar/dex-tools-2.4.38/d2j-dex2jar.bat"   # ThexXTURBOXx/dex2jar 2.4.38, sha256 5d88e269…54e5c (GitHub's digest)
+rm -rf work/java && mkdir -p work/java/classes work/java/dex work/java/r work/java/rclasses
+SOURCES=$(find patches/java -name '*.java')
+CLASSPATH="$ANDROID_JAR"
+D8_CP=()
+if [ -d native/src ] && [ -n "$(find native/src -name '*.java')" ]; then
+  # A class written as source must not keep its smali: Android would run the first copy (tools/native_src_guard.py).
+  python -I tools/native_src_guard.py native
+  # Their classes as a jar - what the sources compile against; R from apktool's public.xml - compile time only.
+  [ -f "$DEX2JAR" ] || { echo "FAIL: $DEX2JAR missing - gh release download 2.4.38 -R ThexXTURBOXx/dex2jar"; exit 1; }
+  cmd //c "${DEX2JAR//\//\\} -f -o work\\java\\app.jar out\\unsigned.apk" >/dev/null 2>&1
+  [ -f work/java/app.jar ] || { echo "FAIL: dex2jar wrote no work/java/app.jar"; exit 1; }
+  python -I tools/gen_r.py native/res/values/public.xml work/java/r com.thousandshores.tribit com.thousandshores.tool \
+    com.thousandshores.commondialog com.thousandshores.widget com.thousandshores.bluetoothlib
+  "$JAVA_HOME/bin/javac" --release 11 -nowarn -d work/java/rclasses $(find work/java/r -name '*.java')
+  CLASSPATH="$ANDROID_JAR;work/java/app.jar;work/java/rclasses"
+  D8_CP=(--classpath work/java/app.jar)
+  SOURCES="$SOURCES $(find native/src -name '*.java')"
+fi
+"$JAVA_HOME/bin/javac" --release 11 -nowarn -encoding UTF-8 -classpath "$CLASSPATH" -d work/java/classes $SOURCES
+JAVA_HOME="$JAVA_HOME" "$BT/d8.bat" --min-api 26 --lib "$ANDROID_JAR" "${D8_CP[@]}" --output work/java/dex $(find work/java/classes -name '*.class')
 python -I patches/add_dex.py out/unsigned.apk work/java/dex/classes.dex
 
 if [ ! -f "$KEYSTORE" ]; then
