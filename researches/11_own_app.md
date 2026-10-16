@@ -3,7 +3,7 @@
 > **Created:** 2026-10-16 (the owner, chat 15:24 +03:00: «Сворачиваем план на суть C» · «Делаем по плану C») ·
 > **Parent:** `MASTER_PLAN.md` phases 2–3, `researches/03` (protocol notes), `researches/08` (beauty), `researches/10`
 > (tools for reading their code) · **Status:** rung 1 of `/plan-epic` for `plans/04_EPIC_own_app.md`; requirements and local
-> state 15:35, industry 15:36, the Blast 2 protocol 15:40 (24 of 24 quotes checked) — rung 1 complete except KARTUN's answer ·
+> state 15:35, industry 15:36, the Blast 2 protocol 15:40 (24 of 24 quotes checked) ; KARTUN's answer 15:45 (§4a) — rung 1 complete ·
 > **Outbound:** forks → `interviews/`; questions to the KARTUN session (sent 15:29)
 
 ## 1. Requirements — the owner's words
@@ -139,6 +139,34 @@ Collected by a delegated web sweep 2026-10-16; the four lines marked ✔ were re
    https://developer.android.com/topic/performance/vitals/launch-time).
 6. **Anti-patterns:** connecting while discovery runs; socket I/O on the main thread; asking `ACCESS_FINE_LOCATION` on 12+;
    GATT calls without a queue; not closing the socket or the profile proxy.
+
+## 4a. The model — KARTUN (the answer of the KARTUN session, 2026-10-16 ≈ 15:45 +03:00; every path checked by reading)
+
+All paths under `D:\work\ai_sandbox\KARTUN` (read-only for us).
+
+1. **Design system — copy first:** `app/src/main/kotlin/com/kriniks/kartun/ui/theme/Theme.kt` (tokens: #FF1A8C on
+   near-black, Unbounded headings, Manrope text, shapes; every colour from `MaterialTheme.colorScheme`, no per-file colour
+   constants) · `ui/Common.kt` (`RoundIconButton`, `PrimaryButton`, `SecondaryButton`, `Pill`, `SectionLabel` with its (i),
+   `InfoButton`/`InfoDialog` — centred dialogs, never bottom sheets: the owner's word there) · `ui/SettingsScreen.kt` (rows,
+   groups) · `ui/AboutScreen.kt` (`Group`/`LinkGroup` cards) · `ui/ModelsScreen.kt` (cards, badges, filter chips). Style recon:
+   `researches/01_krinikcam_style_and_stack.md`.
+2. **Speed:** single activity, Compose, no navigation library; heavy work off the main thread (one engine thread,
+   `EngineThread.kt`); display bitmaps pre-scaled; R8 + resource shrinking in release (`app/build.gradle.kts`:
+   `isMinifyEnabled = true`, `isShrinkResources = true`). No baseline profiles and no startup measurement — our app adds
+   both (§4.5) and measures.
+3. **Navigation:** an own tiny router — a `Screen` enum in `UpscaleViewModel.kt`, `back()` maps a screen to its parent,
+   `MainActivity.kt` switches on it, `BackHandler` per screen; `enableEdgeToEdge` + `WindowInsets.systemBars` /
+   `statusBarsPadding` / `navigationBarsPadding` per screen. Our scaffold already follows it (`MainActivity.kt`, `Page`).
+4. **User guide:** `ui/ManualScreen.kt` renders `res/raw/manual.md` (`raw-ru/`) with a small markdown of its own; lesson —
+   plan the screenshots in from day one with a shooting tool.
+5. **Rakes not to repeat:** EXP-0024 (a tap script pressed into the owner's other app — `tools/titan-tap.mjs` refuses
+   unless our app is focused); EXP-0030 (screen-off tests lock the owner's device — run last, check the keyguard); EXP-0027
+   (heredocs eat backslashes — write scripts with the file tool; our EXP-0007 is the same class); a padding computed from an
+   unmeasured size went negative and crashed (`ResultScreen.kt` «Never below zero»); the owner's word goes into a comment
+   next to the code.
+6. **Tooling:** the UI agent (`C:\Android\private\ui-agent\`, one quoted string per command, SDK platform-tools first in
+   PATH); WebP shots (R4); mock-ups `design/*.html` shot by `tools/shoot-mockups.mjs`; README shots `tools/shoot-readme.mjs`.
+   Stand: the A51 is entirely ours (KARTUN does not support Android 13); KARTUN uses the Titan at `100.99.111.48:5555`.
 
 ## 5. Findings → implications → forks
 
