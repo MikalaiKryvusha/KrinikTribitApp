@@ -22,7 +22,9 @@ class SpeakerFramesTest {
             "EA 05 12 09 0A",          // volume 9
             "EA 05 13 02 04",          // play state 2
         )) for (fr in f.feed(hex(read))) { assertTrue(fr.toString(), fr.sumOk); s = s.apply(fr) }
-        assertEquals(SpeakerState(version = "26/7/24_11.4", battery = 30, volume = 9), s)
+        // play state 2 at rest = paused (mapped since the play/pause run 16:18); 88 → DSP 10098, «new» firmware
+        assertEquals(SpeakerState(version = "26/7/24_11.4", battery = 30, volume = 9, playing = false, dsp = 10098), s)
+        assertEquals(true, s.newFirmware)
         assertEquals(0, f.skipped)
     }
 
@@ -34,6 +36,24 @@ class SpeakerFramesTest {
         assertTrue(frames.all { it.sumOk })
         // The notice alone moves the volume - the speaker's own buttons send it too (researches/11 §3.6).
         assertEquals(10, SpeakerState(volume = 9).apply(frames[1]).volume)
+    }
+
+    @Test fun `eq state of the custom flat and of rock`() {
+        // At connect 16:47:15: custom (7), all bands wire 12 = 0 dB.
+        val custom = Eq.state(Framer().feed(hex("EA 0F 15 07 0C 0C 0C 0C 0C 0C 0C 0C 0C 0C 8D")).single(), true)!!
+        assertTrue(custom.custom)
+        assertEquals(List(10) { 0 }, custom.db)
+        // After Rock 16:48:43: the speaker sends id 5 with zero gains - the bands come from the Rock table, never -12 dB.
+        val rock = Eq.state(Framer().feed(hex("EA 0F 15 05 00 00 00 00 00 00 00 00 00 00 13")).single(), true)!!
+        assertEquals(Eq.Preset.ROCK, rock.preset)
+        assertEquals(listOf(10, 6, -4, -8, -6, 6, 12, 8, 2, 0), rock.db)
+    }
+
+    @Test fun `light on - echo, notice and state in one read`() {
+        // A51 16:53:18 after «1»: three packets in one read.
+        val frames = Framer().feed(hex("EA 05 0C 01 FC EA 05 55 01 45 EA 05 14 01 04"))
+        assertEquals(listOf(12, 85, 20), frames.map { it.cmd })
+        assertEquals(1, frames.fold(SpeakerState()) { s, f -> s.apply(f) }.light)
     }
 
     @Test fun `echo of play and pause`() {

@@ -20,17 +20,26 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.kriniks.tribit.BuildConfig
 import com.kriniks.tribit.protocol.Blast2
+import com.kriniks.tribit.protocol.Eq
+import com.kriniks.tribit.protocol.Frame
 import com.kriniks.tribit.protocol.SpeakerState
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 
 /** Where the way to the speaker stands - each value is one face of the home card. */
@@ -125,10 +134,9 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 c.open()
                 _link.value = Link.Connected(name)
-                launch {
-                    for (q in Blast2.startup()) { c.send(q); delay(Blast2.STARTUP_GAP_MS) }
-                }
-                c.readLoop { f -> _speaker.update { it.apply(f) } }
+                // The full state is re-read on every connect (`researches/11` §4b.4); each query waits for its answer.
+                launch { for (q in Blast2.startup()) request(c, q, q[CMD_INDEX].toInt() and 0xFF) }
+                c.readLoop { f -> _speaker.update { it.apply(f) }; frames.tryEmit(f) }
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
@@ -143,22 +151,71 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Sets the volume 0..31; the speaker's own answer to a re-query is what the slider then shows. */
-    fun setVolume(v: Int) = sendThen(Blast2.setVolume(v), Blast2.queryVolume())
+    /** Every packet from the speaker, for [request] to match answers; the state itself lives in [speaker]. */
+    private val frames = MutableSharedFlow<Frame>(extraBufferCapacity = FRAME_BUFFER)
+
+    /** One command in flight at a time (`researches/11` §4b.3). */
+    private val inFlight = Mutex()
+
+    /**
+     * Sends [packet] and waits for a packet with command [answer] from the speaker: 500 ms × attempt, 3 attempts
+     * (OpenSCQ30 `packet_io_controller.rs`, `researches/11` §4b.3). The Blast 2 echoes its set commands (13, 2 - seen
+     * on the A51); for the EQ the answer is its state 21. Returns false when the speaker stayed silent.
+     */
+    private suspend fun request(c: SpeakerLink, packet: ByteArray, answer: Int): Boolean = inFlight.withLock {
+        for (attempt in 1..ATTEMPTS) {
+            val got = coroutineScope {
+                val waiter = async(start = CoroutineStart.UNDISPATCHED) {
+                    withTimeoutOrNull(ANSWER_TIMEOUT_MS * attempt) { frames.first { it.cmd == answer } }
+                }
+                c.send(packet)
+                waiter.await()
+            }
+            if (got != null) return@withLock true
+            if (BuildConfig.DEBUG) Log.d(SpeakerLink.TAG, "no answer $answer, attempt $attempt")
+        }
+        false
+    }
+
+    /** Runs commands on the open link; a broken link ends the readLoop, which sets the card - nothing to do here. */
+    private fun commands(block: suspend (SpeakerLink) -> Unit) {
+        val c = conn ?: return
+        viewModelScope.launch { try { block(c) } catch (_: java.io.IOException) {} }
+    }
+
+    /** Sets the volume 0..31; the echo and the speaker's notice 84 move the slider. */
+    fun setVolume(v: Int) = commands { request(it, Blast2.setVolume(v), Blast2.CMD_VOLUME_SET) }
 
     /**
      * Play/pause by the last state the SPEAKER reported (unknown → play); the screen is not flipped ahead of its answer
-     * (EXP-0009). The state query after it is logged - its reply values are the inventory's open row.
+     * (EXP-0009); the state 19 read after it sets the button.
      */
     fun togglePlay() {
         val playing = _speaker.value.playing ?: false
-        sendThen(Blast2.play(if (playing) Blast2.PAUSE else Blast2.PLAY), Blast2.queryPlayState())
+        commands {
+            request(it, Blast2.play(if (playing) Blast2.PAUSE else Blast2.PLAY), Blast2.CMD_PLAY)
+            request(it, Blast2.queryPlayState(), Blast2.CMD_PLAY_STATE)
+        }
     }
 
-    private fun sendThen(p: ByteArray, query: ByteArray) {
-        val c = conn ?: return
-        viewModelScope.launch {
-            try { c.send(p); delay(Blast2.STARTUP_GAP_MS); c.send(query) } catch (_: Exception) {}
+    /** Light mode 1..3 or [Blast2.LIGHT_OFF]; the light state 20 read after it (and the notice 85) moves the buttons. */
+    fun setLight(mode: Int) = commands {
+        it.send(Blast2.setLight(mode))
+        request(it, Blast2.queryLight(), Blast2.CMD_LIGHT_GET)
+    }
+
+    /** Selects a preset; the speaker's EQ state 21 read after it is what the screen shows. */
+    fun selectPreset(p: Eq.Preset) = commands {
+        it.send(Eq.setPreset(p))
+        request(it, Eq.queryState(), Eq.CMD_STATE)
+    }
+
+    /** Sends the custom EQ (10 bands, dB); called on slider release only (their app does the same, §3.6 «Pacing»). */
+    fun setCustom(db: List<Int>) {
+        val nf = _speaker.value.newFirmware ?: return
+        commands {
+            it.send(Eq.setCustom(db, nf))
+            request(it, Eq.queryState(), Eq.CMD_STATE)
         }
     }
 
@@ -223,5 +280,13 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
     override fun onCleared() {
         unwatch()
         a2dp?.let { proxy -> adapter?.closeProfileProxy(BluetoothProfile.A2DP, proxy) }
+    }
+
+    private companion object {
+        /** Byte 2 of a packet is its command (`researches/11` §3.2). */
+        const val CMD_INDEX = 2
+        const val ATTEMPTS = 3
+        const val ANSWER_TIMEOUT_MS = 500L
+        const val FRAME_BUFFER = 64
     }
 }

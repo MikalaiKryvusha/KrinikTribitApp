@@ -83,11 +83,15 @@ fun Card(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> U
     }
 }
 
-/** One tappable row of a settings list. */
+/**
+ * One tappable row of a settings list. Inside a [Card] pass `inCard = true`: the row takes the lighter container colour,
+ * so it reads as a button on the card (on the A51 16:47 a row in the card's own colour was invisible).
+ */
 @Composable
-fun SettingsRow(title: String, subtitle: String? = null, onClick: () -> Unit) {
+fun SettingsRow(title: String, subtitle: String? = null, inCard: Boolean = false, onClick: () -> Unit) {
+    val container = if (inCard) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.surfaceContainer
     Column(
-        Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.medium)
+        Modifier.fillMaxWidth().background(container, MaterialTheme.shapes.medium)
             .clickable(onClick = onClick).padding(horizontal = 20.dp, vertical = 16.dp),
     ) {
         Text(title, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurface)

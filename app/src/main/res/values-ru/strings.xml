@@ -24,6 +24,22 @@
     <string name="speaker_play">Играть</string>
     <string name="speaker_pause">Пауза</string>
 
+    <string name="light_title">Подсветка</string>
+    <string name="light_off">Выкл</string>
+    <string name="eq_title">Эквалайзер</string>
+    <string name="eq_presets">Пресеты</string>
+    <string name="eq_custom">Пользовательский эквалайзер</string>
+    <string name="eq_custom_name">Пользовательский</string>
+    <string name="eq_custom_hint">Передвиньте ползунок полосы и отпустите его. Колонка переключится на пользовательский эквалайзер, и все десять полос встанут так, как показаны на ползунках.</string>
+    <string name="eq_db">%1$s дБ</string>
+    <string name="eq_audiobook">Аудиокнига</string>
+    <string name="eq_classical">Классика</string>
+    <string name="eq_rock">Рок</string>
+    <string name="eq_jazz">Джаз</string>
+    <string name="eq_blast">Традиционный Blast</string>
+    <string name="eq_live">Концерт</string>
+    <string name="eq_podcast">Подкаст</string>
+
     <string name="about">О приложении</string>
     <string name="about_sub">Версия, автор, исходный код</string>
     <string name="about_version">Версия %1$s</string>

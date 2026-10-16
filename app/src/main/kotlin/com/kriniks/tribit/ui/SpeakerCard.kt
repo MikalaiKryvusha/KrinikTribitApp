@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
@@ -41,6 +44,8 @@ class SpeakerActions(
     val retry: () -> Unit,
     val setVolume: (Int) -> Unit,
     val togglePlay: () -> Unit,
+    val openEq: () -> Unit,
+    val setLight: (Int) -> Unit,
 )
 
 /**
@@ -145,5 +150,39 @@ private fun Connected(name: String, s: SpeakerState, act: SpeakerActions) {
             stringResource(if (s.playing == true) R.string.speaker_pause else R.string.speaker_play),
             style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurface,
         )
+    }
+    SettingsRow(stringResource(R.string.eq_title), eqName(s), inCard = true, onClick = act.openEq)
+    Light(s.light, act.setLight)
+}
+
+/**
+ * The light of the speaker: «Выкл» and modes 1–3 (`researches/11` §3.6, cmd 12). The pink button is the mode the SPEAKER
+ * reported (20 / 85), none before its answer. [NOT-TESTED]
+ */
+@Composable
+private fun Light(mode: Int?, setLight: (Int) -> Unit) {
+    Text(stringResource(R.string.light_title), style = MaterialTheme.typography.labelLarge)
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        val options = listOf(Blast2.LIGHT_OFF to stringResource(R.string.light_off)) +
+            Blast2.LIGHT_MODES.map { it to it.toString() }
+        for ((value, label) in options) {
+            val selected = mode == value
+            val colors = if (selected) ButtonDefaults.buttonColors()
+            else ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            )
+            Button(
+                onClick = { setLight(value) }, colors = colors, enabled = mode != null,
+                modifier = Modifier.weight(1f).heightIn(min = BUTTON_MIN_HEIGHT),
+                // The default 24 dp side padding broke «Выкл» into «Вы/кл» on the A51 (2026-10-16 16:53).
+                contentPadding = PaddingValues(horizontal = 4.dp),
+            ) {
+                Text(
+                    label, style = MaterialTheme.typography.labelLarge, maxLines = 1,
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                )
+            }
+        }
     }
 }

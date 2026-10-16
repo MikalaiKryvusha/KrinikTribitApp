@@ -26,6 +26,22 @@
     <string name="speaker_play">Play</string>
     <string name="speaker_pause">Pause</string>
 
+    <string name="light_title">Light</string>
+    <string name="light_off">Off</string>
+    <string name="eq_title">Equalizer</string>
+    <string name="eq_presets">Presets</string>
+    <string name="eq_custom">Custom equalizer</string>
+    <string name="eq_custom_name">Custom</string>
+    <string name="eq_custom_hint">Move a band slider and release it. The speaker switches to the custom equalizer, and all ten bands take the levels shown on the sliders.</string>
+    <string name="eq_db">%1$s dB</string>
+    <string name="eq_audiobook">Audiobook</string>
+    <string name="eq_classical">Classical</string>
+    <string name="eq_rock">Rock</string>
+    <string name="eq_jazz">Jazz</string>
+    <string name="eq_blast">Blast traditional</string>
+    <string name="eq_live">Live</string>
+    <string name="eq_podcast">Podcast</string>
+
     <string name="about">About</string>
     <string name="about_sub">Version, author, source code</string>
     <string name="about_version">Version %1$s</string>

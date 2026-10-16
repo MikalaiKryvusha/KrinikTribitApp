@@ -43,6 +43,16 @@ class Blast2Test {
         assertEquals(SpeakerState(version = "1/2/3_2.5", battery = 87, volume = 12, playing = false), s)
     }
 
+    @Test fun `light`() {
+        assertEquals("EA 05 0C 01 FC", Blast2.setLight(1).hex())   // 234+5+12+1 = 252 = FC
+        assertEquals("EA 05 0C 04 FF", Blast2.setLight(4).hex())   // 234+5+12+4 = 255 = FF
+        assertEquals("EA 05 14 00 03", Blast2.queryLight().hex())  // 234+5+20+0 = 259 = 103 -> 03
+        // 85 [4] captured on the A51 2026-10-16 16:17:52: EA 05 55 04 48 - the light is off
+        val notice = Framer().feed(byteArrayOf(0xEA.toByte(), 0x05, 0x55, 0x04, 0x48)).single()
+        assertEquals(Blast2.LIGHT_OFF, SpeakerState().apply(notice).light)
+        assertNull(SpeakerState().apply(reply(Blast2.CMD_LIGHT_GET, 9)).light)
+    }
+
     @Test fun `out of range values are not taken as state`() {
         val s = SpeakerState().apply(reply(Blast2.CMD_BATTERY, 200)).apply(reply(Blast2.CMD_VOLUME_GET, 40))
         assertNull(s.battery)
