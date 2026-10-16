@@ -65,9 +65,9 @@ def _constant(op, arg, ptype):
         kind, val = m.groups()
         suffix = {"long": "L", "float": "f", "double": ""}.get(kind, "")
         return val.rstrip("lLfFdD") + suffix
-    m = re.fullmatch(r"String (.*)", comment)
-    if op in ("ldc", "ldc_w") and m:
-        return '"' + m.group(1).replace("\\", "\\\\").replace('"', '\\"') + '"'
+    # String constants are NOT read: javap drops trailing whitespace in its comment and escapes on its own (the judge
+    # pass 2026-10-16 caught joinToString's ", " read as ","). A String default stays None - the call is reported, never
+    # guessed. Reading the class file's constant pool would close this; not needed while the cleaner only serves reading.
     return None
 
 
@@ -75,7 +75,6 @@ def defaults_of(jar, cls):
     out = subprocess.run([JAVAP, "-c", "-p", "-cp", jar, cls], capture_output=True, text=True, encoding="utf-8",
                          errors="replace").stdout.splitlines()
     table, i = {}, 0
-    static_targets = set(re.findall(r"^\s*(?:public |private |protected )?static [\w.$<>\[\], ]*?\b(\w+)\(", "\n".join(out), re.M))
     while i < len(out):
         h = HEADER.match(out[i])
         if not h:
@@ -109,7 +108,10 @@ def defaults_of(jar, cls):
                 entries.append((bit, None, None))   # more than one instruction: not a constant - never guessed
             k += 1
         table[(name, tuple(params))] = entries
-        table[(name, tuple(params), "static")] = name in static_targets
+        # Static or member target: the instruction that calls `name` at the end of the $default body says it -
+        # invokestatic for a top-level/extension function, invokevirtual/invokeinterface for a member. Unknown -> None.
+        calls = [op for op, arg in body if op.startswith("invoke") and re.search(rf"[ ./]{re.escape(name)}:", arg)]
+        table[(name, tuple(params), "static")] = (calls[-1] == "invokestatic") if calls else None
     return table
 
 

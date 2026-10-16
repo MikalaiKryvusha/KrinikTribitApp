@@ -106,6 +106,7 @@ def clean_text(text, jar, report, where, ctx=None):
         try:
             args, end = split_args(text, m.end() - 1)
         except ValueError:
+            report.append(f"{where}: {simple}.{name}$default - the arguments could not be split")
             continue
         mask = args[-2] if len(args) >= 2 else ""
         if not re.fullmatch(r"\d+", mask):
@@ -136,11 +137,13 @@ def clean_text(text, jar, report, where, ctx=None):
         real = [clean_text(a, jar, report, where, ctx) for a in real]
         statics = {table.get((name, p, "static")) for p, _ in overloads}
         if statics == {False}:   # a member function: the $default's first argument is the instance
-            call = f"{real[0]}.{name}({', '.join(real[1:])})"
+            # a cast or a ternary as the instance would bind wrongly without parentheses: (T) obj.foo() != ((T) obj).foo()
+            inst = real[0] if re.fullmatch(r"[\w.$]+", real[0]) else f"({real[0]})"
+            call = f"{inst}.{name}({', '.join(real[1:])})"
         elif statics == {True}:
             call = f"{simple}.{name}({', '.join(real)})"
         else:
-            report.append(f"{where}: {simple}.{name}$default - static and member overloads mixed in {owner}")
+            report.append(f"{where}: {simple}.{name}$default - static/member unknown or mixed in {owner}")
             continue
         out.append(text[pos:m.start()])
         out.append(call)

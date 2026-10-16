@@ -5,9 +5,11 @@ Needs the app's jar (dex2jar of the APK): python -I tools/test_decompile_clean.p
 THREAT:         a `foo$default` call rewritten by cutting the mask off - jadx's dummy (null) goes where the default belongs
 PROVED-AGAINST: the cleaner with the substitution disabled (dummies kept, mask cut off): both launch cases and asLiveData
                 go red (2026-10-16); replace/split/contains stay green there - their dummies equal the defaults
-GAP:            Tribit's own `$default` functions are covered only through the same bytecode reader, no case of their own
+GAP:            a comma inside generics at depth 0 (`new Pair<A, B>(x, y)`) splits arguments wrongly - 0 cases in Tribit's
+                code (judge 2026-10-16); unqualified `foo$default(this, …)` calls are neither cleaned nor reported (47)
 ON-REAL-PATH:   NOT YET - no cleaned class is in an APK yet; the first migrated class that went through the cleaner closes it
-[TESTED: 2026-10-16 · 10 of 10 green; red on the broken copy (launch x2, asLiveData)]
+[TESTED: 2026-10-16 · 12 of 12 green; red on the broken copy (launch x2, asLiveData); the joinToString case red on the
+reader before the judge fixes (String defaults guessed)]
 """
 import pathlib
 import sys
@@ -18,7 +20,8 @@ from decompile_clean import clean_text  # noqa: E402
 JAR = sys.argv[1] if len(sys.argv) > 1 else "work/spike/tribit-all.jar"
 HEAD = ("package com.thousandshores.tribit.x;\nimport kotlin.text.StringsKt__StringsJVMKt;\nimport kotlin.text.StringsKt__StringsKt;\n"
         "import kotlinx.coroutines.BuildersKt__Builders_commonKt;\nimport androidx.lifecycle.FlowLiveDataConversions;\n"
-        "import com.thousandshores.tribit.moduledevice.viewmodel.ViewModelDeviceBts;\n")
+        "import com.thousandshores.tribit.moduledevice.viewmodel.ViewModelDeviceBts;\n"
+        "import kotlin.collections.CollectionsKt___CollectionsKt;\n")
 EC, DEF = "kotlin.coroutines.EmptyCoroutineContext.INSTANCE", "kotlinx.coroutines.CoroutineStart.DEFAULT"
 CASES = [
     ("replace, mask 4 (ignoreCase)",
@@ -48,6 +51,12 @@ CASES = [
     ("Tribit's own member function: the first argument is the instance",
      "ViewModelDeviceBts.queryFireVersion$default(viewModelDeviceBts4, this, str2, packageName2, this.version, false, 16, null);",
      "viewModelDeviceBts4.queryFireVersion(this, str2, packageName2, this.version, false);", 0),
+    ("a cast instance of a member function gets parentheses",
+     "ViewModelDeviceBts.queryFireVersion$default((ViewModelDeviceBts) vm, this, s, p, v, false, 16, null);",
+     "((ViewModelDeviceBts) vm).queryFireVersion(this, s, p, v, false);", 0),
+    ("joinToString, mask 57: String defaults are never guessed (javap trims \", \" to \",\")",
+     'String j = CollectionsKt___CollectionsKt.joinToString$default(list, null, "[", "]", 0, null, null, 57, null);',
+     'String j = CollectionsKt___CollectionsKt.joinToString$default(list, null, "[", "]", 0, null, null, 57, null);', 1),
     ("lastIndexOf, mask 6: startIndex default is lastIndex - not a constant, left as it is",
      'int i = StringsKt__StringsKt.lastIndexOf$default((CharSequence) str, ".", 0, false, 6, (Object) null);',
      'int i = StringsKt__StringsKt.lastIndexOf$default((CharSequence) str, ".", 0, false, 6, (Object) null);', 1),
