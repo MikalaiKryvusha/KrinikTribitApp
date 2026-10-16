@@ -907,6 +907,53 @@ def patch_card_name_wrap():
     print(f"ok 24 card name wraps up to {NAME_MAX_LINES} lines: {', '.join(NAME_CARDS)}")
 
 
+# --- Patch 25: the firmware check runs on a tap only ------------------------------------------------------------
+# Owner 2026-10-16 10:45 +03:00 (interviews/interview_001 Q2 = A): «По кнопке «Проверить прошивку» в настройках колонки»;
+# its check: «при открытии страницы колонки нет checkFirmwareUpgrade; после нажатия — ровно один». The decision lives in
+# krinik.Firmware (patches/java): each of the two sinks is renamed to krinikQueryFireVersion and a same-named wrapper asks
+# Firmware.allowBts/allowInfo first; TribitApp.onCreate installs the activity watcher that turns the «Версия прошивки» row
+# into the button. Recon - plans/01 §4б item 6 (26 call sites, 13 families, 2 sinks, 14 layouts with the row).
+# [TESTED: 2026-10-16 · A51 Blast 2 (bts56 only): page open -> 0 checkFirmwareUpgrade; row tap -> 2 (main + DSP) and
+# their «latest version» message · testcases/reports/2026-10-16_patch8_anon.md] - earphone sink (ViewModelDeviceInfo) not run
+FIRMWARE_SINKS = [  # (class, parameter descriptor, gate method, last parameter register)
+    ("com.thousandshores.tribit.moduledevice.viewmodel.ViewModelDeviceBts",
+     "Landroidx/lifecycle/LifecycleOwner;Ljava/lang/String;Ljava/lang/String;IZ", "allowBts", "p5"),
+    ("com.thousandshores.tribit.moduledevice.viewmodel.ViewModelDeviceInfo",
+     "Landroidx/lifecycle/LifecycleOwner;Ljava/lang/String;Ljava/lang/String;I", "allowInfo", "p4"),
+]
+
+
+def patch_firmware_on_tap():
+    for cls, params, gate, last in FIRMWARE_SINKS:
+        p = smali(cls)
+        t = p.read_text(encoding="utf-8")
+        header = f".method public final queryFireVersion({params})V"
+        if t.count(header) != 1 or "krinikQueryFireVersion" in t:
+            sys.exit(f"FAIL: firmware sink header in {cls}")
+        desc = "L" + cls.replace(".", "/") + ";"
+        wrapper = (
+            f"{header}\n"
+            "    .locals 1\n\n"
+            f"    invoke-static/range {{p0 .. {last}}}, Lkrinik/Firmware;->{gate}(Ljava/lang/Object;Ljava/lang/Object;"
+            "Ljava/lang/String;Ljava/lang/String;I" + ("Z" if last == "p5" else "") + ")Z\n\n"
+            "    move-result v0\n\n"
+            "    if-eqz v0, :krinik_dropped\n\n"
+            f"    invoke-virtual/range {{p0 .. {last}}}, {desc}->krinikQueryFireVersion({params})V\n\n"
+            "    :krinik_dropped\n"
+            "    return-void\n"
+            ".end method\n\n")
+        t = t.replace(header, f".method public final krinikQueryFireVersion({params})V")
+        t = t.replace(f".method public final krinikQueryFireVersion({params})V",
+                      wrapper + f".method public final krinikQueryFireVersion({params})V", 1)
+        p.write_text(t, encoding="utf-8")
+    a = smali("com.thousandshores.tribit.TribitApp")
+    replace_in_method(a, ".method public onCreate()V",
+        "    invoke-super {p0}, Landroid/app/Application;->onCreate()V\n",
+        "    invoke-super {p0}, Landroid/app/Application;->onCreate()V\n\n"
+        "    invoke-static {p0}, Lkrinik/Firmware;->install(Landroid/app/Application;)V\n")
+    print("ok 25 firmware check on tap only: 2 sinks gated by krinik.Firmware, the firmware version row is the button")
+
+
 # --- Patch 22: the device base inside the APK ------------------------------------------------------------------
 # Owner 2026-10-16 ≈ 11:00 +03:00: «скачай БД из ГУГЛ телефонов, кладемм внутрь АПК» · «но чтобы не больше 1 мб файл весил»
 # (MASTER_PLAN decision journal). patches/assets/krinik_devices.txt (`Brand|Model` per line, built by
@@ -1029,6 +1076,7 @@ if __name__ == "__main__":
     patch_no_cloud()
     patch_no_error_mail()
     patch_card_name_wrap()
+    patch_firmware_on_tap()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:
