@@ -3,7 +3,7 @@
 > **Created:** 2026-10-16 · owner's word in chat 2026-10-16 ≈ 11:10 +03:00: «UI/UX нужно делать красивым» · «нужна
 > разведка» · «можешь заглянуть в проекты KARTUN. KUMM Svarog - там ии агенты много умеют по дизайнам» ·
 > **Parent:** `GOAL.md`, `MASTER_PLAN.md` decision journal (taste class) · **Status:** local recon done 2026-10-16 ≈ 11:15;
-> industry section filled from a web sweep the same day · **Outbound:** first mock-up sheet to the owner (taste class)
+> industry section filled from a web sweep 2026-10-16 ≈ 11:25 · **Outbound:** first mock-up sheet to the owner (taste class)
 
 ## 1. What «beautiful» means to this owner — already written down, in his own words
 
@@ -53,7 +53,47 @@ agent looks at what it made with its own eye first; long chats lose image readin
 
 ## 4. Industry — how the leading speaker apps do these screens
 
-(filled from the web sweep — see below)
+Web sweep 2026-10-16 ≈ 11:25 +03:00 by a research subagent. Limits: Google Play pages and m3.material.io did not render for
+the tool; a few facts come from search snippets of pages that refused access — marked «snippet». No source was found for
+the device page of the B&O, Bose and Marshall apps, nor for any app's dark-theme design.
+
+**How the leading apps present the same screens**
+
+| App | Device page · EQ · other | Source |
+|---|---|---|
+| JBL Portable / JBL One | battery on the product screen; 4 preset EQs + Custom (5 bands on Go 4); JBL moving speakers into JBL One with a similar layout, EQ and lighting kept | techradar.com/audio/wireless-bluetooth-speakers/jbl-go-4-review · soundguys.com/jbl-is-quietly-switching-its-bluetooth-speakers-to-one-app-161728/ |
+| Sony Sound Connect | tabs My Device · Scene · Discover · Menu; My Device shows battery and EQ presets + custom (5 bands + Clear Bass, 2 custom slots — snippet); a home-screen widget with model, battery, EQ | helpguide.sony.net/mdr/2999/v1/en/contents/F002_Using_the_Sound_Connect_app.html · sony-asia.com support 00286844 (snippet) · 00186711 |
+| Bose | presets + 3 sliders (bass, mid, treble); a manual setting could not be saved in 2022; sliders readable by VoiceOver | ubergizmo.com/2022/02/bose-qc45-customizable-eqs/amp/ · applevis.com/comment/209109 |
+| Soundcore | custom EQ as a curve of dots dragged with a finger; 9 bands on Boom 3i; HearID builds a personal profile; 22 presets | service.soundcore.com (Motion X600 EQ article) · community.eufy.com/t/tune-your-boom-3i-a-quick-guide-to-eq/5817974 · soundcore.com/eu/hearid |
+| UE BOOM | named presets («Out Loud», «Intimate» — snippet); volume only through repeated big +/- taps, called «a little dated» | imore.com/ue-boom-3-review · whathifi.com/ultimate-ears/boom/review (snippet) |
+| Marshall | sliders + preset drop-down; 5 bands, 3 saved slots | marshall.com support (Minor IV) · techhive.com/article/3639916 |
+| Bang & Olufsen | Beosonic: a circle of 4 moods, drag a marker (snippet) | support.bang-olufsen.com 360055532452 (snippet) |
+
+**What users praise and complain about:** a guided, personal EQ is «more engaging than a manual EQ slider» (tomsguide.com,
+review of Soundcore headphones); unskippable ads before the controls (community.eufy.com/t/stop-forcing-un/5758781); app
+size and AI extras (mwm.ai — secondary); features and volume numbers removed in a redesign — the Sonos 2024 backlash
+(stuff.tv/news/why-the-tale-of-sonos-revamped-app-is-a-cautionary-one/); EQ controls vanishing (proforums.harman.com 137015).
+
+**Material 3 / Android guidance:** sliders — standard, **centered** (for ranges around zero: EQ ±dB), range, stops; 48 dp
+touch target; content descriptions strongly encouraged (github.com/material-components/material-components-android
+docs/components/Slider.md). Type scale of 5 groups × 3 sizes, «you will likely not need all 15»; corner radii 4/8/12/16/24
+dp; dark theme elevation by tonal overlays; dynamic colour only on Android 12+ with a fallback, brand colour can stay fixed
+or be harmonized (developer.android.com/develop/ui/compose/designsystems/material3 · /develop/ui/views/theming/dynamic-colors).
+Dark grey, not pure black (m2.material.io/design/color/dark-theme). Edge-to-edge is enforced for apps targeting SDK 35 on
+Android 15 — system-bar, cutout and gesture insets must be handled (developer.android.com/develop/ui/views/layout/edge-to-edge)
+— their APK targets SDK 36 (`work/base/apktool.yml`), so edge-to-edge is forced on the Titan (Android 16); the A51
+(Android 13) is outside that rule, so the consent line under the gesture bar there has another cause, still unknown. 16 dp phone
+margins (m2.material.io/design/layout). Accessibility: text ≥ 4.5:1 (large ≥ 3:1), controls ≥ 3:1 (WCAG 1.4.11), targets
+≥ 48×48 dp (developer.android.com/guide/topics/ui/accessibility/apps; w3.org/WAI/WCAG22/Understanding/non-text-contrast).
+
+**Patterns worth adopting for Krinik Tribit:** battery and status at the top of the speaker page (JBL, Sony); presets first,
+Custom second (JBL, Sony, Bose, Marshall); **centered sliders with stops** for the 10-band ±dB editor (MDC Slider doc);
+named, saved custom presets (Bose criticised for not saving — and our `bugs/01`); the brand pink fixed; edge-to-edge with
+proper insets; labelled sliders for screen readers.
+
+**Anti-patterns:** ads or promos before the controls; removing existing features or volume numbers in a redesign; volume
+only through repeated +/- taps; extras unrelated to the speaker; a custom EQ that cannot be saved; contrast or touch
+targets below the thresholds above.
 
 ## 6. The design scheme — the owner's requirements and their checkable form
 
