@@ -16,7 +16,12 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -96,6 +101,37 @@ fun SettingsRow(title: String, subtitle: String? = null, inCard: Boolean = false
     ) {
         Text(title, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurface)
         if (subtitle != null) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** Smallest height of a choice button (light mode, sleep timer). */
+private val CHOICE_MIN_HEIGHT = 48.dp
+
+/**
+ * A row of equal choice buttons; the pink one is [selected] - the value the SPEAKER reported. One component for every
+ * «pick one of a few» in the app (the owner, GOAL.md 11:18: «компонентов, которые переиспользуются везде»). Narrow
+ * side padding: the default 24 dp broke «Выкл» into «Вы/кл» on the A51 (2026-10-16 16:53). [NOT-TESTED]
+ */
+@Composable
+fun <T> Choices(options: List<Pair<T, String>>, selected: T?, enabled: Boolean, onPick: (T) -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        for ((value, label) in options) {
+            val on = selected == value
+            Button(
+                onClick = { onPick(value) }, enabled = enabled,
+                colors = if (on) ButtonDefaults.buttonColors() else ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                ),
+                modifier = Modifier.weight(1f).heightIn(min = CHOICE_MIN_HEIGHT),
+                contentPadding = PaddingValues(horizontal = 4.dp),
+            ) {
+                Text(
+                    label, maxLines = 1, style = MaterialTheme.typography.labelLarge,
+                    fontWeight = if (on) FontWeight.Bold else FontWeight.Normal,
+                )
+            }
+        }
     }
 }
 

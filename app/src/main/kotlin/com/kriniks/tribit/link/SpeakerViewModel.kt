@@ -22,6 +22,8 @@ import com.kriniks.tribit.BuildConfig
 import com.kriniks.tribit.protocol.Blast2
 import com.kriniks.tribit.protocol.Eq
 import com.kriniks.tribit.protocol.Frame
+import com.kriniks.tribit.protocol.Settings
+import com.kriniks.tribit.protocol.SpeakerSettings
 import com.kriniks.tribit.protocol.SpeakerState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineStart
@@ -72,6 +74,9 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _speaker = MutableStateFlow(SpeakerState())
     val speaker: StateFlow<SpeakerState> = _speaker
+
+    private val _settings = MutableStateFlow(SpeakerSettings())
+    val settings: StateFlow<SpeakerSettings> = _settings
 
     private var conn: SpeakerLink? = null
     private var job: Job? = null
@@ -129,14 +134,22 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
             if (!soundConnected(adapter, device)) { _link.value = Link.Waiting(name); return@launch }
             _link.value = Link.Connecting(name)
             _speaker.value = SpeakerState()
+            _settings.value = SpeakerSettings()
             val c = SpeakerLink(adapter, device)
             conn = c
             try {
                 c.open()
                 _link.value = Link.Connected(name)
                 // The full state is re-read on every connect (`researches/11` §4b.4); each query waits for its answer.
-                launch { for (q in Blast2.startup()) request(c, q, q[CMD_INDEX].toInt() and 0xFF) }
-                c.readLoop { f -> _speaker.update { it.apply(f) }; frames.tryEmit(f) }
+                launch {
+                    for (q in Blast2.startup()) request(c, q, q[CMD_INDEX].toInt() and 0xFF)
+                    for (cmd in Settings.QUERIES) request(c, Settings.query(cmd), cmd)
+                }
+                c.readLoop { f ->
+                    _speaker.update { it.apply(f) }
+                    _settings.update { it.apply(f) }
+                    frames.tryEmit(f)
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (_: Exception) {
@@ -203,6 +216,19 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
         it.send(Blast2.setLight(mode))
         request(it, Blast2.queryLight(), Blast2.CMD_LIGHT_GET)
     }
+
+    /** Sends a setting, then reads it back with [get]: the switch shows the speaker's answer. */
+    private fun setting(packet: ByteArray, get: Int) = commands {
+        it.send(packet)
+        request(it, Settings.query(get), get)
+    }
+
+    fun setAutoOff(on: Boolean) = setting(Settings.setAutoOff(on), Settings.CMD_AUTO_OFF_GET)
+    fun setSleep(minutes: Int) = setting(Settings.setSleep(minutes), Settings.CMD_SLEEP_GET)
+    fun setVoice(flags: List<Boolean>) = setting(Settings.setVoice(flags), Settings.CMD_VOICE_GET)
+    fun setIndicator(on: Boolean) = setting(Settings.setIndicator(on), Settings.CMD_INDICATOR_GET)
+    fun setMic(on: Boolean) = setting(Settings.setMic(on), Settings.CMD_MIC_GET)
+    fun setHowl(on: Boolean) = setting(Settings.setHowl(on), Settings.CMD_HOWL_GET)
 
     /** Selects a preset; the speaker's EQ state 21 read after it is what the screen shows. */
     fun selectPreset(p: Eq.Preset) = commands {

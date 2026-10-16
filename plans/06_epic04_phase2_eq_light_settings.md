@@ -1,7 +1,7 @@
 # План 06 — эпик 04, фаза 2: эквалайзер, подсветка, настройки колонки
 
 > **Created:** 2026-10-16 · **Parent:** `plans/04_EPIC_own_app.md` → «Фазы», row 2 «Эквалайзер, подсветка, настройки
-> колонки» · **Status:** 🔧 in work 2026-10-16 16:43 +03:00; steps 1–5 ✅ 16:54 (`testcases/reports/2026-10-16_eq.md`, `…_light.md`) · **Outbound:** —
+> колонки» · **Status:** 🔧 in work 2026-10-16 16:43 +03:00; steps 1–6 ✅ 17:01 (`testcases/reports/2026-10-16_eq.md`, `…_light.md`, `…_speaker_settings.md` — partial: only the indicator written) · **Outbound:** —
 
 ## Goal vector (Achieve)
 
@@ -40,7 +40,7 @@ screen is the speaker's answer; the speaker's own buttons move what the screen s
 - [x] 4. Device run on the A51 (sound only at volume 1–2, `HOUSE_RULES.md` §3): criteria 1–2; the «Blast traditional» id
       8 vs 9 question answered by the speaker's 21 reply. Run report.
 - [x] 5. Light: on/off (12, 20, 85) on the home card. Device run.
-- [ ] 6. Settings screen of the speaker: the six rows of criterion 4. Device run.
+- [x] 6. Settings screen of the speaker: the six rows of criterion 4. Device run.
 - [ ] 7. The open check of phase 1 (`plans/05` step 8): the owner powers the speaker off and on → «Ожидание колонки» →
       connected by itself.
 - [ ] 7a. **The ear through the A51 microphone — presence and loudness only.** The owner 16:49: «микрофон в А51 плохой, ты
@@ -49,6 +49,9 @@ screen is the speaker's answer; the speaker's own buttons move what the screen s
       microphone level (`KT.Ear`) — sound present yes/no, level up/down after a volume change. The EQ sound is the owner's
       ear; the EQ state is the speaker's reply (21 / 82). `RECORD_AUDIO` in the debug manifest only.
 - [ ] 8. `ideas/01` JSON export/import of EQ and light — after 3 and 5 work on the speaker.
+
+Open question for the speaker: reply 15 — the set sleep time or the time left? Set 60 min, read after 2 min (with the
+owner's consent: the timer turns his speaker off).
 
 ## Risks
 

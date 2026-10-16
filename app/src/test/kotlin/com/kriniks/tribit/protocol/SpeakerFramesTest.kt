@@ -56,6 +56,15 @@ class SpeakerFramesTest {
         assertEquals(1, frames.fold(SpeakerState()) { s, f -> s.apply(f) }.light)
     }
 
+    @Test fun `settings read at connect`() {
+        // A51 16:57:33-34, one read per answer.
+        var s = SpeakerSettings()
+        for (read in listOf("EA 05 10 01 00", "EA 06 0F FF FF FD", "EA 09 31 01 01 01 01 01 29", "EA 05 33 01 23",
+            "EA 05 62 00 51", "EA 05 64 00 53")) for (f in Framer().feed(hex(read))) { assertTrue(f.sumOk); s = s.apply(f) }
+        // auto shutdown 1 = OFF (0 means on); sleep FF FF = off; all voice prompts on; indicator on; mic, anti-howl off
+        assertEquals(SpeakerSettings(false, 0, List(5) { true }, true, false, false), s)
+    }
+
     @Test fun `echo of play and pause`() {
         val f = Framer()
         val play = f.feed(hex("EA 05 02 04 F5")).single()

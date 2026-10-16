@@ -22,12 +22,19 @@ import com.kriniks.tribit.link.SpeakerViewModel
 import com.kriniks.tribit.ui.AboutScreen
 import com.kriniks.tribit.ui.EqScreen
 import com.kriniks.tribit.ui.HomeScreen
+import com.kriniks.tribit.ui.SettingsActions
 import com.kriniks.tribit.ui.SettingsScreen
+import com.kriniks.tribit.ui.SpeakerSettingsScreen
 import com.kriniks.tribit.ui.SpeakerActions
 import com.kriniks.tribit.ui.theme.KrinikTheme
 
 /** The screens of the app; the back stack is this enum's parent chain (Home ← Settings ← About / Debug). */
-enum class Screen(val parent: Screen?) { HOME(null), EQ(HOME), SETTINGS(HOME), ABOUT(SETTINGS), DEBUG(SETTINGS) }
+enum class Screen(val parent: Screen?) {
+    HOME(null), EQ(HOME), SPEAKER_SETTINGS(HOME), SETTINGS(HOME), ABOUT(SETTINGS), DEBUG(SETTINGS);
+
+    /** Screens that talk to the speaker - left for home when the speaker's link ends. */
+    val needsSpeaker get() = this == EQ || this == SPEAKER_SETTINGS
+}
 
 /**
  * The single activity: one Compose tree, navigation by a saved enum (survives rotation). The «Отладка» screen comes
@@ -54,6 +61,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         var openEq: () -> Unit = {}
+        var openSpeakerSettings: () -> Unit = {}
         val actions = SpeakerActions(
             askPermission = {
                 if (permissionRefused) openAppSettings() else askConnect.launch(Manifest.permission.BLUETOOTH_CONNECT)
@@ -64,6 +72,11 @@ class MainActivity : ComponentActivity() {
             togglePlay = speakerVm::togglePlay,
             openEq = { openEq() },
             setLight = speakerVm::setLight,
+            openSettings = { openSpeakerSettings() },
+        )
+        val settingsActions = SettingsActions(
+            autoOff = speakerVm::setAutoOff, sleep = speakerVm::setSleep, voice = speakerVm::setVoice,
+            indicator = speakerVm::setIndicator, mic = speakerVm::setMic, howl = speakerVm::setHowl,
         )
         setContent {
             KrinikTheme {
@@ -71,13 +84,17 @@ class MainActivity : ComponentActivity() {
                 val back = { screen = screen.parent ?: screen }
                 val link by speakerVm.link.collectAsState()
                 val speaker by speakerVm.speaker.collectAsState()
+                val speakerSettings by speakerVm.settings.collectAsState()
                 openEq = { screen = Screen.EQ }
+                openSpeakerSettings = { screen = Screen.SPEAKER_SETTINGS }
                 BackHandler(enabled = screen.parent != null) { back() }
-                // The EQ screen needs a live link; when the speaker leaves, the app returns home to its card.
-                if (screen == Screen.EQ && link !is Link.Connected) screen = Screen.HOME
+                // Speaker screens need a live link; when the speaker leaves, the app returns home to its card.
+                if (screen.needsSpeaker && link !is Link.Connected) screen = Screen.HOME
                 when (screen) {
                     Screen.HOME -> HomeScreen(link, speaker, actions, onSettings = { screen = Screen.SETTINGS })
                     Screen.EQ -> EqScreen(speaker, onBack = back, onPreset = speakerVm::selectPreset, onCustom = speakerVm::setCustom)
+                    Screen.SPEAKER_SETTINGS ->
+                        SpeakerSettingsScreen(speakerSettings, speaker.newFirmware, onBack = back, act = settingsActions)
                     Screen.SETTINGS -> SettingsScreen(
                         onBack = back,
                         onAbout = { screen = Screen.ABOUT },

@@ -3,7 +3,7 @@
      (HOUSE_RULES.md R10): что есть и что сделать человеку, имя предмета, повелительное наклонение в инструкции. -->
 <resources>
     <string name="back">Назад</string>
-    <string name="settings">Настройки</string>
+    <string name="settings">Настройки приложения</string>
 
     <string name="link_permission">Доступ к колонке</string>
     <string name="link_permission_hint">Дайте Krinik Tribit разрешение «Устройства поблизости». С этим разрешением Krinik Tribit видит колонку, сопряжённую с телефоном.</string>
@@ -24,8 +24,26 @@
     <string name="speaker_play">Играть</string>
     <string name="speaker_pause">Пауза</string>
 
+    <string name="speaker_settings">Настройки колонки</string>
+    <string name="set_auto_off">Автоматическое выключение</string>
+    <string name="set_indicator">Индикатор громкости</string>
+    <string name="set_sleep">Таймер сна</string>
+    <string name="set_sleep_hint">Колонка выключится через выбранное время.</string>
+    <string name="set_sleep_other">Таймер сна на колонке: %1$d мин.</string>
+    <string name="minutes">%1$d мин</string>
+    <string name="hours">%1$d ч</string>
+    <string name="set_voice">Голосовые подсказки</string>
+    <string name="voice_power">При включении и выключении</string>
+    <string name="voice_pairing">При сопряжении по Bluetooth</string>
+    <string name="voice_battery">При низком заряде</string>
+    <string name="voice_max_volume">При максимальной громкости</string>
+    <string name="voice_tws">При сопряжении двух колонок (TWS)</string>
+    <string name="set_mic_title">Микрофон</string>
+    <string name="set_mic">Усиление микрофона</string>
+    <string name="set_howl">Подавление свиста микрофона</string>
     <string name="light_title">Подсветка</string>
-    <string name="light_off">Выкл</string>
+    <string name="light_off">Выкл.</string>
+    <string name="sleep_off">Выкл.</string>
     <string name="eq_title">Эквалайзер</string>
     <string name="eq_presets">Пресеты</string>
     <string name="eq_custom">Пользовательский эквалайзер</string>
