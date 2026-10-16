@@ -12,8 +12,8 @@ Usage (any shell; adb is taken from the SDK, not from PATH - see HOUSE_RULES.md 
 
 The first `apply` saves the device's own rotation mode into out/screen-profile-<serial>.json (out/ is ignored);
 `reset` restores it, so the owner's auto-rotate survives any number of profiles.
-[TESTED: 2026-10-16 · A51: two cycles titan --land -> small --port -> reset, device read back native size/density and
-auto-rotate "free" 5 s later; login screen shot in 6 profiles · testcases/reports/2026-10-16_a51_stand.md]
+[TESTED: 2026-10-16 10:08 · A51: three cycles titan --land -> reset: display read ROTATION_90 after apply, reset exit 0,
+native size/density and auto-rotate on after; login screen shot in 6 profiles · testcases/reports/2026-10-16_a51_stand.md]
 """
 import argparse
 import json
@@ -63,8 +63,13 @@ def save_rotation_once(serial):
 
 
 def set_orientation(serial, landscape):
-    """Locks the rotation: landscape (1) or portrait (0)."""
-    adb(serial, "wm", "user-rotation", "lock", "1" if landscape else "0")
+    """Locks the rotation: landscape (1) or portrait (0). Both doors: `wm user-rotation lock N` alone left the A51
+    display at ROTATION_0 (2026-10-16 10:05), the settings pair alone is overwritten by WM after a size reset - so
+    WM first, then the settings that actually turn the display."""
+    n = "1" if landscape else "0"
+    adb(serial, "wm", "user-rotation", "lock", n)
+    adb(serial, "settings", "put", "system", "accelerometer_rotation", "0")
+    adb(serial, "settings", "put", "system", "user_rotation", n)
 
 
 def show(serial):
@@ -113,10 +118,18 @@ def main():
         path = state_file(args.serial)
         if path.exists():
             saved = json.loads(path.read_text(encoding="utf-8"))["user_rotation"]
-            adb(args.serial, "wm", "user-rotation", *saved.split())
-            time.sleep(2)  # WM settles after the size reset; read the mode after it, not before
-            now = rotation(args.serial)
-            if now.split()[0] != saved.split()[0]:
+            mode = saved.split()
+            for _attempt in range(3):  # WM rewrites the mode a moment after the size reset (1 of 2 resets failed once)
+                adb(args.serial, "wm", "user-rotation", *mode)
+                # the same two doors as set_orientation: WM alone left the settings pair (auto-rotate 0) behind
+                if mode[0] == "lock" and len(mode) > 1:
+                    adb(args.serial, "settings", "put", "system", "user_rotation", mode[1])
+                adb(args.serial, "settings", "put", "system", "accelerometer_rotation", "1" if mode[0] == "free" else "0")
+                time.sleep(2)  # read the mode after WM settles, not before
+                now = rotation(args.serial)
+                if now.split()[0] == mode[0]:
+                    break
+            if now.split()[0] != mode[0]:
                 print(f"WARNING rotation mode not restored: saved {saved!r}, device {now!r}; state kept in {path}")
                 show(args.serial)
                 return 1

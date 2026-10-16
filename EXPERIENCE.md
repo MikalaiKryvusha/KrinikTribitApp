@@ -89,6 +89,21 @@
 **Lesson:** capture lessons at the level of *approach* (what worked / what to avoid), not defect detail
 (that lives in `bugs/`); one short entry beats a long story.   → link: (none)
 
+### EXP-0008 · 2026-10-16 · ❌ · #claims #a51 #testing
+class: claim-before-evidence
+mechanized: tools/check_tested_ticks.py (a ☑ tested in plans/02 names an existing run report; proved red on 2 rows)
+**Context:** one session on the A51: «patch 8 tested» ticked after seeing the main screen (the speaker page then never
+opened); «login does not scroll in landscape» written without a swipe (the line was under the gesture bar, nothing to
+scroll); `screen_profile.py` «tested» on the reset while the landscape apply itself no longer rotated the display.
+**Tried / did:** each caught by a later run on the real path and corrected where it stood (checklist, reports, marker).
+**Result:** ❌ three corrections in one morning.
+**Lesson:** tick «tested» only for what the run walked: the user's path to the END of the feature (the speaker page, not
+the main screen); an adjective about behaviour («does not scroll») needs the gesture; a tool is tested on its effect
+(`mCurrentRotation`), not on the setting it wrote.
+**Repro:** `adb shell dumpsys window displays | grep mCurrentRotation` after `screen_profile.py apply … --land` prints ROTATION_90.
+**Trigger:** writing ☑ / [TESTED] / «does not X» → name the observation that backs it in the same line.
+**Not for:** hygiene results (lint, build), which are reported as hygiene and never ticked as tested.
+
 ### EXP-0007 · 2026-10-16 · ❌ · #escaping #python #heredoc
 class: escaping-layer
 mechanized: tools/check_ctrl_chars.py (proved red on \f and \a, green on all tracked text files)
