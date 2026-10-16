@@ -31,6 +31,10 @@ official app knows — and it does not crash, finds the speaker with location tu
 and a tablet, and speaks proper English and Russian. It was born on the author's tablet, where the official Tribit app
 version 5.0.0 crashed on «create my EQ», demanded location to find a speaker and cut off the bottom of its screens.
 
+**Direction, October 2026.** Krinik Tribit is now written from scratch as our own app (Kotlin + Jetpack
+Compose). The official app with our fixes (sections 1 and 5) stays the fallback for the speaker models and firmware
+updates our own app does not handle yet.
+
 Sections: [1 What it fixes](#en-1) · [2 What hurts in the official app](#en-2) · [3 Download](#en-3) ·
 [4 Roadmap](#en-4) · [5 Build it yourself](#en-5) · [6 Project map](#en-6) · [7 Legal and credits](#en-7).
 
@@ -58,10 +62,11 @@ that the Tribit server cannot identify a person.
 
 - Done and checked on a Samsung A51: Firebase is off; the app has no Firebase analytics, no advertising ID and no push
   messages.
-- In progress: the app will talk to the Tribit server only as an anonymous guest. No data about the person, their phone
-  or tablet will go to the server. A field the server demands will get a random value, new for every request. Of the
-  speaker's data, the server will get only the model of the speaker that asks for firmware and settings. Cloud copies of
-  EQ presets and the support form will be switched off.
+- Done and checked on a Samsung A51: the app talks to the Tribit server only as an anonymous guest. The guest ID, the
+  phone model and the Android version in its requests are random, picked once at install; no real value of the phone
+  reached a request in the check. Only four kinds of requests go to the Tribit server: the guest sign-in, the speaker
+  catalog, the firmware check (on the user's tap) and the language dictionary. Cloud copies of EQ presets, the support
+  form and every link to Tribit's site are gone.
 
 <a name="en-2"></a>
 
@@ -97,13 +102,12 @@ and use it. The first release comes with step 7 of the roadmap.
 | # | Step | State |
 |---|---|---|
 | 1 | Research: 2,648 Google Play reviews, the languages to translate into, the pains of the official app | ✅ done |
-| 2 | Patches: the EQ crash, location (three places), screen scaling and scrolling, pink brand, password symbols, name, icon | ✅ written, run on the author's tablet |
-| 3 | The first patched build on the author's tablet with a StormBox Blast 2: from the splash to a custom EQ without a crash and without a location permission request | ✅ done, the author is testing it |
-| 4 | Texts: ours in resource files instead of the server's and the hard-coded ones; English and Russian by hand | 🔧 research done, patch next |
-| 5 | Layouts: the screen scaling fits the whole design and cut-off screens scroll (done, run on the tablet); landscape and the remaining screens next | 🔧 in progress |
-| 6 | Crashes, lost connections, the app no longer waits for the Tribit server; the forced-update window is gone (done, run on a Samsung A51) | 🔧 in progress |
-| 7 | Two builds: debug «Debug Krinik Tribit» beside the original (done); release and the first signed release on GitHub | 🔧 debug done, release planned |
-| 8 | No account and no tracking: Firebase and the advertising ID are off (done, run on a Samsung A51); using the app without an account and without cloud copies of EQ presets | 🔧 in progress |
+| 2 | The official app with our fixes, the fallback: no crash on «create my EQ», no location, no account (an anonymous guest), no Firebase, no links to Tribit, TLS checked again — run on a Samsung A51 with a StormBox Blast 2 | ✅ done |
+| 3 | Our own app from scratch: research of the speaker protocol and of how good Bluetooth apps are built | 🔧 in progress |
+| 4 | Our own app on a StormBox Blast 2: find and connect without location and without a server; battery, volume, equalizer, light, speaker settings | 🔲 planned |
+| 5 | Design, every screen size, English and Russian by hand | 🔲 planned |
+| 6 | Firmware updates and other speaker models | 🔲 planned |
+| 7 | Two builds and the first signed release on GitHub | 🔲 planned |
 
 <a name="en-5"></a>
 
@@ -173,6 +177,10 @@ Tribit, которые знает официальное приложение, �
 планшете автора: там официальное приложение Tribit версии 5.0.0 падало на кнопке «создать свой EQ», требовало геолокацию
 для поиска колонки и обрезало низ своих экранов.
 
+**Направление, октябрь 2026.** Krinik Tribit пишется с нуля как своё приложение (Kotlin + Jetpack Compose).
+Официальное приложение с нашими исправлениями (разделы 1 и 5) остаётся запасным путём для моделей колонок и
+обновлений прошивки, которых своё приложение пока не умеет.
+
 Разделы: [1 Что исправлено](#ru-1) · [2 Что болит в официальном приложении](#ru-2) · [3 Скачать](#ru-3) ·
 [4 Дорожная карта](#ru-4) · [5 Собрать самому](#ru-5) · [6 Карта проекта](#ru-6) ·
 [7 Правовая информация и благодарности](#ru-7).
@@ -201,10 +209,11 @@ Tribit, которые знает официальное приложение, �
 
 - Сделано и проверено на Samsung A51: Firebase выключен, аналитики Firebase, рекламного идентификатора и пушей в
   приложении нет.
-- В работе: приложение будет обращаться к серверу Tribit только анонимным гостем. Данные человека, его телефона или
-  планшета на сервер уходить не будут. Поле, которое сервер требует, будет получать случайное значение, новое при каждом
-  запросе. Из данных о колонке сервер будет получать только модель колонки, которая просит прошивку и настройки.
-  Облачные копии пресетов эквалайзера и форма поддержки будут отключены.
+- Сделано и проверено на Samsung A51: приложение обращается к серверу Tribit только анонимным гостем. ID гостя, модель
+  телефона и версия Android в его запросах случайные, выбираются один раз при установке; ни одно настоящее значение
+  телефона в проверке в запросы не попало. К серверу Tribit уходят только четыре вида запросов: вход гостя, каталог
+  колонок, проверка прошивки (по нажатию пользователя) и словарь языка. Облачных копий пресетов эквалайзера, формы
+  поддержки и переходов на сайт Tribit больше нет.
 
 <a name="ru-2"></a>
 
@@ -241,13 +250,12 @@ Krinik Tribit и пользуйтесь. Первый релиз выходит 
 | № | Шаг | Состояние |
 |---|---|---|
 | 1 | Разведка: 2648 отзывов Google Play, языки перевода, боли официального приложения | ✅ сделано |
-| 2 | Патчи: вылет на эквалайзере, геолокация (три места), масштаб и прокрутка экранов, розовый стиль, символы в пароле, название, иконка | ✅ написаны, прогнаны на планшете автора |
-| 3 | Первая патченая сборка на планшете автора с колонкой StormBox Blast 2: от заставки до своего эквалайзера без вылетов и без запроса разрешения на геолокацию | ✅ сделано, автор тестирует |
-| 4 | Тексты: наши в файлах ресурсов вместо серверных и зашитых в код; английский и русский руками | 🔧 разведка готова, дальше патч |
-| 5 | Вёрстка: масштаб экранов вмещает весь макет, обрезанные экраны прокручиваются (сделано, прогнано на планшете); дальше альбомная ориентация и остальные экраны | 🔧 в работе |
-| 6 | Вылеты, обрывы подключения, приложение больше не ждёт сервер Tribit; окно обязательного обновления убрано (сделано, прогнано на Samsung A51) | 🔧 в работе |
-| 7 | Две сборки: debug «Debug Krinik Tribit» рядом с оригиналом (сделано); release и первый подписанный релиз на GitHub | 🔧 debug готов, release в плане |
-| 8 | Без аккаунта и без слежки: Firebase и рекламный идентификатор выключены (сделано, прогнано на Samsung A51); работа без аккаунта и без облачных копий пресетов эквалайзера | 🔧 в работе |
+| 2 | Официальное приложение с нашими исправлениями, запасной путь: без вылета на «создать свой эквалайзер», без геолокации, без аккаунта (анонимный гость), без Firebase, без переходов на Tribit, TLS вновь с проверкой — прогнано на Samsung A51 с колонкой StormBox Blast 2 | ✅ сделано |
+| 3 | Своё приложение с нуля: разведка протокола колонки и того, как устроены хорошие приложения для Bluetooth | 🔧 в работе |
+| 4 | Своё приложение на StormBox Blast 2: найти и подключить без геолокации и без сервера; заряд, громкость, эквалайзер, подсветка, настройки колонки | 🔲 в плане |
+| 5 | Дизайн, экраны любого размера, английский и русский руками | 🔲 в плане |
+| 6 | Обновление прошивки и другие модели колонок | 🔲 в плане |
+| 7 | Две сборки и первый подписанный релиз на GitHub | 🔲 в плане |
 
 <a name="ru-5"></a>
 
@@ -315,6 +323,9 @@ adb install-multiple out/signed/*.apk
 在手机和平板上完整显示每个界面，英文和俄文翻译也通顺自然。这个项目始于作者的一台平板：在那台平板上，官方 Tribit 应用 5.0.0 版
 一点「创建我的 EQ」就闪退，搜索音箱必须开定位，界面底部还被裁掉。
 
+**方向（2026 年 10 月）。** Krinik Tribit 现在作为我们自己的应用从零开始编写（Kotlin + Jetpack Compose）。
+带有我们修复的官方应用（第 1 节和第 5 节）继续作为备用方案，用于我们的应用尚未支持的音箱型号和固件更新。
+
 目录：[1 修复内容](#zh-1) · [2 官方应用的问题](#zh-2) · [3 下载](#zh-3) · [4 路线图](#zh-4) · [5 自行构建](#zh-5) ·
 [6 项目结构](#zh-6) · [7 法律声明与致谢](#zh-7)。
 
@@ -335,7 +346,7 @@ adb install-multiple out/signed/*.apk
 **隐私。** Krinik Tribit 尊重个人数据隐私和 GDPR。我们反对通过 Firebase 和 Tribit 服务器追踪使用数据。Tribit 服务器不应知道谁在使用本应用，我们正在让 Tribit 服务器无法识别用户身份。
 
 - 已完成并在 Samsung A51 上验证：Firebase 已关闭，应用中没有 Firebase 分析、广告标识符和推送。
-- 进行中：应用将只以匿名访客身份访问 Tribit 服务器。用户本人及其手机或平板的数据将不会发送到服务器。服务器要求的字段将在每次请求时填入新的随机值。关于音箱，服务器只会收到请求固件和设置的音箱型号。均衡器预设的云端副本和反馈表单将被关闭。
+- 已完成，并已在 Samsung A51 上验证：应用只以匿名访客身份访问 Tribit 服务器。请求中的访客 ID、手机型号和 Android 版本均为随机值，在安装时选定一次；验证中没有任何真实的手机数据进入请求。发往 Tribit 服务器的请求只有四类：访客登录、音箱目录、固件检查（由用户点击触发）和语言词典。均衡器预设的云端副本、反馈表单以及所有跳转到 Tribit 网站的链接都已移除。
 
 <a name="zh-2"></a>
 
@@ -370,13 +381,12 @@ Android 设备。先卸载官方 Tribit 应用（签名不同），再安装 Kri
 | # | 步骤 | 状态 |
 |---|---|---|
 | 1 | 调研：2648 条 Google Play 评论、翻译语言、官方应用的问题 | ✅ 已完成 |
-| 2 | 补丁：均衡器闪退、定位要求（三处）、界面缩放与滚动、粉色风格、密码符号、应用名、图标 | ✅ 已写好，已在作者的平板上运行 |
-| 3 | 在作者的平板和 StormBox Blast 2 上运行第一个补丁版本：从启动页到自定义均衡器，不闪退、不申请定位权限 | ✅ 已完成，作者正在测试 |
-| 4 | 文字：用资源文件里我们的文字替换服务器下发和代码写死的文字；英文和俄文人工翻译 | 🔧 调研完成，下一步打补丁 |
-| 5 | 布局：界面缩放容纳整个设计稿，被裁的界面可以滚动（已完成，已在平板上运行）；接下来是横屏和其余界面 | 🔧 进行中 |
-| 6 | 闪退、断连，应用不再等待 Tribit 服务器；强制更新窗口已移除（已完成，已在 Samsung A51 上运行） | 🔧 进行中 |
-| 7 | 两个版本：与原版并存的 debug「Debug Krinik Tribit」（已完成）；release 及 GitHub 上的首个签名正式版 | 🔧 debug 已完成，release 计划中 |
-| 8 | 无账号、无追踪：Firebase 和广告标识符已关闭（已完成，已在 Samsung A51 上运行）；下一步：无需账号即可使用，均衡器预设不再备份到云端 | 🔧 进行中 |
+| 2 | 带有我们修复的官方应用（备用方案）：「创建自定义均衡器」不再闪退，无需定位，无需账号（匿名访客），无 Firebase，不跳转到 Tribit，重新校验 TLS——已在 Samsung A51 和 StormBox Blast 2 上运行 | ✅ 已完成 |
+| 3 | 从零编写我们自己的应用：调研音箱协议以及优秀蓝牙应用的做法 | 🔧 进行中 |
+| 4 | 我们的应用支持 StormBox Blast 2：无需定位、无需服务器即可查找并连接；电量、音量、均衡器、灯光、音箱设置 | 🔲 计划中 |
+| 5 | 设计、适配所有屏幕尺寸、人工翻译英文和俄文 | 🔲 计划中 |
+| 6 | 固件更新和其他音箱型号 | 🔲 计划中 |
+| 7 | 两个版本以及 GitHub 上的首个签名正式版 | 🔲 计划中 |
 
 <a name="zh-5"></a>
 
