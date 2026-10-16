@@ -3,7 +3,7 @@
 > **Created:** 2026-10-16 (the owner, chat 15:24 +03:00: «Сворачиваем план на суть C» · «Делаем по плану C») ·
 > **Parent:** `MASTER_PLAN.md` phases 2–3, `researches/03` (protocol notes), `researches/08` (beauty), `researches/10`
 > (tools for reading their code) · **Status:** rung 1 of `/plan-epic` for `plans/04_EPIC_own_app.md`; requirements and local
-> state 15:35, industry 15:36, the Blast 2 protocol 15:40 (24 of 24 quotes checked) ; KARTUN's answer 15:45 (§4a) — rung 1 complete ·
+> state 15:35, industry 15:36, the Blast 2 protocol 15:40 (24 of 24 quotes checked) ; KARTUN's answer ≈ 15:41 (§4a) — rung 1 complete ·
 > **Outbound:** forks → `interviews/`; questions to the KARTUN session (sent 15:29)
 
 ## 1. Requirements — the owner's words
@@ -140,7 +140,7 @@ Collected by a delegated web sweep 2026-10-16; the four lines marked ✔ were re
 6. **Anti-patterns:** connecting while discovery runs; socket I/O on the main thread; asking `ACCESS_FINE_LOCATION` on 12+;
    GATT calls without a queue; not closing the socket or the profile proxy.
 
-## 4a. The model — KARTUN (the answer of the KARTUN session, 2026-10-16 ≈ 15:45 +03:00; every path checked by reading)
+## 4a. The model — KARTUN (the answer of the KARTUN session, 2026-10-16 ≈ 15:41 +03:00; every path checked by reading)
 
 All paths under `D:\work\ai_sandbox\KARTUN` (read-only for us).
 
