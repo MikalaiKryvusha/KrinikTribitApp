@@ -954,6 +954,40 @@ def patch_firmware_on_tap():
     print("ok 25 firmware check on tap only: 2 sinks gated by krinik.Firmware, the firmware version row is the button")
 
 
+# --- Patch 26: the «on» switch of the speaker settings in Krinik pink -----------------------------------------
+# Owner 2026-10-16 11:54 +03:00 (chat, on the yellow switch «Индикатор громкости»): «не по нашей дизайн сжеме» · «схеме».
+# The switch of every speaker settings row is two PNGs set by DateUtils.updateView1: ic_eqbutton (off) and
+# ic_eqbutton_checked (on: dark track, solid #FFEB00 knob, edges blended into the track). Recolour per pixel, so the
+# blended edges follow: yellowness a = (G - B) / 235 (0 on the neutral track, 1 on the knob), out = in + a x (pink - yellow)
+# = (R, G - 209a, B + 140a). The other yellow PNGs of plans/02 (56 names) need an eye on each - not in this patch.
+# [TESTED: 2026-10-16 · histogram: knob 1672 px #FF1A8C, track unchanged; A51 settings «Индикатор громкости» pink
+# (shot 44_settings_pink) · testcases/reports/2026-10-16_patch8_anon.md]
+PINK_PNGS = ["mipmap-xxhdpi/ic_eqbutton_checked.png"]
+# Knob #FFEB00 -> #FF1A8C: G - 209, B + 140 (HOUSE_RULES R3). Yellowness from the ORIGINAL pixel; G - B up to 4/255 counts
+# as neutral (the track is (33,33,31) and must stay as is). Each channel is computed in its own clone, then combined.
+YELLOWNESS = "clamp(((g-b)*255-4)/231)"
+
+
+def patch_pink_switch():
+    import subprocess
+    for rel in PINK_PNGS:
+        png = ROOT / "res" / rel
+        if not png.exists():
+            sys.exit(f"FAIL: {rel} missing")
+        cmd = ["magick", str(png),
+               "(", "-clone", "0", "-fx", "r", ")",
+               "(", "-clone", "0", "-fx", f"g-{YELLOWNESS}*209/255", ")",
+               "(", "-clone", "0", "-fx", f"b+{YELLOWNESS}*140/255", ")",
+               "(", "-clone", "0", "-alpha", "extract", ")",
+               "-delete", "0", "-channel", "RGBA", "-combine", str(png)]
+        if subprocess.run(cmd).returncode != 0:
+            sys.exit(f"FAIL: recolour {rel}")
+        hist = subprocess.run(["magick", str(png), "-format", "%c", "histogram:info:-"], capture_output=True, text=True).stdout
+        if "#FFEB00" in hist.upper() or "#FF1A8C" not in hist.upper():
+            sys.exit(f"FAIL: {rel} still yellow or not pink")
+    print(f"ok 26 pink switch: {len(PINK_PNGS)} PNG recoloured yellow -> #FF1A8C")
+
+
 # --- Patch 22: the device base inside the APK ------------------------------------------------------------------
 # Owner 2026-10-16 ≈ 11:00 +03:00: «скачай БД из ГУГЛ телефонов, кладемм внутрь АПК» · «но чтобы не больше 1 мб файл весил»
 # (MASTER_PLAN decision journal). patches/assets/krinik_devices.txt (`Brand|Model` per line, built by
@@ -1077,6 +1111,7 @@ if __name__ == "__main__":
     patch_no_error_mail()
     patch_card_name_wrap()
     patch_firmware_on_tap()
+    patch_pink_switch()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:
