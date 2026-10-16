@@ -1073,6 +1073,25 @@ def patch_no_support_link():
     print("ok 29 help page: no link to the support form")
 
 
+# --- Patch 30 (TribitApp.initNetWork): TLS is verified again - no trust-all manager, no always-true hostname check ------------------------
+# bugs/03 (S1): TribitApp builds the app's only HTTP client with HttpSslFactory.generateSslConfig() - with no certificates
+# it falls back to UnSafeTrustManager (empty checkServerTrusted) - and UnSafeHostnameVerifier (verify -> true): anyone on
+# the same network could pose as gateway.tribit.com, firmware answers included. Fix: the two builder calls go; OkHttp then
+# checks the certificate chain and the host name against the system trust store (its default).
+# [TESTED: 2026-10-16 · A51: dictionary, catalog, speaker page, firmware check all «success», no TLS error · testcases/reports/2026-10-16_patch8_anon.md] - rejection of a forged certificate not observed (no MITM was set up)
+TLS_TRUST_ALL = ("    invoke-virtual {v2, v3, v1}, Lokhttp3/OkHttpClient$Builder;->sslSocketFactory(Ljavax/net/ssl/SSLSocketFactory;"
+                 "Ljavax/net/ssl/X509TrustManager;)Lokhttp3/OkHttpClient$Builder;\n\n    move-result-object v1\n")
+TLS_ANY_HOST = ("    invoke-virtual {v1, v2}, Lokhttp3/OkHttpClient$Builder;->hostnameVerifier(Ljavax/net/ssl/HostnameVerifier;)"
+                "Lokhttp3/OkHttpClient$Builder;\n\n    move-result-object v1\n")
+
+
+def patch_tls_verified():
+    p = smali("com.thousandshores.tribit.TribitApp")
+    replace_in_method(p, ".method public final initNetWork()V", TLS_TRUST_ALL, "    move-object v1, v2\n")
+    replace_in_method(p, ".method public final initNetWork()V", TLS_ANY_HOST, "")
+    print("ok 30 TLS verified: no trust-all manager, no always-true hostname verifier")
+
+
 # --- Patch 22: the device base inside the APK ------------------------------------------------------------------
 # Owner 2026-10-16 ≈ 11:00 +03:00: «скачай БД из ГУГЛ телефонов, кладемм внутрь АПК» · «но чтобы не больше 1 мб файл весил»
 # (MASTER_PLAN decision journal). patches/assets/krinik_devices.txt (`Brand|Model` per line, built by
@@ -1200,6 +1219,7 @@ if __name__ == "__main__":
     patch_settings_title()
     patch_smaller_back()
     patch_no_support_link()
+    patch_tls_verified()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:
