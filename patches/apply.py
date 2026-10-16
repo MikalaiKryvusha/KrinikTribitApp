@@ -204,6 +204,14 @@ def patch_app_name():
 # [NOT-TESTED]
 ICON_PATH = ("M508,734 L1430,734 A160,160 0 1 0 1291.4,494 L830.4,1293 "
              "A160,160 0 1 0 1107.6,1293 L646.6,494 A160,160 0 1 0 508,734 Z")
+# Placement in the 108-unit icon: the mark has 3-fold symmetry about the centroid of its loop centres (508,574),
+# (1430,574), (969,1373) -> (969, 840.3); that point goes to the centre (54,54) of the launcher circle. Owner 2026-10-16
+# 12:00 +03:00: «иконку нашу нужно перерендерить. Сейчас не по центру круга логотип» · «а нужно по уцентру поставить» -
+# the old translate centred the bounding box, which put the symmetry centre 5.7 units high. Farthest stroke point from
+# the centre: (532.5 + 160 + 40) x 0.0371 = 27.2 < 33, inside the adaptive-icon safe zone. Same values in design/icon.svg.
+ICON_SCALE = "0.0371"
+ICON_TX = "18.05"   # 54 - 0.0371 x 969
+ICON_TY = "22.82"   # 54 - 0.0371 x 840.3
 
 
 def patch_icon():
@@ -221,8 +229,8 @@ def patch_icon():
         '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
         '    android:width="108dp" android:height="108dp"\n'
         '    android:viewportWidth="108" android:viewportHeight="108">\n'
-        '    <group android:scaleX="0.0371" android:scaleY="0.0371"\n'
-        '        android:translateX="18.05" android:translateY="17.14">\n'
+        f'    <group android:scaleX="{ICON_SCALE}" android:scaleY="{ICON_SCALE}"\n'
+        f'        android:translateX="{ICON_TX}" android:translateY="{ICON_TY}">\n'
         f'        <path android:pathData="{ICON_PATH}"\n'
         '            android:fillColor="#00000000" android:strokeColor="#0D0D0D"\n'
         '            android:strokeWidth="80" android:strokeLineJoin="round"/>\n'
@@ -402,8 +410,8 @@ BRAND = "KRINIK TRIBIT"
 SPLASH_LOGO_BOX = "270,700 855,1235"
 SPLASH_BG = "rgb(13,13,12)"
 MARK_GROUP = (
-    '    <group android:scaleX="0.0371" android:scaleY="0.0371"\n'
-    '        android:translateX="18.05" android:translateY="17.14">\n'
+    f'    <group android:scaleX="{ICON_SCALE}" android:scaleY="{ICON_SCALE}"\n'
+    f'        android:translateX="{ICON_TX}" android:translateY="{ICON_TY}">\n'
     f'        <path android:pathData="{ICON_PATH}"\n'
     '            android:fillColor="#00000000" android:strokeColor="{stroke}"\n'
     '            android:strokeWidth="80" android:strokeLineJoin="round"/>\n'
@@ -870,6 +878,35 @@ def patch_no_error_mail():
     print("ok 23 no error mail: EqExceptionMonitor.sendExceptionEmail returns at once")
 
 
+# --- Patch 24: the speaker name on a device card wraps instead of ending in «…» ---------------------------------
+# Owner 2026-10-16 11:43 +03:00 (chat, on «Tribit StormBox Blas…» of the Add Device card): «название нужно переносить на
+# две+ строки, чтобы помещалось». The name TextView tv_name of the new device cards is singleLine with a fixed 26 dp
+# height. Class inventory (2026-10-16, `grep tv_name res/layout/item_device*.xml`): item_device_new (main screen),
+# item_device_search_new (Add Device), item_device_list_new - the three with singleLine; the other five item_device*
+# already wrap. Fix by form, for the class: singleLine -> maxLines 3, height -> wrap_content.
+# [TESTED: 2026-10-16 · A51 main screen: two balanced lines, no ellipsis; Add Device card not seen · testcases/reports/2026-10-16_patch8_anon.md]
+NAME_CARDS = ["item_device_new", "item_device_search_new", "item_device_list_new"]
+NAME_MAX_LINES = 3  # «две+» - two lines fit the longest names seen; a third keeps a long rename visible
+
+
+def patch_card_name_wrap():
+    for name in NAME_CARDS:
+        p = ROOT / "res" / "layout" / f"{name}.xml"
+        t = p.read_text(encoding="utf-8")
+        tags = re.findall(r'<TextView [^>]*android:id="@id/tv_name"[^>]*>', t)
+        if len(tags) != 1:
+            sys.exit(f"FAIL: tv_name in {name}: {len(tags)}")
+        old = tags[0]
+        if old.count('android:singleLine="true"') != 1 or old.count('android:layout_height="@dimen/dp_26"') != 1:
+            sys.exit(f"FAIL: tv_name of {name} is not the singleLine 26 dp row")
+        # balanced: «Tribit StormBox / Blast 2» instead of «Tribit StormBox Blast / 2» (A51 11:56, snapshot 17_main_wrap)
+        new = (old.replace('android:singleLine="true"',
+                           f'android:maxLines="{NAME_MAX_LINES}" android:breakStrategy="balanced"')
+                  .replace('android:layout_height="@dimen/dp_26"', 'android:layout_height="wrap_content"'))
+        p.write_text(t.replace(old, new), encoding="utf-8")
+    print(f"ok 24 card name wraps up to {NAME_MAX_LINES} lines: {', '.join(NAME_CARDS)}")
+
+
 # --- Patch 22: the device base inside the APK ------------------------------------------------------------------
 # Owner 2026-10-16 ≈ 11:00 +03:00: «скачай БД из ГУГЛ телефонов, кладемм внутрь АПК» · «но чтобы не больше 1 мб файл весил»
 # (MASTER_PLAN decision journal). patches/assets/krinik_devices.txt (`Brand|Model` per line, built by
@@ -991,6 +1028,7 @@ if __name__ == "__main__":
     patch_firebase_off()
     patch_no_cloud()
     patch_no_error_mail()
+    patch_card_name_wrap()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:
