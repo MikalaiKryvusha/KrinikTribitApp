@@ -68,7 +68,7 @@ fun eqName(s: SpeakerState): String {
 @Composable
 fun EqScreen(
     s: SpeakerState, onBack: () -> Unit, onPreset: (Eq.Preset) -> Unit, onCustom: (List<Int>) -> Unit,
-    onSaveFile: () -> Unit, onOpenFile: () -> Unit,
+    onSaveFile: () -> Unit, onOpenFile: () -> Unit, onShareFile: () -> Unit,
 ) {
     val eq = s.eq
     val range = Eq.offset(s.newFirmware ?: true)
@@ -138,6 +138,7 @@ fun EqScreen(
             )
             SettingsRow(stringResource(R.string.file_save), inCard = true, onClick = onSaveFile)
             SettingsRow(stringResource(R.string.file_open), inCard = true, onClick = onOpenFile)
+            SettingsRow(stringResource(R.string.file_share), inCard = true, onClick = onShareFile)
         }
         Spacer(Modifier.padding(4.dp))
     }

@@ -56,6 +56,7 @@
     <string name="file_hint">The settings file keeps the speaker\'s equalizer and light. Tap «Save to file» and pick a folder on the phone. You can send this file to a friend who has Krinik Tribit and a Tribit StormBox Blast 2 speaker. «Open file» puts the equalizer and the light from the chosen file on the speaker.</string>
     <string name="file_save">Save to file</string>
     <string name="file_open">Open file</string>
+    <string name="file_share">Share file</string>
     <string name="file_saved">Settings file saved.</string>
     <string name="file_not_saved">The settings file was not saved. Tap «Save to file» and pick another folder.</string>
     <string name="file_applied">Settings file read. Krinik Tribit sends its equalizer and light to the speaker when it connects to the speaker.</string>

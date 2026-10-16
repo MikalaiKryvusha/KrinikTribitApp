@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.provider.Settings
 import android.widget.Toast
+import androidx.core.content.FileProvider
+import java.io.File
 import androidx.lifecycle.lifecycleScope
 import com.kriniks.tribit.protocol.Profile
 import kotlinx.coroutines.Dispatchers
@@ -100,6 +102,26 @@ class MainActivity : ComponentActivity() {
 
     private fun toast(text: Int) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
 
+    /**
+     * «Поделиться файлом» (`ideas/01`, criterion 4): writes the speaker's EQ and light to cache/shared/ and hands the file
+     * to Android's share menu (messenger, mail). [NOT-TESTED]
+     */
+    private fun shareProfile() {
+        val profile = Profile.of(speakerVm.speaker.value) ?: return toast(R.string.file_not_saved)
+        lifecycleScope.launch {
+            val file = withContext(Dispatchers.IO) {
+                runCatching {
+                    File(cacheDir, SHARED_DIR).apply { mkdirs() }.resolve(PROFILE_FILE_NAME)
+                        .also { it.writeText(profile.toJson()) }
+                }.getOrNull()
+            } ?: return@launch toast(R.string.file_not_saved)
+            val uri = FileProvider.getUriForFile(this@MainActivity, "$packageName.files", file)
+            val send = Intent(Intent.ACTION_SEND).setType("application/json").putExtra(Intent.EXTRA_STREAM, uri)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(Intent.createChooser(send, getString(R.string.file_share)))
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Debug only: every disk or network call on the main thread goes to logcat (tag StrictMode) - the check of
         // plans/05 criterion 4 «no main-thread I/O». [NOT-TESTED]
@@ -149,6 +171,7 @@ class MainActivity : ComponentActivity() {
                             if (profileToSave != null) saveFile.launch(PROFILE_FILE_NAME) else toast(R.string.file_not_saved)
                         },
                         onOpenFile = { openFile.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
+                        onShareFile = ::shareProfile,
                     )
                     Screen.SPEAKER_SETTINGS ->
                         SpeakerSettingsScreen(speakerSettings, speaker.newFirmware, onBack = back, act = settingsActions)
@@ -179,6 +202,9 @@ class MainActivity : ComponentActivity() {
     private companion object {
         /** The name the save dialog proposes; the user may change it. */
         const val PROFILE_FILE_NAME = "Krinik Tribit - StormBox Blast 2.json"
+
+        /** The cache folder FileProvider shares (`res/xml/shared_files.xml`). */
+        const val SHARED_DIR = "shared"
     }
 
     private fun openAppSettings() =

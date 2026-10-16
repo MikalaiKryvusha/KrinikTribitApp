@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The one folder FileProvider may hand to other apps: the settings file made for «Поделиться файлом» (ideas/01, criterion 4).
+     It lives in the app's cache; nothing else of the app is reachable. -->
+<paths>
+    <cache-path name="shared" path="shared/" />
+</paths>

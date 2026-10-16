@@ -14,6 +14,16 @@
         android:supportsRtl="true"
         android:localeConfig="@xml/locales_config"
         android:theme="@style/Theme.KrinikTribit">
+        <!-- «Поделиться файлом» (ideas/01): hands the settings file from cache/shared/ to the app the user picks. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/shared_files" />
+        </provider>
         <activity
             android:name=".MainActivity"
             android:exported="true"
