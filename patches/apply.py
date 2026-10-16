@@ -1297,6 +1297,23 @@ def patch_connect_failed_dialog():
     print("ok 34 connection-failed dialog: tips only, the button opens our guide")
 
 
+# --- Patch 35 (release only): no request and answer bodies in the system log -------------------------------------
+# researches/09 (dislikes, item 3), plans/02 «Баги проекта»: TribitApp.initNetWork builds EasyHttp with
+# setLogEnabled(true) in their store build - every request and answer, the guest token and username included, goes to
+# logcat, which other apps with log access and bug-report dumps read. The release build passes false; the debug build
+# keeps their log - testcases/anon_check.py reads it to prove no real value of the phone reaches a request.
+# [TESTED: 2026-10-16 · A51 release START -> guest -> main: 0 EasyHttp lines of 740 app lines; the debug build of the
+# same session logged their bodies (control) · testcases/reports/2026-10-16_patch31_32.md]
+HTTP_LOG_ON = ("    const/4 v2, 0x1\n\n    .line 257\n"
+               "    invoke-virtual {v1, v2}, Lcom/hjq/http/EasyConfig;->setLogEnabled(Z)Lcom/hjq/http/EasyConfig;")
+
+
+def patch_release_quiet_http():
+    replace_in_method(smali("com.thousandshores.tribit.TribitApp"), ".method public final initNetWork()V",
+                      HTTP_LOG_ON, HTTP_LOG_ON.replace("const/4 v2, 0x1", "const/4 v2, 0x0"))
+    print("ok 35 release: EasyHttp log off")
+
+
 # --- Patch 30 (TribitApp.initNetWork): TLS is verified again - no trust-all manager, no always-true hostname check ------------------------
 # bugs/03 (S1): TribitApp builds the app's only HTTP client with HttpSslFactory.generateSslConfig() - with no certificates
 # it falls back to UnSafeTrustManager (empty checkServerTrusted) - and UnSafeHostnameVerifier (verify -> true): anyone on
@@ -1452,4 +1469,6 @@ if __name__ == "__main__":
     make_dex_room()
     if "--debug" in sys.argv[2:]:
         variant_debug()
+    else:
+        patch_release_quiet_http()
     print("all patches applied")
