@@ -4,7 +4,7 @@
 > эффективный нативный код с комментариями, как велит КАИФ, и тестируем» · «Можно в нативный код переграть? есть такие
 > инструменты?» · «чтобы ты блять на Джава писал и на котлине») · **Parent:** `HOUSE_RULES.md` R9 (`native/`),
 > `MASTER_PLAN.md` journal 14:25–14:38 · **Status:** rung 1 of `/plan-epic`; local recon and the compile spike done
-> 2026-10-16 14:46 +03:00, industry sweep pending · **Outbound:** the meta-plan `plans/03_EPIC_java_source.md` (next);
+> 2026-10-16 14:46 +03:00, industry sweep 14:52 +03:00 · **Outbound:** the meta-plan `plans/03_EPIC_java_source.md` (next);
 > forks for the owner → `interviews/`
 
 ## 1. The ask and its fit
@@ -61,9 +61,39 @@ source. **A mechanical rewrite closes this family:** `StringsKt.replace$default(
 
 ## 4. Industry sweep
 
-Pending — delegated web recon with a source URL per claim; it lands here before the meta-plan.
+Collected by a delegated web recon 2026-10-16; the three maintainer quotes were re-read by `gh issue view` (marked ✔).
 
-## 5. Findings → implications (draft, completed after §4)
+1. **Recompiling a decompiled app is a small-app practice.** jadx maintainers: «Decompiling an apk with Jadx and then
+   recompiling it with Android Studio only works for small and simple apps» ✔ (https://github.com/skylot/jadx/issues/947) ·
+   «Edit java code is pointless because in most case it is not possible to recompile app» ✔
+   (https://github.com/skylot/jadx/issues/1959) · a recompile feature closed as not planned ✔
+   (https://github.com/skylot/jadx/issues/2215). The `--export-gradle` template leaves `dependencies {}` empty
+   (https://raw.githubusercontent.com/skylot/jadx/master/jadx-core/src/main/resources/export/android/app.build.gradle.tmpl).
+   No public success story for an app of this size was found.
+2. **Decompilers are lossy by measurement:** the best of 8 Java decompilers gave syntactically correct output for 84 % of
+   classes and semantically equivalent output for 78 % (https://arxiv.org/abs/1908.06895) — on javac-built Java, not Kotlin.
+3. **Kotlin blockers:** coroutine state machines are not valid source and must be rewritten as `suspend` code
+   (https://kotlinlang.org/spec/asynchronous-programming-with-coroutines.html); inline functions arrive expanded at every
+   call site (https://jdriven.com/blog/2023/09/Kotlin-Discovered-Inline-Functions/); data binding classes are generated
+   from `<layout>` XML that the shipped APK no longer has (https://juejin.cn/post/6844904146059935757).
+4. **The proven hybrid is DexPatcher's model:** classes written in Java against the original APK's symbols, built into the
+   APK (https://www.xda-developers.com/dexpatcher-patch-android-apks-using-java/); its Gradle plugin stopped at AGP 4.0
+   (https://github.com/DexPatcher/dexpatcher-gradle/releases), so the tooling is ours to build.
+5. **Pitfalls named by the sources:** a duplicate class is resolved to the FIRST copy, so the original smali must be deleted
+   (https://android.googlesource.com/platform/art/+/de7b436); d8 needs the whole app on `--classpath` and keeps the 64K
+   reference limit per dex (https://developer.android.com/tools/d8); Kotlin `-api-version` is pinned to the bundled stdlib
+   (https://kotlinlang.org/docs/compiler-reference.html); apktool keeps resource ids equal to the original APK
+   (https://apktool.org/blog/apktool-1.0.0).
+6. **Security:** jadx before 1.5.6 lets a crafted `versionName` inject Groovy into the exported `build.gradle`
+   (CVE-2026-42049, https://app.opencve.io/cve/CVE-2026-42049). Ours is 1.5.1 (`tools/jadx/lib/jadx-1.5.1-all.jar`); the
+   exported file carries `versionName "5.0.0"`, and Gradle was never run on it — update jadx before any Gradle run.
+
+## 5. Findings → implications
+
+0. **Our spike agrees with the industry:** a one-shot «whole app compiles» is the path the jadx maintainers call
+   small-app-only, and our count (4 661 type errors after R, plus Kotlin coroutines and data binding) says the same. The
+   class-by-class hybrid (§4 item 4) is the proven path; the whole-code conversion becomes its END STATE, reached class by
+   class.
 
 1. **Only Tribit's own code needs to become source.** The libraries stay the APK's bytecode (classpath jar for `javac`,
    their dex inside the APK); 108 of them could later become Maven dependencies by their `.version` files.
