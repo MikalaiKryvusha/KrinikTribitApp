@@ -1051,6 +1051,28 @@ def patch_smaller_back():
     print(f"ok 28 back button drawn at 20 dp in {n} layouts")
 
 
+# --- Patch 29: no «Сообщить о проблеме? Перейти» on the connection-help page -------------------------------------
+# Owner 2026-10-16 ≈ 09:21 +03:00: «копия эквалайзеров в облаке и форма поддержки - не нужно это нахуй» (MASTER_PLAN
+# journal). The help page of the speaker search (activity_device_help_new, seen on the A51 11:57, shot 19_add_wrap) links
+# to FeedBackNewActivity through tv_problem + tv_problem_go; both go. TWINS: searched `FeedBackNewActivity.class|
+# FeedBackActivity.class` - 5 classes: DeviceHelpNewActivity (this patch), MineActivity, MineFragment, DialogDefault,
+# WebViewHelpActivity - the other four are listed in plans/02 for the next step; sending is cut by krinik.Gate anyway.
+# [TESTED: 2026-10-16 · A51: help page of the search without the support line (shot 49_help_no_support) · testcases/reports/2026-10-16_patch8_anon.md]
+HELP_SUPPORT_VIEWS = ["tv_problem", "tv_problem_go"]
+
+
+def patch_no_support_link():
+    p = ROOT / "res/layout/activity_device_help_new.xml"
+    t = p.read_text(encoding="utf-8")
+    for vid in HELP_SUPPORT_VIEWS:
+        tag = re.findall(rf'<TextView [^>]*android:id="@id/{vid}"[^>]*>', t)
+        if len(tag) != 1 or "android:visibility" in tag[0]:
+            sys.exit(f"FAIL: {vid} in activity_device_help_new")
+        t = t.replace(tag[0], tag[0].replace("<TextView ", '<TextView android:visibility="gone" ', 1))
+    p.write_text(t, encoding="utf-8")
+    print("ok 29 help page: no link to the support form")
+
+
 # --- Patch 22: the device base inside the APK ------------------------------------------------------------------
 # Owner 2026-10-16 ≈ 11:00 +03:00: «скачай БД из ГУГЛ телефонов, кладемм внутрь АПК» · «но чтобы не больше 1 мб файл весил»
 # (MASTER_PLAN decision journal). patches/assets/krinik_devices.txt (`Brand|Model` per line, built by
@@ -1177,6 +1199,7 @@ if __name__ == "__main__":
     patch_pink_switch()
     patch_settings_title()
     patch_smaller_back()
+    patch_no_support_link()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:
