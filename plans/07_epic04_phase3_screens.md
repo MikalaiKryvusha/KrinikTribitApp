@@ -55,6 +55,9 @@ the owner's later corrections (same interview, «Приёмка и следую�
 - [ ] 9. A51 run — `testcases/reports/2026-10-16_phase3_screens.md`, verdict partial.
 - [ ] 10. The parity inventory of Tribit's own Blast 2 screens (`researches/12`) — every row checked against our app.
 
+**Owner's decision on preset names:** «Имена пресетов. Их «XBass Off (V8.6/V7.4)» и «XBass (V8.6/V7.4)» оставить как у
+Tribit» (chat 2026-10-16 ≈ 20:1x +03:00) — the names of `presetName` stay as Tribit's code writes them for the Blast 2.
+
 **Owner's rule in this step:** «стиль Material 3 - всё верно» · «используем нативные материалы и стили» (chat 2026-10-16
 ≈ 19:52 +03:00) — native Material 3 components and their own look (the slider thumb stays Material's), `HOUSE_RULES.md` R11.
 

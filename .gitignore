@@ -70,3 +70,7 @@ testcases/reports/shots/**/run.json
 
 # Raw Google Play supported-devices download (public, large) - only the compact base derived from it is tracked
 /tools/devices/raw/
+
+# Speaker photos found on the web (owner 2026-10-16 ~20:1x: find and download them); rights belong to Tribit -
+# kept local until interviews/interview_004 says where they may go.
+/design/photos/

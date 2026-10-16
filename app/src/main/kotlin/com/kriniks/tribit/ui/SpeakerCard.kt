@@ -1,5 +1,6 @@
 package com.kriniks.tribit.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -90,12 +91,20 @@ fun SpeakerHome(link: Link, speaker: SpeakerState, act: SpeakerActions) {
     }
 }
 
-/** The speaker drawing on its pink glow and the floor light under it (.a-hero). */
+/**
+ * The speaker's photo on its pink glow (.a-hero). The photo is Tribit's own picture of the Blast 2 from their model catalog
+ * (`productLogo`), fetched once by `tools/fetch_speaker_images.py` and built into the app - the owner, 2026-10-16 ≈ 20:0x
+ * +03:00: «мы сейчас забираем у него картинки из запросов и зашиваем в наш апп» · «наш апп не будет делать запросы на
+ * сервер» (`HOUSE_RULES.md` R2, exception 2). The glow is brighter while the speaker's light is on. [NOT-TESTED]
+ */
 @Composable
 private fun Stage(lit: Boolean) {
-    val glow = Brush.radialGradient(listOf(Color(0x52FF1A8C), Color(0x14FF1A8C), Color.Transparent))
+    val glow = Brush.radialGradient(
+        if (lit) listOf(Color(0x66FF1A8C), Color(0x1AFF1A8C), Color.Transparent)
+        else listOf(Color(0x40FF1A8C), Color(0x10FF1A8C), Color.Transparent),
+    )
     Box(Modifier.fillMaxWidth().height(STAGE_HEIGHT).background(glow), contentAlignment = Alignment.Center) {
-        SpeakerArt(Modifier.width(SPEAKER_WIDTH), lit = lit)
+        Image(painterResource(R.drawable.speaker_blast2), Blast2.NAME, Modifier.width(SPEAKER_WIDTH))
     }
 }
 
@@ -222,5 +231,5 @@ private fun Player(s: SpeakerState, act: SpeakerActions) {
 /** «Tribit StormBox Blast 2» → «StormBox Blast 2» under the drawing: the brand stands in the app's own name above. */
 private const val TRIBIT_PREFIX = "Tribit "
 private val STAGE_HEIGHT = 190.dp
-private val SPEAKER_WIDTH = 250.dp
+private val SPEAKER_WIDTH = 280.dp
 private val RESPONSE_HEIGHT = 62.dp
