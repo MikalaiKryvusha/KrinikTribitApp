@@ -167,6 +167,23 @@ All paths under `D:\work\ai_sandbox\KARTUN` (read-only for us).
 6. **Tooling:** the UI agent (`C:\Android\private\ui-agent\`, one quoted string per command, SDK platform-tools first in
    PATH); WebP shots (R4); mock-ups `design/*.html` shot by `tools/shoot-mockups.mjs`; README shots `tools/shoot-readme.mjs`.
    Stand: the A51 is entirely ours (KARTUN does not support Android 13); KARTUN uses the Titan at `100.99.111.48:5555`.
+7. **Second answer** (the session `kartun-6e`, ≈ 15:43; paths checked by reading):
+   - `ui/SetupScreen.kt`: `ModelCard` (pink selected border + tick), `ScaleSlider` (native M3 slider with step marks — our
+     volume 0..31), `DragHandle` and a collapsing header through `NestedScrollConnection` (a header shrunk BY the scroll
+     offset jumps — «прыгает картинка»).
+   - `InfoDialog(title, text, list, onGuide…)` in `ui/Common.kt`: the (i) dialog quotes the guide and links to it — one
+     source of text; guide pictures from day one; EN/RU by hand, other languages by a script (`tools/make-translations.py`
+     with a `--check` guard).
+   - Mock-ups: `design/kartun-mockups.html` with the same tokens as CSS variables; taste variants as one sheet «current + A/B/C»
+     (`design/processing-waiting.html`, shot by `tools/shoot-processing-variants.mjs`).
+   - Speed, honestly: no measured startup and no baseline profile in KARTUN; felt speed from no splash work, state in one
+     ViewModel, plain `when(vm.screen)`, decode once (`UpscaleViewModel.fitForDisplay`, `DISPLAY_MAX_SIDE = 4096`). Measure cold
+     start: `adb shell am start -S -W -n <pkg>/.MainActivity` (TotalTime; KARTUN printed 522 ms on the Titan, their figure).
+   - Rakes: KARTUN's EXP-0007 (adaptive icon with a transparent foreground looks broken on the Android 12+ splash — set
+     `windowSplashScreenBackground`, check home, splash and the themed icon); bugs/01_DONE + EXP-0029 (a native library on a
+     per-screen thread killed the runtime — one process-wide thread, `EngineThreadGuardTest`); the owner's taste rules in
+     their decision log: drag handle without snap points, no living animation on busy tiles, counters with tabular digits,
+     time written in whole words.
 
 ## 5. Findings → implications → forks
 
