@@ -1,0 +1,543 @@
+<!doctype html>
+<!--
+  Krinik Tribit - mock-ups of the own app, sheet v1 (2026-10-16). Owner's brief (chat 2026-10-16 ≈ 19:1x +03:00):
+  «давай макеты сверстаем» · «Ориентируемся на оригинальное приложение Tribit, но делаем ПО-СВОЕМУ, КРСИВО,
+  ПЕРЕОСМЫСЛИВАЕМ!». Three variants A/B/C, two screens each (home, equalizer), ONE material for all: StormBox Blast 2,
+  battery 30 %, volume 10 of 31, playing, EQ «Рок», light mode 1. Preset curves are the band table of Tribit's app
+  (`app/.../protocol/Eq.kt`, dB = wire - 12). The speaker drawing is ours; no picture of Tribit's app is used.
+  Tokens and fonts are KARTUN's (`app/.../ui/theme/Theme.kt`); fonts load from `app/src/main/res/font/` - no network.
+  Each phone is a 390x860 canvas; `tools/shoot-mockups.mjs` shoots them into design/mockups-v1/*.webp. [NOT-TESTED]
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krinik Tribit — макеты</title>
+<style>
+  @font-face { font-family: 'Unbounded'; src: url('../app/src/main/res/font/unbounded.ttf'); font-weight: 200 900; }
+  @font-face { font-family: 'Manrope'; src: url('../app/src/main/res/font/manrope.ttf'); font-weight: 200 800; }
+  :root {
+    --bg: #0D0D0D; --surface: #151516; --card: #1C1C1E; --card2: #262628; --line: #2E2E31;
+    --text: #F5F5F7; --sub: #A1A1A6; --mute: #6E6E73; --green: #3DDC84;
+    --pink: #FF1A8C; --pink-d: #CC0070; --pink-soft: rgba(255, 26, 140, .14); --pink-line: rgba(255, 26, 140, .45);
+    --r-card: 24px; --r-pill: 999px;
+    --font: 'Manrope', system-ui, sans-serif; --head: 'Unbounded', 'Manrope', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #070707; color: var(--text); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+  .sheet-head { padding: 32px 36px 8px; max-width: 1340px; }
+  .sheet-head h1 { font: 700 28px/1.25 var(--head); }
+  .sheet-head h1 b { color: var(--pink); }
+  .sheet-head p { color: var(--sub); margin-top: 10px; line-height: 1.55; font-size: 15px; }
+  .sheet-head ul { color: var(--sub); margin: 10px 0 0 20px; line-height: 1.6; font-size: 14px; }
+  .row { padding: 28px 36px 8px; }
+  .row > h2 { font: 700 19px var(--head); margin-bottom: 16px; }
+  .phones { display: flex; gap: 36px; flex-wrap: wrap; }
+  .cap { margin: 0 0 12px 6px; }
+  .cap b { font: 700 22px var(--head); color: var(--pink); margin-right: 8px; }
+  .cap span { font: 700 15px var(--font); }
+  .cap p { color: var(--sub); font-size: 13px; margin-top: 4px; max-width: 380px; line-height: 1.45; }
+
+  /* ---- phone canvas 390x860 ---- */
+  .screen { width: 390px; height: 860px; background: var(--bg); border-radius: 44px; overflow: hidden; position: relative;
+    box-shadow: 0 0 0 10px #1a1a1a, 0 0 0 11px #2b2b2b; display: flex; flex-direction: column; }
+  .status { height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 28px;
+    font: 600 14px var(--font); flex: none; }
+  .status .dots { display: flex; gap: 6px; align-items: center; }
+  .status .dots i { width: 16px; height: 10px; border-radius: 3px; background: var(--text); opacity: .9; display: block; }
+  .status .dots i:first-child { width: 10px; border-radius: 50%; }
+  .gesture { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 5px;
+    border-radius: 3px; background: rgba(255,255,255,.55); z-index: 9; }
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 6px 20px 10px; flex: none; gap: 12px; }
+  .logo { font: 800 21px var(--head); letter-spacing: .3px; }
+  .logo b { color: var(--pink); }
+  .title { font: 700 19px var(--head); flex: 1; }
+  .body { flex: 1; padding: 0 20px 28px; display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(transparent, var(--bg)); z-index: 4; pointer-events: none; }
+
+  svg.ic { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .icon-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--card); display: grid; place-items: center; color: var(--text); flex: none; }
+  .icon-btn.big { width: 56px; height: 56px; }
+  .label { font: 700 12px var(--font); letter-spacing: 1.4px; text-transform: uppercase; color: var(--pink);
+    display: flex; align-items: center; justify-content: space-between; margin: 6px 4px -4px; }
+  .label .ic { width: 20px; height: 20px; color: var(--mute); stroke-width: 1.6; }
+  .card { background: var(--card); border-radius: var(--r-card); padding: 16px; }
+  .muted { color: var(--sub); font-size: 13px; line-height: 1.45; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: var(--r-pill);
+    background: var(--card); font: 600 13px var(--font); color: var(--text); white-space: nowrap; }
+  .pill.on { background: var(--pink); color: #fff; }
+  .pill .ic { width: 16px; height: 16px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .btn { height: 56px; border-radius: var(--r-pill); display: flex; align-items: center; justify-content: center; gap: 10px;
+    font: 700 17px var(--font); letter-spacing: .3px; }
+  .btn.primary { background: var(--pink); color: #fff; box-shadow: 0 10px 30px rgba(255,26,140,.35); }
+  .btn .ic { width: 22px; height: 22px; stroke-width: 2; }
+  .seg { display: flex; background: var(--card); border-radius: var(--r-pill); padding: 4px; gap: 4px; }
+  .seg div { flex: 1; text-align: center; padding: 10px 0; border-radius: var(--r-pill); font: 700 14px var(--font); color: var(--sub); }
+  .seg div.on { background: var(--pink); color: #fff; }
+  .chev { color: var(--mute); }
+  .row-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+  .row-item + .row-item { border-top: 1px solid var(--line); }
+  .row-item .t { flex: 1; font: 700 15px var(--font); }
+  .row-item .t small { display: block; font: 400 13px var(--font); color: var(--sub); margin-top: 2px; }
+  .ico-box { width: 40px; height: 40px; border-radius: 13px; background: var(--pink-soft); color: var(--pink); display: grid; place-items: center; flex: none; }
+
+  /* ---- slider (volume) ---- */
+  .slider { position: relative; height: 28px; flex: 1; }
+  .slider .track { position: absolute; left: 0; right: 0; top: 11px; height: 6px; border-radius: 3px; background: var(--card2); }
+  .slider .fill { position: absolute; left: 0; top: 11px; height: 6px; border-radius: 3px; background: var(--pink); }
+  .slider .thumb { position: absolute; top: 4px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%; background: #fff;
+    box-shadow: 0 0 0 5px var(--pink-soft), 0 2px 8px rgba(0,0,0,.5); }
+  .slider .ticks { position: absolute; left: 0; right: 0; top: 24px; display: flex; justify-content: space-between; }
+  .slider .ticks i { width: 2px; height: 4px; background: var(--mute); opacity: .55; border-radius: 1px; }
+  .vol { display: flex; align-items: center; gap: 12px; }
+  .vol .num { font: 700 17px var(--head); min-width: 30px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ============ A: «Сцена» ============ */
+  .a-hero { position: relative; height: 210px; display: grid; place-items: center; flex: none; margin: -4px -20px 0; }
+  .a-hero::before { content: ''; position: absolute; left: 50%; top: 52%; width: 360px; height: 230px; transform: translate(-50%, -50%);
+    background: radial-gradient(closest-side, rgba(255,26,140,.32), rgba(255,26,140,.08) 60%, transparent); }
+  .a-hero::after { content: ''; position: absolute; left: 50%; bottom: 14px; width: 280px; height: 30px; transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(255,26,140,.35), transparent); border-radius: 50%; }
+  .a-hero svg { width: 290px; position: relative; z-index: 1; }
+  .a-name { text-align: center; margin-top: -6px; }
+  .a-name h3 { font: 700 20px var(--head); }
+  .a-name .pills { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+  .a-player { background: var(--card); border-radius: 28px; padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 16px; }
+  .a-transport { display: flex; align-items: center; justify-content: center; gap: 28px; }
+  .a-play { width: 72px; height: 72px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center;
+    box-shadow: 0 10px 34px rgba(255,26,140,.45); }
+  .a-play .ic { width: 30px; height: 30px; }
+  .a-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .a-tile { background: var(--card); border-radius: 22px; padding: 14px; height: 126px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+  .a-tile h4 { font: 700 14px/1.25 var(--font); }
+  .a-tile small { font: 500 12px var(--font); color: var(--sub); display: block; margin-top: 2px; }
+  .a-tile svg.spark { position: absolute; right: 10px; top: 14px; width: 74px; height: 34px; }
+  .a-light { position: absolute; right: 14px; top: 20px; width: 64px; height: 8px; border-radius: 4px;
+    background: linear-gradient(90deg, #FF1A8C, #8a5cff, #18c8ff); box-shadow: 0 0 14px rgba(255,26,140,.6); }
+
+  .graph { position: relative; background: var(--card); border-radius: 28px; padding: 16px 14px 10px; }
+  .graph h3 { font: 700 26px var(--head); }
+  .graph .muted { margin-top: 2px; }
+  .graph svg { width: 100%; height: 190px; display: block; margin-top: 8px; }
+  .bands { display: flex; justify-content: space-between; padding: 0 6px; font: 600 11px var(--font); color: var(--mute); }
+  .a-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .a-preset { height: 92px; border-radius: 22px; background: var(--card); position: relative; overflow: hidden; padding: 14px; border: 1.5px solid transparent; }
+  .a-preset svg { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 44px; }
+  .a-preset span { position: relative; font: 700 14px/1.25 var(--font); z-index: 1; display: block; max-width: 120px; }
+  .a-preset.on { border-color: var(--pink); background: linear-gradient(160deg, rgba(255,26,140,.18), var(--card) 70%); }
+  .tick { position: absolute; right: 12px; top: 12px; width: 24px; height: 24px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; z-index: 2; }
+  .tick .ic { width: 15px; height: 15px; stroke-width: 2.6; }
+
+  /* ============ B: «Пульт» ============ */
+  .b-dev { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: 22px; padding: 10px 14px 10px 10px; }
+  .b-dev svg.mini { width: 64px; flex: none; }
+  .b-dev .t { flex: 1; }
+  .b-dev .t b { font: 700 14px var(--head); display: block; }
+  .b-dev .t span { font: 500 12px var(--font); color: var(--sub); display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .batt { display: flex; align-items: center; gap: 6px; font: 700 14px var(--font); font-variant-numeric: tabular-nums; }
+  .batt i { width: 26px; height: 13px; border: 1.8px solid var(--text); border-radius: 4px; position: relative; display: block; }
+  .batt i::after { content: ''; position: absolute; right: -4px; top: 3px; width: 2px; height: 5px; background: var(--text); border-radius: 1px; }
+  .batt i b { position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; border-radius: 1.5px; background: var(--text); }
+  .b-dial { position: relative; width: 280px; height: 280px; margin: 4px auto 0; flex: none; }
+  .b-dial svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .b-dial .c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .b-dial .c b { font: 700 76px/1 var(--head); font-variant-numeric: tabular-nums; }
+  .b-dial .c span { font: 600 14px var(--font); color: var(--sub); margin-top: 6px; }
+  .b-dial .c small { font: 700 11px var(--font); letter-spacing: 1.4px; text-transform: uppercase; color: var(--pink); margin-bottom: 8px; }
+  .b-transport { display: flex; align-items: center; gap: 12px; }
+  .b-transport .btn { flex: 1; }
+  .chips { display: flex; gap: 8px; overflow: hidden; margin-right: -20px; }
+  .seg4 { display: flex; gap: 8px; }
+  .seg4 div { flex: 1; height: 46px; border-radius: 16px; background: var(--card); display: flex; align-items: center; justify-content: center; gap: 7px; font: 700 15px var(--font); }
+  .seg4 div.on { background: var(--pink); color: #fff; }
+  .seg4 i { width: 9px; height: 9px; border-radius: 50%; display: block; }
+
+  .faders { background: var(--card); border-radius: 28px; padding: 16px 10px 12px; position: relative; }
+  .faders svg { width: 100%; height: 360px; display: block; }
+
+  /* ============ C: «Карточки» ============ */
+  .c-hero { border-radius: 28px; padding: 1.5px; background: linear-gradient(140deg, var(--pink), rgba(255,26,140,.15) 45%, rgba(255,26,140,.5)); flex: none; }
+  .c-hero > div { border-radius: 27px; background: radial-gradient(120% 90% at 20% 30%, #3a1027, #1a1215 55%, var(--card)); padding: 16px; display: flex; gap: 12px; align-items: center; }
+  .c-hero svg.mid { width: 150px; flex: none; }
+  .c-hero h3 { font: 700 17px/1.25 var(--head); }
+  .c-hero .st { display: flex; align-items: center; gap: 7px; font: 600 13px var(--font); color: var(--sub); margin-top: 8px; }
+  .c-hero .bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); margin-top: 12px; position: relative; }
+  .c-hero .bar b { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; background: var(--text); }
+  .c-hero .bt { display: flex; justify-content: space-between; font: 600 12px var(--font); color: var(--sub); margin-top: 6px; }
+  .c-vol-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .c-vol-head span { font: 700 15px var(--font); }
+  .c-vol-head b { font: 700 15px var(--font); font-variant-numeric: tabular-nums; }
+  .c-vol-head b em { font-style: normal; color: var(--sub); font-weight: 500; }
+  .c-transport { display: flex; gap: 10px; margin-top: 14px; align-items: center; }
+  .c-transport .icon-btn { background: var(--card2); }
+  .b-file { display: flex; gap: 10px; }
+  .b-file .btn { flex: 1; height: 52px; font-size: 15px; background: var(--card); }
+  .b-file .btn .ic { color: var(--pink); }
+  .c-transport .btn { flex: 1; }
+  .c-eqrow { display: flex; align-items: center; gap: 14px; }
+  .c-eqrow svg.spark { width: 96px; height: 40px; flex: none; }
+  .c-eqrow .t { flex: 1; font: 700 15px var(--font); }
+  .c-eqrow .t small { display: block; font: 400 13px var(--font); color: var(--sub); margin-top: 2px; }
+  .c-list { display: flex; flex-direction: column; gap: 10px; }
+  .c-item { background: var(--card); border-radius: 20px; border: 1.5px solid transparent; padding: 0 14px 0 16px; height: 64px; display: flex; align-items: center; gap: 12px; position: relative; }
+  .c-item.on { border-color: var(--pink); }
+  .c-item .t { flex: 1; font: 700 15px var(--font); }
+  .c-item svg.spark { width: 92px; height: 34px; }
+  .c-item .tick { position: static; }
+  .c-now { background: var(--card); border-radius: 26px; padding: 16px 14px 8px; }
+  .c-now h3 { font: 700 22px var(--head); }
+  .c-now svg { width: 100%; height: 120px; display: block; margin-top: 6px; }
+  .pinned { position: absolute; left: 20px; right: 20px; bottom: 26px; z-index: 6; }
+</style>
+</head>
+<body>
+
+<!-- ===== Shared drawings: the speaker (ours) and line icons ===== -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3a3e"/><stop offset=".55" stop-color="#1f1f22"/><stop offset="1" stop-color="#111113"/></linearGradient>
+    <linearGradient id="cap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2c30"/><stop offset="1" stop-color="#0f0f11"/></linearGradient>
+    <pattern id="mesh" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#19191b"/><circle cx="3" cy="3" r="1.25" fill="#34343a"/></pattern>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".14"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
+    <linearGradient id="fillPink" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF1A8C" stop-opacity=".45"/><stop offset="1" stop-color="#FF1A8C" stop-opacity="0"/></linearGradient>
+  </defs>
+  <!-- StormBox Blast 2, drawn for Krinik Tribit: handle, barrel body, mesh grille, end caps with the light ring -->
+  <symbol id="spk" viewBox="0 0 300 180">
+    <ellipse cx="150" cy="170" rx="118" ry="7" fill="#000" opacity=".6"/>
+    <path d="M86 70 C 92 20, 208 20, 214 70" fill="none" stroke="#1c1c1f" stroke-width="16" stroke-linecap="round"/>
+    <path d="M90 66 C 97 27, 203 27, 210 66" fill="none" stroke="#3b3b40" stroke-width="2" stroke-linecap="round"/>
+    <rect x="18" y="62" width="264" height="102" rx="50" fill="url(#body)"/>
+    <rect x="72" y="74" width="156" height="78" rx="26" fill="url(#mesh)"/>
+    <rect x="72" y="74" width="156" height="78" rx="26" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="2"/>
+    <rect x="136" y="108" width="28" height="7" rx="3.5" fill="#4b4b52"/>
+    <ellipse cx="46" cy="113" rx="27" ry="47" fill="url(#cap)" stroke="#2f2f34" stroke-width="2"/>
+    <ellipse cx="254" cy="113" rx="27" ry="47" fill="url(#cap)" stroke="#2f2f34" stroke-width="2"/>
+    <ellipse cx="46" cy="113" rx="17" ry="33" fill="none" stroke="#FF1A8C" stroke-width="5" filter="url(#glow)"/>
+    <ellipse cx="254" cy="113" rx="17" ry="33" fill="none" stroke="#FF1A8C" stroke-width="5" filter="url(#glow)"/>
+    <ellipse cx="46" cy="113" rx="17" ry="33" fill="none" stroke="#ff7cbf" stroke-width="2"/>
+    <ellipse cx="254" cy="113" rx="17" ry="33" fill="none" stroke="#ff7cbf" stroke-width="2"/>
+    <ellipse cx="46" cy="113" rx="9" ry="20" fill="#121214"/>
+    <ellipse cx="254" cy="113" rx="9" ry="20" fill="#121214"/>
+    <rect x="18" y="62" width="264" height="102" rx="50" fill="url(#glass)"/>
+  </symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-eq" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="i-light" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M8 8h8M8 12h5M8 16h8"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 14l3 3 3-3M12 10v7"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M19 20 9 12l10-8z" fill="currentColor"/><path d="M5 19V5"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="m5 4 10 8-10 8z" fill="currentColor"/><path d="M19 5v14"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4" height="15" rx="1.2" fill="currentColor" stroke="none"/><rect x="14" y="4.5" width="4" height="15" rx="1.2" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 16v-5M12 8h.01"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-speaker" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="12" rx="6"/><path d="M8 7c0-3 8-3 8 0"/><circle cx="12" cy="13" r="2"/></symbol>
+</svg>
+
+<div class="sheet-head">
+  <h1><b>Krinik Tribit</b> — макеты, лист 1</h1>
+  <p>Три варианта главного экрана и эквалайзера. Данные у всех вариантов одни: колонка Tribit StormBox Blast 2 подключена,
+    заряд 30 %, громкость 10 из 31, колонка играет, эквалайзер «Рок», подсветка — режим 1. Образец — экраны приложения
+    Tribit 5.0.0 (фото колонки, плеер, карточки звуковых эффектов, график эквалайзера) и дизайн-схема KARTUN.</p>
+  <ul>
+    <li>Кривые пресетов — полосы из таблицы приложения Tribit. У пресетов TRIBIT Signature, Классика, Концерт и Подкаст в этой таблице все десять полос стоят на 0 дБ.</li>
+    <li>Колонка нарисована для Krinik Tribit. Фото и картинки приложения Tribit в макетах не используются.</li>
+    <li>Кнопки «Назад» и «Вперёд» переключают трек. Команда для них есть в протоколе колонки, в Krinik Tribit этих кнопок пока нет.</li>
+    <li>Главный экран и эквалайзер можно взять из разных вариантов.</li>
+  </ul>
+</div>
+
+<!-- ======================= ROW 1: HOME ======================= -->
+<section class="row">
+  <h2>Главный экран</h2>
+  <div class="phones">
+
+    <!-- A-home -->
+    <div class="phone-wrap" data-id="A-home">
+      <div class="cap"><b>A</b><span>Сцена</span><p>Колонка в центре, как на экране устройства Tribit. Под колонкой плеер и четыре плитки разделов.</p></div>
+      <div class="screen">
+        <div class="status"><span>17:01</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="logo"><b>K</b>rinik Tribit</div><div class="icon-btn"><svg class="ic"><use href="#i-gear"/></svg></div></div>
+        <div class="body">
+          <div class="a-hero"><svg viewBox="0 0 300 180"><use href="#spk"/></svg></div>
+          <div class="a-name">
+            <h3>StormBox Blast 2</h3>
+            <div class="pills"><span class="pill"><i class="dot"></i>Подключена</span><span class="pill"><span class="batt"><i><b style="width:30%"></b></i></span>30 %</span></div>
+          </div>
+          <div class="a-player">
+            <div class="a-transport">
+              <div class="icon-btn big"><svg class="ic"><use href="#i-prev"/></svg></div>
+              <div class="a-play"><svg class="ic"><use href="#i-pause"/></svg></div>
+              <div class="icon-btn big"><svg class="ic"><use href="#i-next"/></svg></div>
+            </div>
+            <div class="vol"><svg class="ic" style="color:var(--sub)"><use href="#i-vol"/></svg><div class="slider" data-v="10" data-max="31"></div><span class="num">10</span></div>
+          </div>
+          <div class="a-tiles">
+            <div class="a-tile"><div class="ico-box"><svg class="ic"><use href="#i-eq"/></svg></div><svg class="spark" data-db="10,6,-4,-8,-6,6,12,8,2,0"></svg><div><h4>Эквалайзер</h4><small>Рок</small></div></div>
+            <div class="a-tile"><div class="ico-box"><svg class="ic"><use href="#i-light"/></svg></div><i class="a-light"></i><div><h4>Подсветка</h4><small>Режим 1</small></div></div>
+            <div class="a-tile"><div class="ico-box"><svg class="ic"><use href="#i-sliders"/></svg></div><div><h4>Настройки колонки</h4><small>Таймер сна, подсказки</small></div></div>
+            <div class="a-tile"><div class="ico-box"><svg class="ic"><use href="#i-file"/></svg></div><div><h4>Файл настроек</h4><small>Сохранить, открыть</small></div></div>
+          </div>
+        </div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+    <!-- B-home -->
+    <div class="phone-wrap" data-id="B-home">
+      <div class="cap"><b>B</b><span>Пульт</span><p>Главный элемент — круглая ручка громкости, как на самой колонке. Пресеты и подсветка переключаются прямо на главном экране.</p></div>
+      <div class="screen">
+        <div class="status"><span>17:01</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="logo"><b>K</b>rinik Tribit</div><div class="icon-btn"><svg class="ic"><use href="#i-gear"/></svg></div></div>
+        <div class="body">
+          <div class="b-dev">
+            <svg class="mini" viewBox="0 0 300 180"><use href="#spk"/></svg>
+            <div class="t"><b>StormBox Blast 2</b><span><i class="dot"></i>Подключена</span></div>
+            <div class="batt"><i><b style="width:30%"></b></i>30 %</div>
+          </div>
+          <div class="b-dial" data-v="10" data-max="31"><svg viewBox="0 0 280 280"></svg>
+            <div class="c"><small>Громкость</small><b>10</b><span>из 31</span></div></div>
+          <div class="b-transport">
+            <div class="icon-btn big"><svg class="ic"><use href="#i-prev"/></svg></div>
+            <div class="btn primary"><svg class="ic"><use href="#i-pause"/></svg>Пауза</div>
+            <div class="icon-btn big"><svg class="ic"><use href="#i-next"/></svg></div>
+          </div>
+          <div class="label">Эквалайзер<svg class="ic"><use href="#i-chev"/></svg></div>
+          <div class="chips"><span class="pill on">Рок</span><span class="pill">XBass</span><span class="pill">Джаз</span><span class="pill">Традиционный Blast</span><span class="pill">Аудиокнига</span></div>
+          <div class="label">Подсветка</div>
+          <div class="seg4"><div>Выкл.</div><div class="on">1</div><div>2</div><div>3</div></div>
+          <div class="card" style="padding:0">
+            <div class="row-item"><svg class="ic" style="color:var(--pink)"><use href="#i-sliders"/></svg><div class="t">Настройки колонки</div><svg class="ic chev"><use href="#i-chev"/></svg></div>
+          </div>
+          <div class="fade"></div>
+        </div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+    <!-- C-home -->
+    <div class="phone-wrap" data-id="C-home">
+      <div class="cap"><b>C</b><span>Карточки</span><p>Схема KARTUN: карточка колонки с розовой рамкой, разделы под розовыми подписями, у каждой подписи кнопка (i) с пояснением.</p></div>
+      <div class="screen">
+        <div class="status"><span>17:01</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="logo"><b>K</b>rinik Tribit</div><div class="icon-btn"><svg class="ic"><use href="#i-gear"/></svg></div></div>
+        <div class="body">
+          <div class="c-hero"><div>
+            <svg class="mid" viewBox="0 0 300 180"><use href="#spk"/></svg>
+            <div style="flex:1">
+              <h3>StormBox Blast 2</h3>
+              <div class="st"><i class="dot"></i>Подключена</div>
+              <div class="bar"><b style="width:30%"></b></div>
+              <div class="bt"><span>Заряд</span><span style="color:var(--text)">30 %</span></div>
+            </div>
+          </div></div>
+          <div class="label">Звук<svg class="ic"><use href="#i-info"/></svg></div>
+          <div class="card">
+            <div class="c-vol-head"><span>Громкость</span><b>10 <em>из 31</em></b></div>
+            <div class="slider" data-v="10" data-max="31"></div>
+            <div class="c-transport">
+              <div class="icon-btn big"><svg class="ic"><use href="#i-prev"/></svg></div>
+              <div class="btn primary"><svg class="ic"><use href="#i-pause"/></svg>Пауза</div>
+              <div class="icon-btn big"><svg class="ic"><use href="#i-next"/></svg></div>
+            </div>
+          </div>
+          <div class="label">Эквалайзер<svg class="ic"><use href="#i-info"/></svg></div>
+          <div class="card c-eqrow"><svg class="spark" data-db="10,6,-4,-8,-6,6,12,8,2,0"></svg><div class="t">Рок<small>Пресет</small></div><svg class="ic chev"><use href="#i-chev"/></svg></div>
+          <div class="label">Подсветка<svg class="ic"><use href="#i-info"/></svg></div>
+          <div class="seg4"><div>Выкл.</div><div class="on">1</div><div>2</div><div>3</div></div>
+          <div class="card" style="padding:0">
+            <div class="row-item"><div class="ico-box"><svg class="ic"><use href="#i-sliders"/></svg></div><div class="t">Настройки колонки</div><svg class="ic chev"><use href="#i-chev"/></svg></div>
+            <div class="row-item"><div class="ico-box"><svg class="ic"><use href="#i-file"/></svg></div><div class="t">Файл настроек</div><svg class="ic chev"><use href="#i-chev"/></svg></div>
+          </div>
+          <div class="fade"></div>
+        </div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================= ROW 2: EQUALIZER ======================= -->
+<section class="row">
+  <h2>Эквалайзер</h2>
+  <div class="phones">
+
+    <!-- A-eq -->
+    <div class="phone-wrap" data-id="A-eq">
+      <div class="cap"><b>A</b><span>Сцена</span><p>График кривой, как у Tribit. Вместо фото на карточке пресета нарисована его кривая.</p></div>
+      <div class="screen">
+        <div class="status"><span>17:02</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="icon-btn"><svg class="ic"><use href="#i-back"/></svg></div><div class="title">Эквалайзер</div></div>
+        <div class="body">
+          <div class="seg"><div class="on">Пресеты</div><div>Пользовательский</div></div>
+          <div class="graph">
+            <h3>Рок</h3>
+            <div class="muted">Сейчас на колонке</div>
+            <svg class="big" data-db="10,6,-4,-8,-6,6,12,8,2,0" viewBox="0 0 340 190" preserveAspectRatio="none"></svg>
+            <div class="bands"><span>40</span><span>62</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
+          </div>
+          <div class="a-presets">
+            <div class="a-preset on"><span>Рок</span><div class="tick"><svg class="ic"><use href="#i-check"/></svg></div><svg class="art" data-db="10,6,-4,-8,-6,6,12,8,2,0"></svg></div>
+            <div class="a-preset"><span>XBass</span><svg class="art" data-db="6,12,4,0,0,0,0,0,0,0"></svg></div>
+            <div class="a-preset"><span>Джаз</span><svg class="art" data-db="-4,6,8,0,2,4,0,8,10,6"></svg></div>
+            <div class="a-preset"><span>Традиционный Blast</span><svg class="art" data-db="-6,-4,6,0,-4,8,10,6,8,4"></svg></div>
+            <div class="a-preset"><span>Аудиокнига</span><svg class="art" data-db="-8,-4,0,6,0,10,2,-8,-4,-12"></svg></div>
+            <div class="a-preset"><span>TRIBIT Signature</span><svg class="art" data-db="0,0,0,0,0,0,0,0,0,0"></svg></div>
+          </div>
+          <div class="fade"></div>
+        </div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+    <!-- B-eq -->
+    <div class="phone-wrap" data-id="B-eq">
+      <div class="cap"><b>B</b><span>Пульт</span><p>Десять вертикальных фейдеров, как на микшерном пульте. Пресеты — строкой над фейдерами.</p></div>
+      <div class="screen">
+        <div class="status"><span>17:02</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="icon-btn"><svg class="ic"><use href="#i-back"/></svg></div><div class="title">Эквалайзер</div></div>
+        <div class="body">
+          <div class="chips"><span class="pill">Пользовательский</span><span class="pill on">Рок</span><span class="pill">XBass</span><span class="pill">Джаз</span><span class="pill">Классика</span></div>
+          <div class="faders"><svg data-db="10,6,-4,-8,-6,6,12,8,2,0" viewBox="0 0 350 360"></svg></div>
+          <p class="muted" style="padding:0 4px">Передвиньте ползунок полосы и отпустите его. Колонка переключится на пользовательский эквалайзер, и все десять полос встанут так, как показаны на ползунках.</p>
+          <div class="label">Файл настроек</div>
+          <div class="b-file"><div class="btn">Сохранить в файл</div><div class="btn">Открыть файл</div></div>
+        </div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+    <!-- C-eq -->
+    <div class="phone-wrap" data-id="C-eq">
+      <div class="cap"><b>C</b><span>Карточки</span><p>Список пресетов, как список моделей в KARTUN: выбранный в розовой рамке с галочкой, у каждого своя кривая.</p></div>
+      <div class="screen">
+        <div class="status"><span>17:02</span><div class="dots"><i></i><i></i><i></i></div></div>
+        <div class="top"><div class="icon-btn"><svg class="ic"><use href="#i-back"/></svg></div><div class="title">Эквалайзер</div></div>
+        <div class="body">
+          <div class="c-now"><h3>Рок</h3><div class="muted">Сейчас на колонке</div><svg class="big" data-db="10,6,-4,-8,-6,6,12,8,2,0" viewBox="0 0 340 120" preserveAspectRatio="none"></svg>
+            <div class="bands"><span>40</span><span>62</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div></div>
+          <div class="label">Пресеты<svg class="ic"><use href="#i-info"/></svg></div>
+          <div class="c-list">
+            <div class="c-item on"><div class="t">Рок</div><svg class="spark" data-db="10,6,-4,-8,-6,6,12,8,2,0"></svg><div class="tick"><svg class="ic"><use href="#i-check"/></svg></div></div>
+            <div class="c-item"><div class="t">XBass</div><svg class="spark" data-db="6,12,4,0,0,0,0,0,0,0"></svg></div>
+            <div class="c-item"><div class="t">Джаз</div><svg class="spark" data-db="-4,6,8,0,2,4,0,8,10,6"></svg></div>
+            <div class="c-item"><div class="t">Традиционный Blast</div><svg class="spark" data-db="-6,-4,6,0,-4,8,10,6,8,4"></svg></div>
+            <div class="c-item"><div class="t">Аудиокнига</div><svg class="spark" data-db="-8,-4,0,6,0,10,2,-8,-4,-12"></svg></div>
+          </div>
+          <div class="fade" style="height:160px"></div>
+          <div class="pinned"><div class="btn primary"><svg class="ic"><use href="#i-eq"/></svg>Пользовательский эквалайзер</div></div>
+        </div>
+        <div class="gesture"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<div style="height:40px"></div>
+
+<script>
+// Draws every chart of the sheet from its data-db (ten bands, dB, range ±12). Pure SVG, no library. [NOT-TESTED]
+const NS = 'http://www.w3.org/2000/svg';
+const RANGE = 12;
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
+const dbOf = s => s.dataset.db.split(',').map(Number);
+
+// Smooth path through the points (Catmull-Rom turned into cubic Bezier).
+function smooth(pts) {
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+    d += ` C${p1[0] + (p2[0] - p0[0]) / 6},${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6},${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]},${p2[1]}`;
+  }
+  return d;
+}
+function points(db, w, h, padX, padY) {
+  return db.map((v, i) => [padX + i * (w - 2 * padX) / (db.length - 1), h / 2 - v / RANGE * (h / 2 - padY)]);
+}
+
+// Small sparkline (tiles, list rows).
+document.querySelectorAll('svg.spark').forEach(s => {
+  const w = 100, h = 40; s.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  const p = points(dbOf(s), w, h, 3, 5);
+  el('line', { x1: 0, x2: w, y1: h / 2, y2: h / 2, stroke: '#3a3a3e', 'stroke-width': 1, 'stroke-dasharray': '2 3' }, s);
+  el('path', { d: smooth(p), fill: 'none', stroke: '#FF1A8C', 'stroke-width': 2.4, 'stroke-linecap': 'round' }, s);
+});
+
+// Preset-card art: the curve as a glowing ribbon at the card's bottom.
+document.querySelectorAll('svg.art').forEach(s => {
+  const w = 170, h = 64; s.setAttribute('viewBox', `0 0 ${w} ${h}`); s.setAttribute('preserveAspectRatio', 'none');
+  const p = points(dbOf(s), w, h, -6, 10); const d = smooth(p);
+  el('path', { d: `${d} L${w + 6},${h} L-6,${h} Z`, fill: 'url(#fillPink)', opacity: .7 }, s);
+  el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 6, opacity: .35, filter: 'url(#glow)' }, s);
+  el('path', { d, fill: 'none', stroke: '#ff5fae', 'stroke-width': 2 }, s);
+});
+
+// Big graph: grid ±12 / 0, filled curve, a node on every band.
+document.querySelectorAll('svg.big').forEach(s => {
+  const [, , w, h] = s.getAttribute('viewBox').split(' ').map(Number);
+  const padY = 12, padX = 14;
+  [RANGE, 0, -RANGE].forEach(v => {
+    const y = h / 2 - v / RANGE * (h / 2 - padY);
+    el('line', { x1: 0, x2: w, y1: y, y2: y, stroke: v === 0 ? '#45454b' : '#2a2a2e', 'stroke-width': 1, 'stroke-dasharray': v === 0 ? '' : '3 4' }, s);
+  });
+  const p = points(dbOf(s), w, h, padX, padY);
+  p.forEach(([x]) => el('line', { x1: x, x2: x, y1: padY, y2: h - padY, stroke: '#232326', 'stroke-width': 1 }, s));
+  const d = smooth(p);
+  el('path', { d: `${d} L${p[p.length - 1][0]},${h} L${p[0][0]},${h} Z`, fill: 'url(#fillPink)' }, s);
+  el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 8, opacity: .35, filter: 'url(#glow)' }, s);
+  el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 3, 'stroke-linecap': 'round' }, s);
+  p.forEach(([x, y]) => el('circle', { cx: x, cy: y, r: 4.5, fill: '#0D0D0D', stroke: '#fff', 'stroke-width': 2 }, s));
+});
+
+// Faders: ten vertical tracks, pink fill from the 0 dB line, a knob with its value, the curve through the knobs.
+document.querySelectorAll('.faders svg').forEach(s => {
+  const db = dbOf(s), w = 350, h = 360, top = 34, bot = 326, labels = ['40','62','125','250','500','1K','2K','4K','8K','16K'];
+  const mid = (top + bot) / 2, yOf = v => mid - v / RANGE * (mid - top);
+  el('line', { x1: 6, x2: w - 6, y1: mid, y2: mid, stroke: '#45454b', 'stroke-dasharray': '3 4' }, s);
+  const xs = db.map((_, i) => 22 + i * (w - 44) / 9);
+  db.forEach((v, i) => {
+    const x = xs[i], y = yOf(v);
+    el('rect', { x: x - 3, y: top, width: 6, height: bot - top, rx: 3, fill: '#2a2a2e' }, s);
+    el('rect', { x: x - 3, y: Math.min(y, mid), width: 6, height: Math.abs(mid - y), rx: 3, fill: '#FF1A8C' }, s);
+    const t = el('text', { x, y: 18, 'text-anchor': 'middle', fill: v ? '#F5F5F7' : '#A1A1A6', 'font-family': 'Manrope', 'font-weight': 700, 'font-size': 12 }, s);
+    t.textContent = (v > 0 ? '+' : '') + v;
+    const l = el('text', { x, y: h - 6, 'text-anchor': 'middle', fill: '#6E6E73', 'font-family': 'Manrope', 'font-weight': 600, 'font-size': 11 }, s);
+    l.textContent = labels[i];
+  });
+  const p = db.map((v, i) => [xs[i], yOf(v)]);
+  el('path', { d: smooth(p), fill: 'none', stroke: '#FF1A8C', 'stroke-width': 6, opacity: .3, filter: 'url(#glow)' }, s);
+  el('path', { d: smooth(p), fill: 'none', stroke: '#ff7cbf', 'stroke-width': 1.5, opacity: .8 }, s);
+  p.forEach(([x, y]) => { el('rect', { x: x - 13, y: y - 8, width: 26, height: 16, rx: 8, fill: '#fff' }, s);
+    el('line', { x1: x - 6, x2: x + 6, y1: y, y2: y, stroke: '#FF1A8C', 'stroke-width': 2, 'stroke-linecap': 'round' }, s); });
+});
+
+// Horizontal volume slider with 32 step ticks (0..31).
+document.querySelectorAll('.slider').forEach(s => {
+  const pct = s.dataset.v / s.dataset.max * 100;
+  s.innerHTML = `<div class="track"></div><div class="fill" style="width:${pct}%"></div><div class="thumb" style="left:${pct}%"></div>` +
+    `<div class="ticks">${'<i></i>'.repeat(+s.dataset.max + 1)}</div>`;
+});
+
+// Volume dial: a 270° arc, 32 step ticks, the pink arc up to the value, a knob at its end.
+document.querySelectorAll('.b-dial').forEach(d => {
+  const s = d.querySelector('svg'), v = +d.dataset.v, max = +d.dataset.max, c = 140, r = 118, start = 135, sweep = 270;
+  const at = (deg, rr) => [c + rr * Math.cos(deg * Math.PI / 180), c + rr * Math.sin(deg * Math.PI / 180)];
+  const arc = (a0, a1, rr) => { const [x0, y0] = at(a0, rr), [x1, y1] = at(a1, rr); return `M${x0},${y0} A${rr},${rr} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1},${y1}`; };
+  el('circle', { cx: c, cy: c, r: 96, fill: '#151516' }, s);
+  el('circle', { cx: c, cy: c, r: 96, fill: 'none', stroke: '#26262a', 'stroke-width': 1.5 }, s);
+  el('path', { d: arc(start, start + sweep, r), fill: 'none', stroke: '#26262a', 'stroke-width': 14, 'stroke-linecap': 'round' }, s);
+  const end = start + sweep * v / max;
+  el('path', { d: arc(start, end, r), fill: 'none', stroke: '#FF1A8C', 'stroke-width': 14, 'stroke-linecap': 'round', opacity: .45, filter: 'url(#glow)' }, s);
+  el('path', { d: arc(start, end, r), fill: 'none', stroke: '#FF1A8C', 'stroke-width': 14, 'stroke-linecap': 'round' }, s);
+  for (let i = 0; i <= max; i++) { const a = start + sweep * i / max, [x0, y0] = at(a, 133), [x1, y1] = at(a, i % 5 ? 137 : 140);
+    el('line', { x1: x0, y1: y0, x2: x1, y2: y1, stroke: i <= v ? '#FF1A8C' : '#4a4a50', 'stroke-width': 2, 'stroke-linecap': 'round' }, s); }
+  const [kx, ky] = at(end, r); el('circle', { cx: kx, cy: ky, r: 11, fill: '#fff' }, s);
+});
+</script>
+</body>
+</html>
