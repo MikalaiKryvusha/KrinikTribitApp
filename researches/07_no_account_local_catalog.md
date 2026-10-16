@@ -49,3 +49,12 @@ user info answers (not needed).
 **Second use — wave 2 and patch 8a.** The Russian dictionary is what their server sends on every start; turned into our own
 `values-ru` (plans/01 §3, the validator first), it lets patch 8a stop waiting for the server without the interface turning
 English (`testcases/reports/2026-10-16_wave1.md`, Found 1).
+
+## Open fork before step 1
+
+FORK: options <A: a local catalog with the owner's models only (Blast 2) | B: the full catalog (27 + 25 products) shipped in
+the APK - their data in our git | C: the interceptor passes the request on and substitutes the local answer ONLY when their
+gateway answers «Full authentication» (fallback; local data needed only for that case)> · price of error <A: every user with
+another Tribit model loses the speaker page; B: their catalog in a public repository; C: more smali, still needs the data of
+A or B for the substitution> · consulted <recon of the app's own answers above; owner's word on accounts - the choice of
+which models the fork supports is the owner's (asked in the next session's chat, not decided here)>
