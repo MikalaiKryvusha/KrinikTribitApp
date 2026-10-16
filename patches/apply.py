@@ -988,6 +988,69 @@ def patch_pink_switch():
     print(f"ok 26 pink switch: {len(PINK_PNGS)} PNG recoloured yellow -> #FF1A8C")
 
 
+# --- Patch 27: the settings title is «Настройки», the speaker name on the line below ------------------------------
+# Owner 2026-10-16 12:41 +03:00 (chat, on «НастройкиTribit StormBox Blast 2»): «Заголовок экрана просто Настройки» ·
+# «Отдельной строкой ниже название колонки». Class inventory: 26 sites, each `const vN, 0x7f120551` (R.string.settings)
+# + ResourceUtils.getString (a `.line` may stand between), in the 13 *Info*Activity classes and their showNameEditDialog
+# listeners - every one appends the speaker name. They call krinik.Title.settings (their text + a line break) instead;
+# the two other users of R.string.settings (BtsControlActivity, DeviceControlActivity) stay. The 12 settings headers
+# (a 44 dp row: iv_back, tv_title, help) grow with the two lines: height wrap_content, minHeight 44 dp.
+# [TESTED: 2026-10-16 · A51 Blast 2 settings: «Настройки» / «Tribit StormBox Blast 2» in two lines (shot 47) · testcases/reports/2026-10-16_patch8_anon.md] - the other 12 families not opened
+SETTINGS_TITLE = re.compile(
+    r"(const (v\d+), 0x7f120551\n\n(?:    \.line \d+\n)?    )"
+    r"invoke-static \{\2\}, Lcom/thousandshores/tool/utils/ResourceUtils;->getString\(I\)Ljava/lang/String;")
+SETTINGS_TITLE_SITES = 26
+SETTINGS_HEADER = re.compile(
+    r'(<LinearLayout [^>]*)android:layout_height="@dimen/dp_44"([^>]*>\s*<ImageView android:id="@id/iv_back"[^>]*>\s*'
+    r'<TextView [^>]*android:id="@id/tv_title")')
+SETTINGS_HEADERS = 12
+
+
+def patch_settings_title():
+    n = 0
+    for p in ROOT.glob("smali*/com/thousandshores/tribit/moduledevice/*/*Info*.smali"):
+        t = p.read_text(encoding="utf-8")
+        t2, k = SETTINGS_TITLE.subn(r"\1invoke-static {\2}, Lkrinik/Title;->settings(I)Ljava/lang/String;", t)
+        if k:
+            p.write_text(t2, encoding="utf-8")
+            n += k
+    if n != SETTINGS_TITLE_SITES:
+        sys.exit(f"FAIL: settings title sites {n}, expected {SETTINGS_TITLE_SITES}")
+    h = 0
+    for p in ROOT.glob("res/layout/activity_*info*.xml"):
+        t = p.read_text(encoding="utf-8")
+        t2, k = SETTINGS_HEADER.subn(r'\1android:layout_height="wrap_content" android:minHeight="@dimen/dp_44"\2', t)
+        if k:
+            p.write_text(t2, encoding="utf-8")
+            h += k
+    if h != SETTINGS_HEADERS:
+        sys.exit(f"FAIL: settings headers {h}, expected {SETTINGS_HEADERS}")
+    print(f"ok 27 settings title: name on the second line ({n} sites, {h} headers grow)")
+
+
+# --- Patch 28: the back button «<» drawn smaller, the same place to tap -------------------------------------------
+# Owner 2026-10-16 12:41 +03:00: «Кнопки < можноменьше размером». Class: every ImageView iv_back of 32 x 32 dp in the app's
+# layouts (43 of them, 2026-10-16; four more are 20 dp already, one wrap_content). A 6 dp padding draws the arrow at
+# 20 dp inside the same 32 dp view - the touch area does not shrink (it is already below Material's 48 dp).
+# [TESTED: 2026-10-16 · A51: smaller arrow on the speaker settings screen (shot 47) · testcases/reports/2026-10-16_patch8_anon.md] - other screens not looked at
+BACK_BUTTON = re.compile(r'(<ImageView android:id="@id/iv_back" android:layout_width="@dimen/dp_32" '
+                         r'android:layout_height="@dimen/dp_32")(?![^>]*padding)')
+BACK_BUTTONS = 43
+
+
+def patch_smaller_back():
+    n = 0
+    for p in ROOT.glob("res/layout/*.xml"):
+        t = p.read_text(encoding="utf-8")
+        t2, k = BACK_BUTTON.subn(r'\1 android:padding="@dimen/dp_6"', t)
+        if k:
+            p.write_text(t2, encoding="utf-8")
+            n += k
+    if n != BACK_BUTTONS:
+        sys.exit(f"FAIL: back buttons {n}, expected {BACK_BUTTONS}")
+    print(f"ok 28 back button drawn at 20 dp in {n} layouts")
+
+
 # --- Patch 22: the device base inside the APK ------------------------------------------------------------------
 # Owner 2026-10-16 ≈ 11:00 +03:00: «скачай БД из ГУГЛ телефонов, кладемм внутрь АПК» · «но чтобы не больше 1 мб файл весил»
 # (MASTER_PLAN decision journal). patches/assets/krinik_devices.txt (`Brand|Model` per line, built by
@@ -1112,6 +1175,8 @@ if __name__ == "__main__":
     patch_card_name_wrap()
     patch_firmware_on_tap()
     patch_pink_switch()
+    patch_settings_title()
+    patch_smaller_back()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:
