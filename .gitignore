@@ -9,6 +9,8 @@
 /out/
 /tools/apktool.jar
 /tools/jadx/
+# dex2jar (github.com/ThexXTURBOXx/dex2jar): dex -> jar for the compile classpath of Tribit's code as Java source
+/tools/dex2jar/
 /diagnostics/
 *.apk
 *.keystore
