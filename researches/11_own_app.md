@@ -160,6 +160,32 @@ anti-howl 99 [1/0], get 100 — shown only on «new».
 *Pacing* (V): their app never waits for an echo (`BlueFlowIO.send` writes at once); query bursts with 100–150 ms gaps
 (main: 18, 19, 21, 20); sliders send on release only (volume, EQ bands, brightness); clicks debounced 100 ms.
 
+**3.7 EQ on OLD and MID firmware** (delegated code recon 2026-10-16 17:29–17:3x, read-only; V = line read, I = inferred;
+arrived after the soft closure — not yet applied to `Eq.kt`, `plans/06` D2).
+
+*Flags* (V): main screen — new = DSP > 10074 or BTS56C, newEq = DSP > 10095 (`Bts56ControlActivity.java:527–528`); the EQ
+detail screen overwrites both from the FIRMWARE version — new = fw > 10093 or 56C, newEq = fw > 10110 (S `Eq56DetailActivity`
+.line 201–204; `DateUtils.versionView("11.4")` = 10114). OLD = !new, MID = new && !newEq.
+
+*Send* (`Eq56SettingActivity.sendEqData` J:2505–2559, `eqDefault` J:2574–2607, V): OLD — Default = cmd 4 `[01]` (1 byte),
+every other preset `[id, 12×10]`, custom = dB + 8 (±8); MID — Default `[01, 10,10,9,12×7]` (MusicGainsO), XBass `[02,
+16,18,16,12×7]` (XBassGainsO), the rest as newEq; Live/Podcast always `[id, 12×10]`.
+
+*Lists* (`EqUtil.getEqPre`, V): OLD — Default, Custom, XBass, Blast traditional, Classical, **Ex-XBass (sent 9)**, Audiobook,
+Rock, Jazz; no Live/Podcast; band labels 50, 80, 150, 300, 600, 1.2K, 2.5K, 5K, 9K, 13K (`Bts56Constant.java:41–46`). MID and
+newEq add Live (10) and Podcast (11); BTS56C — N tables, no Live/Podcast.
+
+*Read* (`PageUtil.bts56Eq` J:280–329, V): id 10 = Ex-XBass on OLD, Live otherwise; 8 = no name; 9 = Blast traditional. Band
+gains decoded only for id 7 (wire − 12 new/56C, − 8 old). The preset curve shown is decorative (`EqListUtil.getData56`).
+
+*Open (I):* N-table wire − 12 equals exactly 2 × their shown curve for Rock and XBass — a preset wire unit may be 0.5 dB, or
+their chart is drawn at half scale. Our EQ screen shows wire − 12 as dB for presets (Rock +10…+12) — check on the speaker
+before trusting it.
+
+*Changes for `Eq.kt`:* firmware state OLD / MID / NEW_EQ + BTS56C; `setPreset(p, fw)` per the send rules above; preset list
+per firmware (Ex-XBass on OLD only, no Live/Podcast on OLD and 56C); `byId(id, fw)`; on OLD preset bands null; OLD band
+labels; flags from the firmware version as their detail screen does.
+
 ## 4. Industry
 
 Collected by a delegated web sweep 2026-10-16; the four lines marked ✔ were re-read on developer.android.com by me.
