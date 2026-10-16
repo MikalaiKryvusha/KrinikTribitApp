@@ -1219,6 +1219,84 @@ def patch_no_tribit_links():
           "profile Tribit.com and Rate us gone, About -> GitHub")
 
 
+# --- Patch 33: «Руководство пользователя» row in the app settings ------------------------------------------------
+# Owner 2026-10-16 13:38 +03:00 (interviews/interview_002 Q3): «в руководстве пользователя, которое ты сделаешь в настройках
+# приложения». Patch 32 put the guide behind the profile row and every «?»; this adds a row to the app settings screen
+# (activity_settings_new, the group «notifications / clear cache / check for updates»): the same divider and row markup
+# as their rows, the label from our string krinik_guide (values: «User guide», values-ru: «Руководство пользователя» -
+# a layout @string, so their language dictionary does not touch it), and android:onClick="krinikGuide" - their rows
+# already call the activity's onClick(View) this way, so a new public method of SettingsNewActivity serves the tap.
+# [TESTED: 2026-10-16 · A51: the row stands under «Проверка обновлений» in their row style, a tap opens the guide
+# (shots 08_app_settings, 09_settings_guide) · testcases/reports/2026-10-16_patch31_32.md] - the English label not seen
+SETTINGS_LAST_ROW_END = re.compile(
+    r'(<RelativeLayout [^>]*android:id="@id/setting_check_update"[^>]*>(?:\s*<(?:TextView|ImageView) [^>]*/>)+\s*</RelativeLayout>)')
+GUIDE_ROW = (
+    '\n                <android.view.View android:background="@color/color_424242" android:layout_width="fill_parent" '
+    'android:layout_height="@dimen/dp_1" />\n'
+    '                <RelativeLayout android:gravity="center_vertical" android:paddingLeft="@dimen/dp_15" '
+    'android:paddingRight="@dimen/dp_15" android:layout_width="fill_parent" android:layout_height="@dimen/dp_56" '
+    'android:onClick="krinikGuide">\n'
+    '                    <TextView android:textSize="@dimen/dp_15" android:textColor="@color/white" '
+    'android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/krinik_guide" />\n'
+    '                    <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" '
+    'android:src="@mipmap/ic_choose_grey" android:layout_alignParentRight="true" />\n'
+    '                </RelativeLayout>')
+GUIDE_ON_CLICK = """
+.method public krinikGuide(Landroid/view/View;)V
+    .locals 0
+
+    invoke-static {}, Lkrinik/Guide;->open()V
+
+    return-void
+.end method
+"""
+
+
+def patch_settings_guide_row():
+    layout = ROOT / "res/layout/activity_settings_new.xml"
+    t = layout.read_text(encoding="utf-8")
+    t2, k = SETTINGS_LAST_ROW_END.subn(lambda m: m.group(1) + GUIDE_ROW, t)
+    if k != 1:
+        sys.exit(f"FAIL: settings «check for updates» row found {k}x")
+    layout.write_text(t2, encoding="utf-8")
+    for d, text in (("values", "User guide"), ("values-ru", "Руководство пользователя")):
+        _sub_once(ROOT / "res" / d / "strings.xml", "</resources>",
+                  f'    <string name="krinik_guide">{text}</string>\n</resources>', f"{d}/strings.xml end")
+    add_method(smali("com.thousandshores.tribit.modulemine.activity.SettingsNewActivity"), "krinikGuide(", GUIDE_ON_CLICK)
+    print("ok 33 app settings: \"User guide\" row opens krinik.Guide")
+
+
+# --- Patch 34: the «connection failed» dialog leads to our guide, never to the support form ------------------------
+# Owner 2026-10-16 13:32 +03:00: «ни на какую поддерку Трибита ... мы не ведем из Krinik Tribit. Убираем это.» Found
+# 2026-10-16 while closing patch 32: DeviceSearchingActivity -> DialogDefault.showConnectFailedDialog shows their tips
+# (ensure_connection_tips) + «\n\n» + not_work_feedback («If the above method does not work, please click the "Feedback"
+# button below…») and a positive button «Feedback» that opens FeedBackActivity. Now: the tips alone, the button is
+# «Руководство пользователя» (krinik.Guide.title) and opens our guide - its section 1 is about connecting a speaker.
+# [NOT-TESTED]
+CONNECT_FAILED = ".method public final showConnectFailedDialog(Landroid/content/Context;)V"
+FEEDBACK_TEXT = re.compile(
+    r"(const (v\d+), 0x7f120296\n\n(?:    \.line \d+\n)?    )"   # R.string.feedback
+    r"invoke-static \{\2\}, Lcom/thousandshores/tool/utils/ResourceUtils;->getString\(I\)Ljava/lang/String;")
+
+
+def patch_connect_failed_dialog():
+    p = smali("com.thousandshores.tribit.utils.DialogDefault")
+    replace_in_method(p, CONNECT_FAILED, 'const-string v0, "\\n\\n"', 'const-string v0, ""')
+    replace_in_method(p, CONNECT_FAILED,
+                      "invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;\n",
+                      "")
+    text = p.read_text(encoding="utf-8")
+    s, e = method_span(text, CONNECT_FAILED)
+    body, k = FEEDBACK_TEXT.subn(r"\1invoke-static {\2}, Lkrinik/Guide;->title(I)Ljava/lang/String;", text[s:e])
+    if k != 1:
+        sys.exit(f"FAIL: «Feedback» button text found {k}x")
+    p.write_text(text[:s] + body + text[e:], encoding="utf-8")
+    header = ".method public onClick(Lcom/thousandshores/commondialog/dialog/base/BaseDialog;)V"
+    replace_method(smali("com.thousandshores.tribit.utils.DialogDefault$showConnectFailedDialog$1"), header,
+                   header + "\n" + GUIDE_OPEN)
+    print("ok 34 connection-failed dialog: tips only, the button opens our guide")
+
+
 # --- Patch 30 (TribitApp.initNetWork): TLS is verified again - no trust-all manager, no always-true hostname check ------------------------
 # bugs/03 (S1): TribitApp builds the app's only HTTP client with HttpSslFactory.generateSslConfig() - with no certificates
 # it falls back to UnSafeTrustManager (empty checkServerTrusted) - and UnSafeHostnameVerifier (verify -> true): anyone on
@@ -1368,6 +1446,8 @@ if __name__ == "__main__":
     patch_tls_verified()
     patch_pink_buttons_white_text()
     patch_no_tribit_links()
+    patch_settings_guide_row()
+    patch_connect_failed_dialog()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:
