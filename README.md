@@ -47,6 +47,10 @@ Sections: [1 What it fixes](#en-1) · [2 What hurts in the official app](#en-2) 
 5. Screens are laid out for tablets and landscape.
 6. The password field accepts letters, digits and symbols.
 7. The app is named «Krinik Tribit» and has its own pink icon.
+8. There is no forced-update window. That window had no close button, sent the user to Google Play and installed the
+   official Tribit app over Krinik Tribit.
+9. Firebase is switched off: Krinik Tribit collects no analytics, does not read the advertising ID and receives no push
+   messages; Crashlytics report collection is off. The app does not declare the advertising-ID permission.
 
 <a name="en-2"></a>
 
@@ -86,8 +90,9 @@ and use it. The first release comes with step 7 of the roadmap.
 | 3 | The first patched build on the author's tablet with a StormBox Blast 2: from the splash to a custom EQ without a crash and without a location permission request | ✅ done, the author is testing it |
 | 4 | Texts: ours in resource files instead of the server's and the hard-coded ones; English and Russian by hand | 🔧 research done, patch next |
 | 5 | Layouts: the screen scaling fits the whole design and cut-off screens scroll (done, run on the tablet); landscape and the remaining screens next | 🔧 in progress |
-| 6 | Crashes, lost connections, the app no longer waits for the Tribit server | 🔧 research done, patch next |
+| 6 | Crashes, lost connections, the app no longer waits for the Tribit server; the forced-update window is gone (done, run on a Samsung A51) | 🔧 in progress |
 | 7 | Two builds: debug «Debug Krinik Tribit» beside the original (done); release and the first signed release on GitHub | 🔧 debug done, release planned |
+| 8 | No account and no tracking: Firebase and the advertising ID are off (done, run on a Samsung A51); using the app without an account and without cloud copies of EQ presets | 🔧 in progress |
 
 <a name="en-5"></a>
 
@@ -174,6 +179,10 @@ Tribit, которые знает официальное приложение, �
 5. Экраны свёрстаны под планшет и альбомную ориентацию.
 6. Поле пароля принимает буквы, цифры и символы.
 7. Приложение называется «Krinik Tribit», у него своя розовая иконка.
+8. Окна обязательного обновления нет. Это окно не закрывалось, вело в Google Play и ставило официальное приложение
+   Tribit поверх Krinik Tribit.
+9. Firebase выключен: Krinik Tribit не собирает аналитику, не читает рекламный идентификатор и не получает пуши,
+   сбор отчётов Crashlytics выключен. Разрешения на рекламный идентификатор в приложении нет.
 
 <a name="ru-2"></a>
 
@@ -214,8 +223,9 @@ Krinik Tribit и пользуйтесь. Первый релиз выходит 
 | 3 | Первая патченая сборка на планшете автора с колонкой StormBox Blast 2: от заставки до своего эквалайзера без вылетов и без запроса разрешения на геолокацию | ✅ сделано, автор тестирует |
 | 4 | Тексты: наши в файлах ресурсов вместо серверных и зашитых в код; английский и русский руками | 🔧 разведка готова, дальше патч |
 | 5 | Вёрстка: масштаб экранов вмещает весь макет, обрезанные экраны прокручиваются (сделано, прогнано на планшете); дальше альбомная ориентация и остальные экраны | 🔧 в работе |
-| 6 | Вылеты, обрывы подключения, приложение больше не ждёт сервер Tribit | 🔧 разведка готова, дальше патч |
+| 6 | Вылеты, обрывы подключения, приложение больше не ждёт сервер Tribit; окно обязательного обновления убрано (сделано, прогнано на Samsung A51) | 🔧 в работе |
 | 7 | Две сборки: debug «Debug Krinik Tribit» рядом с оригиналом (сделано); release и первый подписанный релиз на GitHub | 🔧 debug готов, release в плане |
+| 8 | Без аккаунта и без слежки: Firebase и рекламный идентификатор выключены (сделано, прогнано на Samsung A51); работа без аккаунта и без облачных копий пресетов эквалайзера | 🔧 в работе |
 
 <a name="ru-5"></a>
 
@@ -297,6 +307,8 @@ adb install-multiple out/signed/*.apk
 5. 界面适配平板和横屏。
 6. 密码框接受字母、数字和符号。
 7. 应用名为「Krinik Tribit」，有自己的粉色图标。
+8. 没有强制更新窗口。该窗口没有关闭按钮，会跳转到 Google Play，并用 Tribit 官方应用覆盖 Krinik Tribit。
+9. Firebase 已关闭：Krinik Tribit 不收集分析数据，不读取广告标识符，也不接收推送；Crashlytics 报告收集已关闭。应用不再申请广告标识符权限。
 
 <a name="zh-2"></a>
 
@@ -335,8 +347,9 @@ Android 设备。先卸载官方 Tribit 应用（签名不同），再安装 Kri
 | 3 | 在作者的平板和 StormBox Blast 2 上运行第一个补丁版本：从启动页到自定义均衡器，不闪退、不申请定位权限 | ✅ 已完成，作者正在测试 |
 | 4 | 文字：用资源文件里我们的文字替换服务器下发和代码写死的文字；英文和俄文人工翻译 | 🔧 调研完成，下一步打补丁 |
 | 5 | 布局：界面缩放容纳整个设计稿，被裁的界面可以滚动（已完成，已在平板上运行）；接下来是横屏和其余界面 | 🔧 进行中 |
-| 6 | 闪退、断连，应用不再等待 Tribit 服务器 | 🔧 调研完成，下一步打补丁 |
+| 6 | 闪退、断连，应用不再等待 Tribit 服务器；强制更新窗口已移除（已完成，已在 Samsung A51 上运行） | 🔧 进行中 |
 | 7 | 两个版本：与原版并存的 debug「Debug Krinik Tribit」（已完成）；release 及 GitHub 上的首个签名正式版 | 🔧 debug 已完成，release 计划中 |
+| 8 | 无账号、无追踪：Firebase 和广告标识符已关闭（已完成，已在 Samsung A51 上运行）；下一步：无需账号即可使用，均衡器预设不再备份到云端 | 🔧 进行中 |
 
 <a name="zh-5"></a>
 
