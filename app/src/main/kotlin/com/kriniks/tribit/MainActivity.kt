@@ -60,14 +60,23 @@ class MainActivity : ComponentActivity() {
 
     /** «Сохранить в файл»: Android's own save dialog; the user picks the folder (`ideas/01`). */
     private val saveFile = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
-        val profile = Profile.of(speakerVm.speaker.value)
+        // The profile is taken when the button is pressed: on return from the dialog the link restarts and the state is
+        // empty (the §7B pass 2026-10-16 17:18).
+        val profile = profileToSave
+        profileToSave = null
         if (uri != null && profile != null) lifecycleScope.launch {
             val ok = withContext(Dispatchers.IO) {
-                runCatching { contentResolver.openOutputStream(uri)?.use { it.write(profile.toJson().toByteArray()) } }.isSuccess
+                runCatching {
+                    val out = contentResolver.openOutputStream(uri) ?: error("no stream")
+                    out.use { it.write(profile.toJson().toByteArray()) }
+                }.isSuccess
             }
-            toast(if (ok) R.string.file_saved else R.string.file_unreadable)
+            toast(if (ok) R.string.file_saved else R.string.file_not_saved)
         }
     }
+
+    /** The speaker's EQ and light at the moment «Сохранить в файл» was pressed. */
+    private var profileToSave: Profile? = null
 
     /** «Открыть файл»: Android's own file picker; a refused file says why and changes nothing (`ideas/01`, criterion 5). */
     private val openFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -135,7 +144,10 @@ class MainActivity : ComponentActivity() {
                     Screen.HOME -> HomeScreen(link, speaker, actions, onSettings = { screen = Screen.SETTINGS })
                     Screen.EQ -> EqScreen(
                         speaker, onBack = back, onPreset = speakerVm::selectPreset, onCustom = speakerVm::setCustom,
-                        onSaveFile = { saveFile.launch(PROFILE_FILE_NAME) },
+                        onSaveFile = {
+                            profileToSave = Profile.of(speakerVm.speaker.value)
+                            if (profileToSave != null) saveFile.launch(PROFILE_FILE_NAME) else toast(R.string.file_not_saved)
+                        },
                         onOpenFile = { openFile.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
                     )
                     Screen.SPEAKER_SETTINGS ->

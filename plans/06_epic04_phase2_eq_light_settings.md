@@ -61,12 +61,12 @@ owner's consent: the timer turns his speaker off).
 
 ## Open defects from the judge pass (2026-10-16 17:11)
 
-- [ ] D1. `Eq.state`: a preset id outside the table (not 7) falls back to the speaker's zero gains → shows −12 dB on all
+- [x] D1. ✅ 17:19 — unknown preset → bands null, sliders disabled; EqTest guards it. `Eq.state`: a preset id outside the table (not 7) falls back to the speaker's zero gains → shows −12 dB on all
       bands. Fix: unknown preset → bands unknown (sliders disabled), never the zeros.
 - [ ] D2. Old firmware (±8 dB): `Eq.kt` subtracts 8 from the «new» preset table and `setPreset` always sends the «new»
       11-byte gains (risk (а)). Not our speaker (DSP 10098); needs the old tables of `Bts56Constant` before any old-firmware
       user.
-- [ ] D3. `SpeakerViewModel.start`: `if (job?.isActive) return` drops an A2DP «connected» event that arrives while a
+- [x] D3. 🔧 17:19 — a start asked during a lookup re-runs it after (`startAgain`); not seen on the device (needs the speaker's own A2DP event). `SpeakerViewModel.start`: `if (job?.isActive) return` drops an A2DP «connected» event that arrives while a
       lookup is running → the card may stay on waiting until the next event. Fix: remember the event, re-run after the job.
 
 ## Risks

@@ -38,14 +38,21 @@ data class Profile(val model: String, val preset: Eq.Preset?, val customDb: List
         /** The current state as a profile; null while the speaker has not reported its EQ. */
         fun of(s: SpeakerState): Profile? {
             val eq = s.eq ?: return null
+            if (!eq.custom && eq.preset == null) return null // a preset outside our table cannot be written down
             return Profile(Blast2.NAME, if (eq.custom) null else eq.preset, if (eq.custom) eq.db else null, s.light)
         }
 
         /** Reads a file; the problem tells the user what is wrong instead of crashing (`ideas/01`, criterion 5). */
-        fun parse(text: String): Result = try {
-            val o = JSONObject(text)
-            if (o.optString("format") != FORMAT) Result.Refused(Problem.NOT_A_PROFILE)
-            else if (!Blast2.isBlast2(o.optString("model"))) Result.Refused(Problem.OTHER_MODEL)
+        fun parse(text: String): Result {
+            val o = try { JSONObject(text) } catch (_: JSONException) { return Result.Refused(Problem.NOT_A_PROFILE) }
+            if (o.optString("format") != FORMAT) return Result.Refused(Problem.NOT_A_PROFILE)
+            // From here it is our file: whatever is missing or wrong in it is damage, not «another file» (§7B pass 17:18).
+            return try { body(o) } catch (_: JSONException) { Result.Refused(Problem.BROKEN) }
+            catch (_: IllegalArgumentException) { Result.Refused(Problem.BROKEN) } // an unknown preset name
+        }
+
+        private fun body(o: JSONObject): Result =
+            if (!Blast2.isBlast2(o.optString("model"))) Result.Refused(Problem.OTHER_MODEL)
             else {
                 val eq = o.getJSONObject("eq")
                 val preset = if (eq.has("preset")) Eq.Preset.valueOf(eq.getString("preset")) else null
@@ -58,11 +65,6 @@ data class Profile(val model: String, val preset: Eq.Preset?, val customDb: List
                     else -> Result.Ok(Profile(Blast2.NAME, preset, db, light))
                 }
             }
-        } catch (_: JSONException) {
-            Result.Refused(Problem.NOT_A_PROFILE)
-        } catch (_: IllegalArgumentException) {
-            Result.Refused(Problem.BROKEN) // an unknown preset name
-        }
     }
 
     sealed interface Result {

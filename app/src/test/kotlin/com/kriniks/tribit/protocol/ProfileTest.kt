@@ -36,5 +36,8 @@ class ProfileTest {
             refused("""{"format":"krinik-tribit-profile","version":1,"model":"Tribit StormBox Blast 2","eq":{"preset":"LOUD"}}"""))
         assertEquals(Profile.Problem.BROKEN, refused(
             """{"format":"krinik-tribit-profile","version":1,"model":"Tribit StormBox Blast 2","eq":{"preset":"ROCK"},"light":{"mode":9}}"""))
+        // our format without "eq" is our damaged file, not «another file» (§7B pass 2026-10-16 17:18)
+        assertEquals(Profile.Problem.BROKEN,
+            refused("""{"format":"krinik-tribit-profile","version":1,"model":"Tribit StormBox Blast 2"}"""))
     }
 }

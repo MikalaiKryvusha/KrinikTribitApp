@@ -52,6 +52,14 @@ class EqTest {
         assertEquals(listOf(-12, -6, 0, 3, 6, 6, 0, 0, 12, 12), s.db)
     }
 
+    @Test fun `an unknown preset id has unknown bands, never the zeros`() {
+        // judge pass D1: id 12 is outside the table; the speaker sends zero gains for presets
+        val f = Framer().feed(Packet.encode(Eq.CMD_STATE, byteArrayOf(12) + ByteArray(10))).single()
+        val s = Eq.state(f, newFirmware = true)!!
+        assertNull(s.db)
+        assertNull(s.preset)
+    }
+
     @Test fun `blast traditional is read as 9 and as 8`() {
         assertEquals(Eq.Preset.BLAST, Eq.Preset.byId(9))
         assertEquals(Eq.Preset.BLAST, Eq.Preset.byId(8))

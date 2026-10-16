@@ -64,8 +64,8 @@ object Eq {
 
     fun queryState() = Packet.encode(CMD_STATE)
 
-    /** The EQ the speaker reports: preset id and the ten band gains in dB. */
-    data class State(val id: Int, val db: List<Int>) {
+    /** The EQ the speaker reports: preset id and the ten band gains in dB; null gains = a preset id outside our table. */
+    data class State(val id: Int, val db: List<Int>?) {
         val preset: Preset? get() = Preset.byId(id)
         val custom: Boolean get() = id == CUSTOM_ID
     }
@@ -80,9 +80,10 @@ object Eq {
         if ((f.cmd != CMD_STATE && f.cmd != CMD_STATE_NOTICE) || f.payload.size < 1 + BANDS) return null
         val off = offset(newFirmware)
         val id = f.u8(0)
-        val preset = if (id == CUSTOM_ID) null else Preset.byId(id)
-        val wire = preset?.wire ?: List(BANDS) { f.u8(1 + it) }
-        return State(id, wire.map { it - off })
+        // Custom: the speaker's own gains. A known preset: its table. An unknown preset: the speaker sent zeros, which are
+        // not its curve - the bands stay unknown (judge pass 2026-10-16 17:11, D1).
+        val wire = if (id == CUSTOM_ID) List(BANDS) { f.u8(1 + it) } else Preset.byId(id)?.wire
+        return State(id, wire?.map { it - off })
     }
 
     /** The DSP version from 88, or null. */

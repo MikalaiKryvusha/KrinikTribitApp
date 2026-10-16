@@ -114,7 +114,7 @@ fun EqScreen(
                         },
                         valueRange = -range.toFloat()..range.toFloat(),
                         steps = 2 * range - 1,
-                        enabled = eq != null,
+                        enabled = eq?.db != null, // unknown bands are never shown as a curve (D1)
                         modifier = Modifier.weight(1f),
                         colors = SliderDefaults.colors(
                             thumbColor = MaterialTheme.colorScheme.primary,

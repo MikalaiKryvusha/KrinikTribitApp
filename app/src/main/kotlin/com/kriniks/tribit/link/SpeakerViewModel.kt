@@ -125,9 +125,16 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
         return Found(adapter, device)
     }
 
-    /** (Re)starts the way to the speaker; does nothing while a connection is up or being made. */
+    /** An event asked for a start while a lookup ran (judge pass D3): the lookup re-runs when it ends idle. */
+    private var startAgain = false
+
+    /** (Re)starts the way to the speaker; while a connection is up or being made, remembers the request instead. */
     fun start() {
-        if (job?.isActive == true) return
+        if (job?.isActive == true) {
+            if (_link.value !is Link.Connected) startAgain = true
+            return
+        }
+        startAgain = false
         job = viewModelScope.launch {
             val found = withContext(Dispatchers.IO) { lookUp() } ?: return@launch
             val adapter = found.adapter
@@ -169,6 +176,9 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
             // channel itself failed (held by another app).
             _link.value = if (soundConnected(adapter, device)) Link.Failed(name) else Link.Waiting(name)
         }
+        // A start asked while this job ran (e.g. the speaker's A2DP came up during the lookup) runs now; a cancelled job
+        // (the app left the screen) does not restart.
+        job?.invokeOnCompletion { cause -> if (cause == null && startAgain) viewModelScope.launch { start() } }
     }
 
     /** Every packet from the speaker, for [request] to match answers; the state itself lives in [speaker]. */
