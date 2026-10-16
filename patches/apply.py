@@ -525,6 +525,194 @@ def patch_brand():
     print(f"ok 17 brand: pink in {changed} res files + {code_files} code files + {len(YELLOW_COLOURS)} colours, {BRAND}, splash/login/registration")
 
 
+# --- Patch 8a: the splash does not wait for their language dictionary --------------------------------------
+# Play complaint 4 «stuck on the logo» (159 reviews). FirstNewActivity.onCreate: with network on it first asks their
+# server for strings (ViewModelFirst.getStringResources) and goes on only when the answer sets 1; an empty answer, a
+# «no data» answer (2) or a slow server keeps the logo forever or up to ~80 s (researches/05 §3.3, researches/06 З1).
+# Fix: the network check jumps straight to showAgree() - the offline branch the app already has. Strings stay as
+# shipped in the APK; server texts are wave 2 (plans/01 §3).
+# [TESTED: 2026-10-16 · A51: dictionary requests 2 -> 0; NOT applied - the login screen turned English · testcases/reports/2026-10-16_wave1.md]
+def patch_splash_no_dictionary_wait():
+    p = smali("com.thousandshores.tribit.modulelogin.activity.FirstNewActivity")
+    replace_in_method(p, ".method public onCreate(Landroid/os/Bundle;)V",
+        "    invoke-static {}, Lcom/thousandshores/tool/utils/NetworkUtils;->isConnected()Z\n\n"
+        "    move-result p1\n\n"
+        "    if-eqz p1, :cond_11\n",
+        "    goto :cond_11\n")
+    # Twin: FirstActivity (the launcher activity) runs the same branch before handing over to FirstNewActivity.
+    # TWINS: searched `ViewModelFirst;->getStringResources` callers - 2 sites, both patched.
+    p = smali("com.thousandshores.tribit.modulelogin.activity.FirstActivity")
+    replace_in_method(p, ".method public onCreate(Landroid/os/Bundle;)V",
+        "    invoke-static {}, Lcom/thousandshores/tool/utils/NetworkUtils;->isConnected()Z\n\n"
+        "    move-result v1\n\n"
+        "    if-eqz v1, :cond_10\n",
+        "    goto :cond_10\n")
+    print("ok  8a splash: no wait for the server dictionary (FirstActivity, FirstNewActivity)")
+
+
+# --- Patch 8: no account - the app opens on the main screen ------------------------------------------------
+# Owner 2026-10-16 ≈ 09:16 +03:00: «аккаунт не нужен» · «выпиливаем НАХУЙ аккаунты» (MASTER_PLAN decision journal).
+# Play complaints 11 «why an account» (77) and 17 «needs their server» (63). The splash sends a user without a token to
+# autoLogin (a guest account made on their server from the MAC / ANDROID_ID, no network - no entry), and START opens
+# LoginNewActivity (researches/06 З2, З3). Fix: checkToken always ends in ViewModelFirst.startMainActivity (a stored
+# token still goes into the Authorization header, as before); START marks the agreement and calls checkToken instead
+# of opening the login screen. Requests without a token are answered «Full authentication» - patch 9 keeps the user.
+# [TESTED: 2026-10-16 · A51: clean install -> START -> main screen, no login screen, no visitorLogin/getUserOf* requests, no crash · testcases/reports/2026-10-16_wave1.md]
+CHECK_TOKEN = """
+.method private final checkToken()V
+    .locals 4
+
+    invoke-static {}, Lcom/thousandshores/tribit/database/datamanager/AccountTokenManager;->getInstance()Lcom/thousandshores/tribit/database/datamanager/AccountTokenManager;
+
+    move-result-object v0
+
+    invoke-virtual {v0}, Lcom/thousandshores/tribit/database/datamanager/AccountTokenManager;->getAccountToken()Lcom/thousandshores/tribit/database/entity/TokenInfo;
+
+    move-result-object v0
+
+    if-eqz v0, :krinik_main
+
+    invoke-virtual {v0}, Lcom/thousandshores/tribit/database/entity/TokenInfo;->getAccess_token()Ljava/lang/String;
+
+    move-result-object v1
+
+    invoke-static {v1}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
+
+    move-result v2
+
+    if-nez v2, :krinik_main
+
+    invoke-static {}, Lcom/hjq/http/EasyConfig;->getInstance()Lcom/hjq/http/EasyConfig;
+
+    move-result-object v0
+
+    new-instance v2, Ljava/lang/StringBuilder;
+
+    invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v3, "Bearer "
+
+    invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    const-string v2, "Authorization"
+
+    invoke-virtual {v0, v2, v1}, Lcom/hjq/http/EasyConfig;->addHeader(Ljava/lang/String;Ljava/lang/String;)Lcom/hjq/http/EasyConfig;
+
+    :krinik_main
+    iget-object v0, p0, Lcom/thousandshores/tribit/modulelogin/activity/FirstNewActivity;->mViewModel:Lcom/thousandshores/tribit/modulelogin/viewmodel/ViewModelFirst;
+
+    if-nez v0, :krinik_vm
+
+    const-string v0, "mViewModel"
+
+    invoke-static {v0}, Lkotlin/jvm/internal/Intrinsics;->throwUninitializedPropertyAccessException(Ljava/lang/String;)V
+
+    return-void
+
+    :krinik_vm
+    invoke-virtual {v0}, Lcom/thousandshores/tribit/modulelogin/viewmodel/ViewModelFirst;->startMainActivity()V
+
+    return-void
+.end method
+"""
+
+
+def patch_no_account():
+    p = smali("com.thousandshores.tribit.modulelogin.activity.FirstNewActivity")
+    replace_method(p, ".method private final checkToken()V", CHECK_TOKEN)
+    # START: the button's context is the splash activity; call its checkToken. Any other context keeps the old path.
+    h = ".method private static final onCreate$lambda$1(Landroid/view/View;)V"
+    replace_method(p, h, h + START_HANDLER)
+    print("ok  8 no account: splash and START open the main screen")
+
+
+START_HANDLER = """
+    .locals 3
+
+    move-object v2, p0
+
+    sget-object p0, Lcom/thousandshores/tribit/utils/ui/PrivateTextUtil;->INSTANCE:Lcom/thousandshores/tribit/utils/ui/PrivateTextUtil;
+
+    invoke-virtual {p0}, Lcom/thousandshores/tribit/utils/ui/PrivateTextUtil;->isFastClick()Z
+
+    move-result p0
+
+    if-eqz p0, :krinik_done
+
+    invoke-static {}, Lcom/thousandshores/tool/utils/SPUtils;->getInstance()Lcom/thousandshores/tool/utils/SPUtils;
+
+    move-result-object p0
+
+    const-string v0, "is_agree_private"
+
+    const/4 v1, 0x1
+
+    invoke-virtual {p0, v0, v1}, Lcom/thousandshores/tool/utils/SPUtils;->put(Ljava/lang/String;Z)V
+
+    invoke-virtual {v2}, Landroid/view/View;->getContext()Landroid/content/Context;
+
+    move-result-object p0
+
+    instance-of v0, p0, Lcom/thousandshores/tribit/modulelogin/activity/FirstNewActivity;
+
+    if-eqz v0, :krinik_old
+
+    check-cast p0, Lcom/thousandshores/tribit/modulelogin/activity/FirstNewActivity;
+
+    invoke-direct {p0}, Lcom/thousandshores/tribit/modulelogin/activity/FirstNewActivity;->checkToken()V
+
+    return-void
+
+    :krinik_old
+    const-class p0, Lcom/thousandshores/tribit/modulelogin/activity/LoginNewActivity;
+
+    invoke-static {p0}, Lcom/thousandshores/tool/utils/ActivityUtils;->startActivity(Ljava/lang/Class;)V
+
+    :krinik_done
+    return-void
+.end method
+"""
+
+
+# --- Patch 9: their server never throws the user out to the login screen -----------------------------------
+# Play complaint 12 «keeps logging me out» (74 reviews). RequestHandler.requestSuccess reads resp_msg of every answer:
+# «Offsite access token» and «Full authentication» wipe the tokens and open the login screen, «Invalid access token»
+# posts ReloginEvent (researches/06 З4). Fix: right after the answer is parsed, return it - the three branches are
+# skipped (also the NPE of resp_msg.contains on an empty resp_msg). Cloud functions fail quietly on a stale token.
+# [NOT-TESTED] the throw-out itself (needs a server answer we cannot provoke); the user path runs without crashes - testcases/reports/2026-10-16_wave1.md
+def patch_no_relogin():
+    p = smali("com.thousandshores.tribit.http.model.RequestHandler")
+    replace_in_method(p, ".method public requestSuccess(",
+        "    instance-of p3, p1, Lcom/thousandshores/tribit/bean/BaseData;\n\n"
+        "    if-eqz p3, :cond_f\n",
+        "    goto :cond_f\n")
+    print("ok  9 no relogin: server answers are returned as parsed")
+
+
+# --- Patch 10: no forced update ---------------------------------------------------------------------------
+# ViewModelMainNew.checkUpdate asks their server for the latest version and shows a dialog without a close button
+# that leads to Google Play, where the «update» replaces Krinik Tribit with the original (researches/06 З5). The
+# settings screen has its own manual check (ViewModelSettings.checkUpdate). Fix: both methods return at once.
+# [TESTED: 2026-10-16 · A51: «Проверка обновлений» -> 0 EasyHttp lines, no dialog; the same process logged 7 other requests · testcases/reports/2026-10-16_wave1.md]
+EMPTY_VOID = "    .locals 0\n\n    return-void\n.end method"
+
+
+def patch_no_forced_update():
+    p = smali("com.thousandshores.tribit.ViewModelMainNew")
+    h = ".method public final checkUpdate(Landroidx/lifecycle/LifecycleOwner;Ljava/lang/String;)V"
+    replace_method(p, h, h + "\n" + EMPTY_VOID)
+    s = smali("com.thousandshores.tribit.modulemine.viewmodel.ViewModelSettings")
+    h2 = ".method public final checkUpdate(Landroidx/lifecycle/LifecycleOwner;Ljava/lang/String;Z)V"
+    replace_method(s, h2, h2 + "\n" + EMPTY_VOID)
+    print("ok 10 no forced update: both checkUpdate return at once")
+
+
 # --- Variant: debug — «Debug Krinik Tribit», its own package beside the original ---------------------------
 # Owner's rule R6 (HOUSE_RULES.md): two builds, debug named «Debug Krinik Tribit», release «Krinik Tribit», different
 # signing keys. The debug build gets its own package so it installs next to the owner's original Tribit and the agent
@@ -595,6 +783,13 @@ if __name__ == "__main__":
     patch_scroll_fix()
     patch_brand()
     patch_location_permission()
+    # Patch 8a is NOT applied yet: on the A51 (2026-10-16) it removed the dictionary request (2 -> 0) but the login screen
+    # of a fresh install turned English - their Russian texts come only from that dictionary. It waits for our values-ru
+    # (wave 2, plans/01 §3); a failed request already goes on (onHttpFail sets 1), only a slow server holds the logo.
+    # patch_splash_no_dictionary_wait()
+    patch_no_account()
+    patch_no_relogin()
+    patch_no_forced_update()
     if "--debug" in sys.argv[2:]:
         variant_debug()
     print("all patches applied")
