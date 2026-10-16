@@ -56,7 +56,7 @@
 > <!-- classes: question-already-answered, guard-not-proven-against-threat, shown-as-link,
 >      claim-before-evidence, owner-decision-not-applied, text-in-agents-world,
 >      etalon-from-dirty-tree, shell-lied, escaping-layer, twins-missed,
->      field-dropped-in-rebuild, renamed-package-identity, own-work-not-recalled -->
+>      field-dropped-in-rebuild, renamed-package-identity, own-work-not-recalled, dex-reference-limit -->
 >
 > | Class slug | The failure it names |
 > |---|---|
@@ -73,6 +73,9 @@
 > | `field-dropped-in-rebuild` | a field or section silently lost when an artifact was regenerated |
 | `renamed-package-identity` | a renamed application package breaks code that looks things up by the package name |
 | `own-work-not-recalled` | a tool or recipe the owner's projects already have was not looked up before the work |
+| `dex-reference-limit` | a patch adds method references to a dex that is already at 65 536 and apktool refuses to build |
+>
+> <!-- class-ok: claim-before-evidence — its machine-checkable part (a ☑ «tested» in plans/02 without a run report) is mechanized by tools/check_tested_ticks.py (EXP-0008); what stays (which observation a sentence in a chat rests on: a probe, a screen, a device log line) lives in replies no tool sees — /fable-judge's claim-wider-than-observation hunt is its check -->
 >
 > The `#tags` are **trigger-tags**: before a task, grep by the task's tags and QUOTE the relevant
 > lessons in your report (id + one line) — or state "no relevant lessons". An unquoted recall is
@@ -88,6 +91,30 @@
 **Result:** ✅ — the experience log is live and greppable.
 **Lesson:** capture lessons at the level of *approach* (what worked / what to avoid), not defect detail
 (that lives in `bugs/`); one short entry beats a long story.   → link: (none)
+
+### EXP-0010 · 2026-10-16 · ❌→✅ · #build #smali #dex
+class: dex-reference-limit
+mechanized: patches/apply.py make_dex_room (kotlin-reflect moved to smali_classes6; the build fails loudly if the move breaks)
+**Context:** patch 8 added four calls (krinik.Anon, krinik.Gate) into classes of smali_classes5.
+**Tried / did:** apktool: «Unsigned short value out of range: 65536» while writing a kotlin-reflect method of classes5.
+**Result:** ✅ after moving the self-contained kotlin/reflect package into a new smali_classes6 (multidex loads every dex).
+**Lesson:** their classes5 sits at the method-reference limit; any new reference there can break the build - room is made
+by moving a whole self-contained package to a new smali_classesN, never by trimming their code.
+**Repro:** `bash build.sh debug 2>&1 | grep "dex room"` prints «2037 classes of kotlin/reflect moved».
+**Trigger:** apktool fails with «out of range: 65536» → check which smali_classesN, move a self-contained package out.
+**Not for:** the 64K limit of our own classesN.dex (d8 splits ours by itself).
+
+### EXP-0009 · 2026-10-16 · ❌ · #claims #a51 #speaker
+class: claim-before-evidence
+none-cheap: which source a state claim rests on (screen vs device log) is judgement; /fable-judge hunts it - like EXP-0003
+**Context:** the A51 settings screen showed «Автоматическое выключение» on; I told the owner «автовыключение включено».
+**Tried / did:** the app's own log said the speaker answered «自动关机-- false» before and after; the screen showed the
+field default (`isShutDown = true`) because the speaker had not answered yet (`bugs/02`).
+**Result:** ❌ a false alarm to the owner, corrected in the same reply.
+**Lesson:** a switch on their screen is not the speaker's state; the speaker's state is the log line it answers with.
+**Repro:** `adb logcat -d --pid <pid> | grep "自动关机--"` - the last line is the speaker's answer.
+**Trigger:** writing «the speaker has X on/off» → quote the speaker's log line, or say «the screen shows».
+**Not for:** settings the app keeps only on the phone (no speaker answer exists).
 
 ### EXP-0008 · 2026-10-16 · ❌ · #claims #a51 #testing
 class: claim-before-evidence
