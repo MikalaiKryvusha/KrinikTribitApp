@@ -94,12 +94,12 @@
   .vol .num { font: 700 17px var(--head); min-width: 30px; text-align: right; font-variant-numeric: tabular-nums; }
 
   /* ============ A: «Сцена» ============ */
-  .a-hero { position: relative; height: 210px; display: grid; place-items: center; flex: none; margin: -4px -20px 0; }
+  .a-hero { position: relative; height: 180px; display: grid; place-items: center; flex: none; margin: -4px -20px 0; }
   .a-hero::before { content: ''; position: absolute; left: 50%; top: 52%; width: 360px; height: 230px; transform: translate(-50%, -50%);
     background: radial-gradient(closest-side, rgba(255,26,140,.32), rgba(255,26,140,.08) 60%, transparent); }
   .a-hero::after { content: ''; position: absolute; left: 50%; bottom: 14px; width: 280px; height: 30px; transform: translateX(-50%);
     background: radial-gradient(closest-side, rgba(255,26,140,.35), transparent); border-radius: 50%; }
-  .a-hero svg { width: 290px; position: relative; z-index: 1; }
+  .a-hero svg { width: 250px; position: relative; z-index: 1; }
   .a-name { text-align: center; margin-top: -6px; }
   .a-name h3 { font: 700 20px var(--head); }
   .a-name .pills { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
@@ -113,6 +113,13 @@
   .a-tile h4 { font: 700 14px/1.25 var(--font); }
   .a-tile small { font: 500 12px var(--font); color: var(--sub); display: block; margin-top: 2px; }
   .a-tile svg.spark { position: absolute; right: 10px; top: 14px; width: 74px; height: 34px; }
+  .a-strip { background: var(--card); border-radius: 22px; padding: 12px 14px 12px 12px; flex: none; }
+  .a-strip .head { display: flex; align-items: center; gap: 12px; }
+  .a-strip .t { flex: 1; font: 700 15px var(--font); min-width: 0; }
+  .a-strip .t small { display: block; font: 500 12px var(--font); color: var(--sub); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .a-strip svg.resp { width: 100%; height: 62px; display: block; margin-top: 8px; }
+  .bands.mini { font-size: 10px; padding: 0 2px; margin-top: 2px; }
+  .a-strip .a-light { position: static; flex: none; }
   .a-light { position: absolute; right: 14px; top: 20px; width: 64px; height: 8px; border-radius: 4px;
     background: linear-gradient(90deg, #FF1A8C, #8a5cff, #18c8ff); box-shadow: 0 0 14px rgba(255,26,140,.6); }
 
@@ -125,6 +132,9 @@
   .a-preset { height: 92px; border-radius: 22px; background: var(--card); position: relative; overflow: hidden; padding: 14px; border: 1.5px solid transparent; }
   .a-preset svg { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 44px; }
   .a-preset span { position: relative; font: 700 14px/1.25 var(--font); z-index: 1; display: block; max-width: 120px; }
+  .a-preset.custom { border: 1.5px dashed var(--pink-line); }
+  .a-preset .edit { position: absolute; right: 10px; top: 10px; width: 30px; height: 30px; border-radius: 10px; background: var(--pink-soft); color: var(--pink); display: grid; place-items: center; z-index: 2; }
+  .a-preset .edit .ic { width: 17px; height: 17px; }
   .a-preset.on { border-color: var(--pink); background: linear-gradient(160deg, rgba(255,26,140,.18), var(--card) 70%); }
   .tick { position: absolute; right: 12px; top: 12px; width: 24px; height: 24px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; z-index: 2; }
   .tick .ic { width: 15px; height: 15px; stroke-width: 2.6; }
@@ -258,7 +268,7 @@
 
     <!-- A-home -->
     <div class="phone-wrap" data-id="A-home">
-      <div class="cap"><b>A</b><span>Сцена</span><p>Колонка в центре, как на экране устройства Tribit. Под колонкой плеер и четыре плитки разделов.</p></div>
+      <div class="cap"><b>A</b><span>Сцена · выбран</span><p>Колонка в центре, как на экране устройства Tribit. Большая «Пауза» из C; разделы полосами во всю ширину, у эквалайзера — АЧХ пресета (слово владельца 19:26).</p></div>
       <div class="screen">
         <div class="status"><span>17:01</span><div class="dots"><i></i><i></i><i></i></div></div>
         <div class="top"><div class="logo"><b>K</b>rinik Tribit</div><div class="icon-btn"><svg class="ic"><use href="#i-gear"/></svg></div></div>
@@ -269,19 +279,29 @@
             <div class="pills"><span class="pill"><i class="dot"></i>Подключена</span><span class="pill"><span class="batt"><i><b style="width:30%"></b></i></span>30 %</span></div>
           </div>
           <div class="a-player">
-            <div class="a-transport">
+            <div class="vol"><svg class="ic" style="color:var(--sub)"><use href="#i-vol"/></svg><div class="slider" data-v="10" data-max="31"></div><span class="num">10</span></div>
+            <div class="c-transport" style="margin-top:0">
               <div class="icon-btn big"><svg class="ic"><use href="#i-prev"/></svg></div>
-              <div class="a-play"><svg class="ic"><use href="#i-pause"/></svg></div>
+              <div class="btn primary"><svg class="ic"><use href="#i-pause"/></svg>Пауза</div>
               <div class="icon-btn big"><svg class="ic"><use href="#i-next"/></svg></div>
             </div>
-            <div class="vol"><svg class="ic" style="color:var(--sub)"><use href="#i-vol"/></svg><div class="slider" data-v="10" data-max="31"></div><span class="num">10</span></div>
           </div>
-          <div class="a-tiles">
-            <div class="a-tile"><div class="ico-box"><svg class="ic"><use href="#i-eq"/></svg></div><svg class="spark" data-db="10,6,-4,-8,-6,6,12,8,2,0"></svg><div><h4>Эквалайзер</h4><small>Рок</small></div></div>
-            <div class="a-tile"><div class="ico-box"><svg class="ic"><use href="#i-light"/></svg></div><i class="a-light"></i><div><h4>Подсветка</h4><small>Режим 1</small></div></div>
-            <div class="a-tile"><div class="ico-box"><svg class="ic"><use href="#i-sliders"/></svg></div><div><h4>Настройки колонки</h4><small>Таймер сна, подсказки</small></div></div>
-            <div class="a-tile"><div class="ico-box"><svg class="ic"><use href="#i-file"/></svg></div><div><h4>Файл настроек</h4><small>Сохранить, открыть</small></div></div>
+          <!-- Sections as full-width strips (owner 19:26): more information per row, the EQ strip shows the preset's response. -->
+          <div class="a-strip eq">
+            <div class="head"><div class="ico-box"><svg class="ic"><use href="#i-eq"/></svg></div><div class="t">Эквалайзер<small>Рок</small></div><svg class="ic chev"><use href="#i-chev"/></svg></div>
+            <svg class="resp" data-db="10,6,-4,-8,-6,6,12,8,2,0" viewBox="0 0 320 70" preserveAspectRatio="none"></svg>
+            <div class="bands mini"><span>40</span><span>62</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
           </div>
+          <div class="a-strip">
+            <div class="head"><div class="ico-box"><svg class="ic"><use href="#i-light"/></svg></div><div class="t">Подсветка<small>Режим 1</small></div><i class="a-light"></i><svg class="ic chev"><use href="#i-chev"/></svg></div>
+          </div>
+          <div class="a-strip">
+            <div class="head"><div class="ico-box"><svg class="ic"><use href="#i-sliders"/></svg></div><div class="t">Настройки колонки<small>Автовыключение, таймер сна, подсказки, микрофон</small></div><svg class="ic chev"><use href="#i-chev"/></svg></div>
+          </div>
+          <div class="a-strip">
+            <div class="head"><div class="ico-box"><svg class="ic"><use href="#i-file"/></svg></div><div class="t">Файл настроек<small>Сохранить, открыть, поделиться</small></div><svg class="ic chev"><use href="#i-chev"/></svg></div>
+          </div>
+          <div class="fade"></div>
         </div>
         <div class="gesture"></div>
       </div>
@@ -369,12 +389,11 @@
 
     <!-- A-eq -->
     <div class="phone-wrap" data-id="A-eq">
-      <div class="cap"><b>A</b><span>Сцена</span><p>График кривой, как у Tribit. Вместо фото на карточке пресета нарисована его кривая.</p></div>
+      <div class="cap"><b>A</b><span>Сцена · выбран</span><p>График кривой, как у Tribit. Вместо фото на карточке пресета нарисована его кривая. Вкладок нет, «Пользовательский» — первая карточка списка (слово владельца 19:25).</p></div>
       <div class="screen">
         <div class="status"><span>17:02</span><div class="dots"><i></i><i></i><i></i></div></div>
         <div class="top"><div class="icon-btn"><svg class="ic"><use href="#i-back"/></svg></div><div class="title">Эквалайзер</div></div>
         <div class="body">
-          <div class="seg"><div class="on">Пресеты</div><div>Пользовательский</div></div>
           <div class="graph">
             <h3>Рок</h3>
             <div class="muted">Сейчас на колонке</div>
@@ -382,6 +401,7 @@
             <div class="bands"><span>40</span><span>62</span><span>125</span><span>250</span><span>500</span><span>1K</span><span>2K</span><span>4K</span><span>8K</span><span>16K</span></div>
           </div>
           <div class="a-presets">
+            <div class="a-preset custom"><span>Пользовательский</span><svg class="art" data-db="0,0,0,0,0,6,0,0,0,0"></svg></div>
             <div class="a-preset on"><span>Рок</span><div class="tick"><svg class="ic"><use href="#i-check"/></svg></div><svg class="art" data-db="10,6,-4,-8,-6,6,12,8,2,0"></svg></div>
             <div class="a-preset"><span>XBass</span><svg class="art" data-db="6,12,4,0,0,0,0,0,0,0"></svg></div>
             <div class="a-preset"><span>Джаз</span><svg class="art" data-db="-4,6,8,0,2,4,0,8,10,6"></svg></div>
@@ -459,6 +479,15 @@ function smooth(pts) {
 function points(db, w, h, padX, padY) {
   return db.map((v, i) => [padX + i * (w - 2 * padX) / (db.length - 1), h / 2 - v / RANGE * (h / 2 - padY)]);
 }
+
+// Frequency response on the home EQ strip: ±12 frame, 0 dB line, filled curve.
+document.querySelectorAll('svg.resp').forEach(s => {
+  const w = 320, h = 70, p = points(dbOf(s), w, h, 6, 6), d = smooth(p);
+  [6, h / 2, h - 6].forEach((y, i) => el('line', { x1: 0, x2: w, y1: y, y2: y, stroke: i === 1 ? '#45454b' : '#2a2a2e', 'stroke-dasharray': i === 1 ? '' : '3 4' }, s));
+  el('path', { d: `${d} L${p[p.length - 1][0]},${h} L${p[0][0]},${h} Z`, fill: 'url(#fillPink)' }, s);
+  el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 6, opacity: .35, filter: 'url(#glow)' }, s);
+  el('path', { d, fill: 'none', stroke: '#FF1A8C', 'stroke-width': 2.5, 'stroke-linecap': 'round' }, s);
+});
 
 // Small sparkline (tiles, list rows).
 document.querySelectorAll('svg.spark').forEach(s => {
