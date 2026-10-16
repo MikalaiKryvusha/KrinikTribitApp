@@ -43,11 +43,16 @@ screen is the speaker's answer; the speaker's own buttons move what the screen s
 - [x] 6. Settings screen of the speaker: the six rows of criterion 4. Device run.
 - [ ] 7. The open check of phase 1 (`plans/05` step 8): the owner powers the speaker off and on → «Ожидание колонки» →
       connected by itself.
-- [ ] 7a. **The ear through the A51 microphone — presence and loudness only.** The owner 16:49: «микрофон в А51 плохой, ты
+- [x] 7a. **The ear through the A51 microphone — presence and loudness only.** The owner 16:49: «микрофон в А51 плохой, ты
       не сможешь оценить качество работы жквалайзера» · 16:50: «микрофон в А51 качества такого, чтобы услышать вообще, есть
       звук, или нет, меняется громкость, или нет». A debug-only tool in «Отладка»: play a test tone at volume 1–2, log the
       microphone level (`KT.Ear`) — sound present yes/no, level up/down after a volume change. The EQ sound is the owner's
       ear; the EQ state is the speaker's reply (21 / 82). `RECORD_AUDIO` in the debug manifest only.
+      **Built 17:03 (`app/src/debug/.../EarActivity.kt`), measured 17:04–17:06** at confirmed speaker volumes (each set
+      through our app, answered by `RX EA 05 54 vv`): volume 2 — tone above silence +6.3 dB and +7.0 dB; volume 0 (control) —
+      +2.3 dB and −11.8 dB; the room's noise moved between −70 and −53 dBFS. Verdict: at volume 2 the ear hears the tone,
+      but one run is not evidence — the room noise is of the same size; three runs and the median, always with a volume-0
+      control. Volume restored to 9 (`RX EA 05 54 09`, 17:07).
 - [ ] 8. `ideas/01` JSON export/import of EQ and light — after 3 and 5 work on the speaker.
 
 Open question for the speaker: reply 15 — the set sleep time or the time left? Set 60 min, read after 2 min (with the

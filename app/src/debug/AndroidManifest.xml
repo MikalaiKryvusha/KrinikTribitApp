@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug build only («Debug Krinik Tribit», owner's rule R6): the ear of the stand (plans/06 step 7a). The A51 stands in one
+     room with the speaker; its microphone tells whether sound plays and whether the loudness changes. RECORD_AUDIO is
+     granted by the agent with `adb shell pm grant com.kriniks.tribit.debug android.permission.RECORD_AUDIO`; the release
+     build has neither the permission nor the activity. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <application>
+        <activity
+            android:name=".EarActivity"
+            android:exported="true"
+            android:theme="@style/Theme.KrinikTribit" />
+    </application>
+</manifest>
