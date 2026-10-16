@@ -152,8 +152,8 @@ All paths under `D:\work\ai_sandbox\KARTUN` (read-only for us).
    `researches/01_krinikcam_style_and_stack.md`.
 2. **Speed:** single activity, Compose, no navigation library; heavy work off the main thread (one engine thread,
    `EngineThread.kt`); display bitmaps pre-scaled; R8 + resource shrinking in release (`app/build.gradle.kts`:
-   `isMinifyEnabled = true`, `isShrinkResources = true`). No baseline profiles and no startup measurement — our app adds
-   both (§4.5) and measures.
+   `isMinifyEnabled = true`, `isShrinkResources = true`). No baseline profile of its own and no startup measurement; AGP still ships the libraries' profiles (Compose,
+   AndroidX) in a normal release build (correction of the KARTUN session ≈ 15:47). Our app adds its own (§4.5) and measures.
 3. **Navigation:** an own tiny router — a `Screen` enum in `UpscaleViewModel.kt`, `back()` maps a screen to its parent,
    `MainActivity.kt` switches on it, `BackHandler` per screen; `enableEdgeToEdge` + `WindowInsets.systemBars` /
    `statusBarsPadding` / `navigationBarsPadding` per screen. Our scaffold already follows it (`MainActivity.kt`, `Page`).
@@ -210,8 +210,9 @@ All paths under `D:\work\ai_sandbox\KARTUN` (read-only for us).
 4. Rename: there is no speaker command — a name in our app is a local label only (fork below).
 5. Speed: R8 release, Baseline/Startup Profiles, nothing heavy at start — measured like KARTUN (its answer pending).
 
-**Open forks for the owner** (→ `interviews/`):
-1. Rename: a local label in our app only (the speaker keeps its own Bluetooth name) — or drop the rename row.
-2. Android 8–11 without location: bonded devices only (pair in system settings) — accepted, or also offer the CDM path
-   that needs the system Location toggle on.
-3. The scaffold's «От людей для людей» title against the owner's earlier «сделано людьми для людей - убрать».
+**Forks — answered by the owner 2026-10-16 ≈ 15:45 +03:00** (chat; `MASTER_PLAN.md` journal):
+1. Rename — a local label in our app only, nothing is sent to the speaker: «ну и похер, не нужно на колонку слать ее имя.
+   Локально в приложнии ей имя пусть дается и все.»
+2. Minimum Android 13 (`minSdk = 33`) — the 8–11 question is gone; the search uses `neverForLocation`: «минимальная
+   поддерживаемая версия от андроида 13 и выше.»
+3. «От людей для людей» leaves the app, stays a README slogan: «убрать, оставить только как слоган в РИДМИ гитхаба.»

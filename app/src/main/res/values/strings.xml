@@ -9,7 +9,6 @@
     <string name="home_no_speaker">No speaker connected</string>
     <string name="home_no_speaker_hint">Turn the Tribit speaker on and keep it close. Krinik Tribit finds it over Bluetooth, with location turned off.</string>
     <string name="home_find_soon">Speaker search comes in the next build</string>
-    <string name="home_promise_title">Made by people, for people</string>
     <string name="home_promise">No location, no account, no Tribit server. Volume, equalizer and battery on every screen size.</string>
 
     <string name="about">About</string>

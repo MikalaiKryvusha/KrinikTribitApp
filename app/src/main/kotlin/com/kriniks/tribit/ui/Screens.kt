@@ -111,8 +111,9 @@ fun HomeScreen(onSettings: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             ) { Text(stringResource(R.string.home_find_soon)) }
         }
+        // No «От людей для людей» title in the app - the owner, 2026-10-16 ≈ 15:45 +03:00: «убрать, оставить только как
+        // слоган в РИДМИ гитхаба».
         Card {
-            Text(stringResource(R.string.home_promise_title), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.home_promise), style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }

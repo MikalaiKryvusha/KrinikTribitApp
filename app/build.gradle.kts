@@ -10,8 +10,9 @@ android {
 
     defaultConfig {
         applicationId = "com.kriniks.tribit"
-        // [AI] Android 8: the app must install on the older phones Tribit owners use (GOAL.md, «для людей»).
-        minSdk = 26
+        // Android 13 and up - the owner, 2026-10-16 ≈ 15:45 +03:00: «минимальная поддерживаемая версия от андроида 13 и
+        // выше» (MASTER_PLAN.md journal). On 13+ the speaker search runs with BLUETOOTH_SCAN neverForLocation: no location.
+        minSdk = 33
         targetSdk = 37
         versionCode = 1
         versionName = "0.1 (1)"

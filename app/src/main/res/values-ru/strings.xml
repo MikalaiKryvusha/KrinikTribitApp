@@ -7,7 +7,6 @@
     <string name="home_no_speaker">Колонка не подключена</string>
     <string name="home_no_speaker_hint">Включите колонку Tribit и держите её рядом. Krinik Tribit находит её по Bluetooth при выключенной геолокации.</string>
     <string name="home_find_soon">Поиск колонки появится в следующей сборке</string>
-    <string name="home_promise_title">От людей для людей</string>
     <string name="home_promise">Без геолокации, без аккаунта, без сервера Tribit. Громкость, эквалайзер и заряд на экране любого размера.</string>
 
     <string name="about">О приложении</string>
