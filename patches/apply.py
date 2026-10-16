@@ -1073,6 +1073,72 @@ def patch_no_support_link():
     print("ok 29 help page: no link to the support form")
 
 
+# --- Patch 31: white bold text, 19 sp and up, on every pink-filled button ----------------------------------------
+# Owner 2026-10-16 13:32 +03:00: «B вариант по кнопкам» (interviews/interview_002 Q2 = B: white text on our #FF1A8C, the
+# label bigger and bolder, «от 19 px жирным» - WCAG large text needs 3:1, white on #FF1A8C is 3.63:1). Class inventory
+# 2026-10-16 (scratch scan of res/layout: every widget whose background selector is pink-filled in its default state):
+# 88 buttons and text views + 3 icon buttons (PINK_CONTAINER) in 11 selectors, their text was black #040A07 / #333333 at 13-17 dp. Outline buttons (shape_eq_waite,
+# shape_eq_edit: pink text on dark) and buttons pink only when selected (btn_text_size, btn_register_prepare) stay as they are.
+# The disabled state of btn_normal/btn_labble_save was Tribit's darkened yellow #B1A200 (patch 17 missed it: not in its
+# yellow list) - white on it is 2.61:1; it becomes pink darkened the same way (x 0.695) #B1125F, white on it 6.73:1
+# (WCAG relative luminance, computed by a script 2026-10-16).
+# [TESTED: 2026-10-16 · A51: «Выключение» of the speaker settings white bold on pink (shot 04_settings) ·
+# testcases/reports/2026-10-16_patch31_32.md] - the disabled state and the screens off our path not opened
+PINK_FILLED = ("btn_normal", "btn_login_new", "btn_login", "btn_hearing_yes", "btn_eq_button", "btn_labble_save",
+               "update_bg_new_version", "shape_ai_checked", "btn_quick_new", "btn_start", "btn_sound_manager")
+PINK_BUTTONS = 88
+BUTTON_TEXT_SP = 19.0
+DISABLED_PINK = "b1125f"
+PINK_BUTTON_TAG = re.compile(r'<[\w.]*(?:Button|TextView) [^>]*android:background="@drawable/(' + "|".join(PINK_FILLED) + r')"[^>]*>')
+# Three pink buttons are a RelativeLayout around an icon + a TextView (layout_no_device «add», two webview feedback rows):
+# the label goes white the same way, the black icon is tinted white.
+PINK_CONTAINER = re.compile(r'(<RelativeLayout [^>]*android:background="@drawable/(?:' + "|".join(PINK_FILLED) +
+                            r')"[^>]*>\s*<LinearLayout [^>]*>\s*<ImageView )([^>]*>\s*)(<TextView [^>]*>)')
+PINK_CONTAINERS = 3
+
+
+def _bigger_bold_white(tag, dimens):
+    """One widget tag: white text, bold, at least BUTTON_TEXT_SP."""
+    tag = re.sub(r' android:textColor="[^"]*"', "", tag)
+    tag = re.sub(r' android:textStyle="[^"]*"', "", tag)
+    size = re.search(r' android:textSize="([^"]*)"', tag)
+    if size:
+        v = size.group(1)
+        if v.startswith("@dimen/"):
+            v = dimens.get(v.split("/")[1], "0")
+        num = float(re.match(r"[\d.]+", v).group(0)) if re.match(r"[\d.]+", v) else 0.0
+        if num < BUTTON_TEXT_SP:
+            tag = tag.replace(size.group(0), f' android:textSize="{BUTTON_TEXT_SP}sp"')
+    else:
+        tag = tag.replace(" ", f' android:textSize="{BUTTON_TEXT_SP}sp" ', 1)
+    return tag.replace(" ", ' android:textColor="#ffffffff" android:textStyle="bold" ', 1)
+
+
+def patch_pink_buttons_white_text():
+    res = ROOT / "res"
+    dimens = dict(re.findall(r'<dimen name="([^"]+)">([^<]+)</dimen>', (res / "values/dimens.xml").read_text(encoding="utf-8")))
+    n = c = 0
+    for p in res.glob("layout*/*.xml"):
+        t = p.read_text(encoding="utf-8")
+        t2, k = PINK_BUTTON_TAG.subn(lambda m: _bigger_bold_white(m.group(0), dimens), t)
+        t2, kc = PINK_CONTAINER.subn(lambda m: m.group(1) + 'android:tint="#ffffffff" ' + m.group(2)
+                                     + _bigger_bold_white(m.group(3), dimens), t2)
+        if k or kc:
+            p.write_text(t2, encoding="utf-8")
+            n += k
+            c += kc
+    if n != PINK_BUTTONS or c != PINK_CONTAINERS:
+        sys.exit(f"FAIL: pink buttons {n} (expected {PINK_BUTTONS}), containers {c} (expected {PINK_CONTAINERS})")
+    _sub_once(res / "values/colors.xml", '<color name="common_button_enableed_55_bg">#ffb1a200</color>',
+              f'<color name="common_button_enableed_55_bg">#ff{DISABLED_PINK}</color>', "disabled button colour")
+    for d in ("shape_leable_disable_button", "shape_normal_button_enable", "shape_normal_button_not"):
+        p = res / f"drawable/{d}.xml"
+        t = p.read_text(encoding="utf-8")
+        p.write_text(re.sub("b1a200", DISABLED_PINK, t, flags=re.I), encoding="utf-8")
+    print(f"ok 31 pink buttons: white bold text >= {BUTTON_TEXT_SP:g} sp on {n} widgets + {c} icon buttons, "
+          f"disabled #{DISABLED_PINK.upper()}")
+
+
 # --- Patch 30 (TribitApp.initNetWork): TLS is verified again - no trust-all manager, no always-true hostname check ------------------------
 # bugs/03 (S1): TribitApp builds the app's only HTTP client with HttpSslFactory.generateSslConfig() - with no certificates
 # it falls back to UnSafeTrustManager (empty checkServerTrusted) - and UnSafeHostnameVerifier (verify -> true): anyone on
@@ -1220,6 +1286,7 @@ if __name__ == "__main__":
     patch_smaller_back()
     patch_no_support_link()
     patch_tls_verified()
+    patch_pink_buttons_white_text()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:
