@@ -1297,6 +1297,50 @@ def patch_connect_failed_dialog():
     print("ok 34 connection-failed dialog: tips only, the button opens our guide")
 
 
+# --- Patch 36: a settings value stands whole on the second line under its name ----------------------------------
+# Owner 2026-10-16 11:54 +03:00 (shot 2026-10-16_patch8/15_settings: «Обратный отсчет до выключения · В…», «Tribit
+# StormBox Blast…»): «Смысла такого сокращения нет» · «нужно переделывать красиво, может второй строкой»; 13:31 +03:00
+# interviews/interview_002 Q4 = A, whose text reads «в настройках второй строкой под «Имя устройства»» - one rule
+# for the class (the design scheme, MASTER_PLAN 11:18: «однотипность дизайна»). Class inventory 2026-10-16: a horizontal
+# row «name · value (singleLine, ellipsize end, weight 1) · arrow» - 29 rows in 14 settings layouts (tv_device_name 14,
+# tv_sleep_time_new 11, tv_sleep_time 2, tv_device_light 2). Now the name and the value stand in a vertical block, the
+# value under the name in grey, wrapping whole words; the row grows from its fixed height (min 60 dp kept).
+# Mock-up of the three ways (A chosen): design/variants/settings_values.html.
+# [TESTED: 2026-10-16 · A51 Blast 2 settings: «Tribit StormBox Blast 2» whole under «Имя устройства», «Выключить» under
+# «Обратный отсчет до выключения» (shot 2026-10-16_patch36/01_settings) · testcases/reports/2026-10-16_patch31_32.md] - other 13 layouts not opened
+SETTINGS_VALUE_ROW = re.compile(r'(<LinearLayout [^>]*>)(\s*)(<TextView [^>]*/>)\s*'
+                                r'(<TextView [^>]*android:singleLine="true"[^>]*android:layout_weight="1.0"[^>]*/>)(\s*)'
+                                r'(<ImageView [^>]*/>)(\s*</LinearLayout>)')
+SETTINGS_VALUE_ROWS = 29
+
+
+def _value_under_name(m):
+    outer, ws, name, value, ws2, arrow, end = m.groups()
+    h = re.search(r' android:layout_height="(@dimen/dp_\d+)"', outer)
+    if not h:
+        sys.exit(f"FAIL: settings row height: {outer[:120]}")
+    outer = outer.replace(h.group(0), f' android:layout_height="wrap_content" android:minHeight="{h.group(1)}"')
+    for attr in ("singleLine", "ellipsize", "gravity", "layout_marginLeft", "layout_weight"):
+        value = re.sub(rf' android:{attr}="[^"]*"', "", value)
+    value = value.replace('android:layout_width="0.0dip"', 'android:layout_width="fill_parent" android:layout_marginTop="@dimen/dp_2"')
+    block = ('<LinearLayout android:orientation="vertical" android:layout_width="0.0dip" '
+             'android:layout_height="wrap_content" android:layout_weight="1.0">')
+    return f"{outer}{ws}{block}{ws}    {name}{ws}    {value}{ws}</LinearLayout>{ws2}{arrow}{end}"
+
+
+def patch_settings_value_under_name():
+    n = 0
+    for p in ROOT.glob("res/layout/*.xml"):
+        t = p.read_text(encoding="utf-8")
+        t2, k = SETTINGS_VALUE_ROW.subn(_value_under_name, t)
+        if k:
+            p.write_text(t2, encoding="utf-8")
+            n += k
+    if n != SETTINGS_VALUE_ROWS:
+        sys.exit(f"FAIL: settings value rows {n}, expected {SETTINGS_VALUE_ROWS}")
+    print(f"ok 36 settings: the value under its name in {n} rows")
+
+
 # --- Patch 35 (release only): no request and answer bodies in the system log -------------------------------------
 # researches/09 (dislikes, item 3), plans/02 «Баги проекта»: TribitApp.initNetWork builds EasyHttp with
 # setLogEnabled(true) in their store build - every request and answer, the guest token and username included, goes to
@@ -1465,6 +1509,7 @@ if __name__ == "__main__":
     patch_no_tribit_links()
     patch_settings_guide_row()
     patch_connect_failed_dialog()
+    patch_settings_value_under_name()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:

@@ -1,0 +1,67 @@
+<!doctype html>
+<!-- Mock-up for interviews/interview_003 Q1: how a settings row shows a long value. Material: the rows of the A51
+     Blast 2 settings screen (testcases/reports/shots/2026-10-16_patch31/04_settings.webp); width 411 px = the A51 screen
+     in dp (1080 px at 420 dpi); sizes in px = dp of their layout (label 15, row 56) x the A51 font scale 1.1; card 367 px = the card on that shot. Rendered to
+     interviews/interview_003_pictures/1_settings_values.webp: chrome --headless --screenshot=<png> --window-size=1349,400
+     file:///D:/work/ai_sandbox/KrinikTribit/design/variants/settings_values.html, then magick <png> -quality 85 <webp>. -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin: 0; background: #0D0D0D; font-family: Roboto, "Segoe UI", sans-serif; color: #fff; }
+  .sheet { display: flex; gap: 24px; padding: 20px; }
+  .phone { width: 411px; background: #1A1A1A; border-radius: 18px; padding: 14px 0 18px; }
+  .tag { font: bold 22px sans-serif; color: #FF1A8C; padding: 0 22px 6px; }
+  .note { font-size: 13px; color: #9a9a9a; padding: 0 22px 12px; min-height: 34px; }
+  .card { margin: 0 22px; background: #2B2B2D; border-radius: 12px; }
+  .row { display: flex; align-items: center; padding: 0 15px; min-height: 56px; border-bottom: 1px solid #424242; }
+  .row:last-child { border-bottom: 0; }
+  .label { font-size: 16.5px; }
+  .value { font-size: 16.5px; color: #8a8a8a; }
+  .arrow { color: #8a8a8a; font-size: 18px; margin-left: 6px; }
+  /* A: value on its own line under the label */
+  .a .row { flex-wrap: wrap; padding-top: 9px; padding-bottom: 9px; }
+  .a .text { flex: 1; }
+  .a .value { display: block; font-size: 15.4px; margin-top: 2px; }
+  /* B: label and value side by side, each wraps onto as many lines as it needs */
+  .b .label { flex: 1; padding: 9px 10px 9px 0; }
+  .b .value { max-width: 45%; text-align: right; padding: 9px 0; }
+  /* C: the value stays on the right while it fits, a long one goes to the second line, right-aligned */
+  .c .row { flex-wrap: wrap; padding-top: 9px; padding-bottom: 9px; }
+  .c .label { flex: 1 1 auto; }
+  .c .value.long { flex: 1 0 100%; text-align: right; order: 3; margin-top: 2px; }
+  .c .arrow { order: 2; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="phone a">
+    <div class="tag">A</div>
+    <div class="note">значение — второй строкой под названием</div>
+    <div class="card">
+      <div class="row"><div class="text"><span class="label">Имя устройства</span><span class="value">Tribit StormBox Blast 2</span></div><span class="arrow">›</span></div>
+      <div class="row"><div class="text"><span class="label">Голосовая подсказка</span><span class="value">Включить</span></div><span class="arrow">›</span></div>
+      <div class="row"><div class="text"><span class="label">Обратный отсчет до выключения</span><span class="value">Выключить</span></div><span class="arrow">›</span></div>
+    </div>
+  </div>
+  <div class="phone b">
+    <div class="tag">B</div>
+    <div class="note">название и значение рядом, каждое переносится целыми словами</div>
+    <div class="card">
+      <div class="row"><span class="label">Имя устройства</span><span class="value">Tribit StormBox Blast 2</span><span class="arrow">›</span></div>
+      <div class="row"><span class="label">Голосовая подсказка</span><span class="value">Включить</span><span class="arrow">›</span></div>
+      <div class="row"><span class="label">Обратный отсчет до выключения</span><span class="value">Выключить</span><span class="arrow">›</span></div>
+    </div>
+  </div>
+  <div class="phone c">
+    <div class="tag">C</div>
+    <div class="note">значение справа, пока влезает; длинное — второй строкой справа</div>
+    <div class="card">
+      <div class="row"><span class="label">Имя устройства</span><span class="arrow">›</span><span class="value long">Tribit StormBox Blast 2</span></div>
+      <div class="row"><span class="label">Голосовая подсказка</span><span class="value">Включить</span><span class="arrow">›</span></div>
+      <div class="row"><span class="label">Обратный отсчет до выключения</span><span class="arrow">›</span><span class="value long">Выключить</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
