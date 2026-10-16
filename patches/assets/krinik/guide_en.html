@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>User guide</title>
+<style>
+  :root { --bg: #0D0D0D; --card: #1D1E20; --text: #FFFFFF; --muted: #B8B8B8; --pink: #FF1A8C; }
+  body { margin: 0; padding: 16px 20px 40px; background: var(--bg); color: var(--text);
+         font: 16px/1.5 sans-serif; }
+  h1 { font-size: 24px; margin: 8px 0 4px; letter-spacing: 0.04em; }
+  h2 { font-size: 18px; margin: 28px 0 8px; }
+  h2 span { color: var(--pink); margin-right: 6px; }
+  p, li { color: var(--text); }
+  .lead { color: var(--muted); margin-top: 0; }
+  ol, ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .card { background: var(--card); border-radius: 12px; padding: 12px 16px; margin: 10px 0; }
+  .path { color: var(--pink); font-weight: bold; }
+  a { color: var(--pink); }
+</style>
+</head>
+<body>
+<h1>KRINIK TRIBIT</h1>
+<p class="lead">The Tribit app with fixes: no account, no Firebase, no location.</p>
+
+<h2><span>1</span>Connecting a speaker</h2>
+<ol>
+  <li>Turn on the speaker and Bluetooth on your phone.</li>
+  <li>Open Krinik Tribit and tap “START”.</li>
+  <li>Allow access to nearby devices: the phone needs it to find the speaker over Bluetooth. The app does not ask
+    for your location.</li>
+  <li>On the home screen, tap “Tap to Add Device” and pick your speaker.</li>
+</ol>
+
+<h2><span>2</span>Equalizer</h2>
+<p>On the speaker page, open “Sound Effects”. To create your own equalizer, tap “New Custom”. An equalizer name holds up to
+  15 characters.</p>
+<p>The “Device Name” row of the speaker settings (the gear on the speaker page) renames the speaker, up to 25
+  characters.</p>
+
+<h2><span>3</span>Speaker firmware</h2>
+<p>The app checks the firmware when you tap the “Firmware Version” row of the speaker settings. It then asks the
+  Tribit server whether there is new firmware for this model and shows the answer.</p>
+
+<h2><span>4</span>Privacy</h2>
+<p>Krinik Tribit respects your privacy and the GDPR. The Tribit server cannot tell who you are.</p>
+<p>A <b>guest</b> is a sign-in to the Tribit server with no account and no personal data. The app works like this:</p>
+<ul>
+  <li>there is no account: the app signs in to the Tribit server as an anonymous guest;</li>
+  <li>the guest ID, the phone model and the Android version in its requests are random: the app picks them once and keeps
+    them until the app's data is cleared;</li>
+  <li>only four kinds of requests reach the Tribit server: the guest sign-in, the speaker catalog, the firmware check
+    and the translations of the interface;</li>
+  <li>Firebase (analytics with the advertising ID, Crashlytics, push messages) is removed from the app.</li>
+</ul>
+
+<h2><span>5</span>A new anonymous guest</h2>
+<p>To sign in to the Tribit server as another guest, clear the app's data in Android. The app then picks a new
+  random guest ID, phone model and Android version.</p>
+<div class="card">
+  <p class="path">Settings → Apps → Krinik Tribit → Storage → Clear data</p>
+</div>
+<p>After a reinstall the app also signs in as another guest.</p>
+
+<h2><span>6</span>Krinik Tribit on GitHub</h2>
+<p>The source of the fixes, the build and the test reports:
+  <a href="https://github.com/MikalaiKryvusha/KrinikTribitApp">github.com/MikalaiKryvusha/KrinikTribitApp</a></p>
+</body>
+</html>

@@ -1139,6 +1139,86 @@ def patch_pink_buttons_white_text():
           f"disabled #{DISABLED_PINK.upper()}")
 
 
+# --- Patch 32: no way out to Tribit - our user guide, our GitHub ---------------------------------------------------
+# Owner 2026-10-16 13:32 +03:00: «ни на какую поддерку Трибита и на их сайт, форумы - мы не ведем из Krinik Tribit. Убираем
+# это. В О приложении будет ссылка на GH Криника»; 13:38 +03:00 (interviews/interview_002 Q3): the user guide in the app
+# tells that «очистить данные приложения» starts a new anonymous guest. Inventory 2026-10-16 (decompiled sources, grep of
+# tribit.com|saasadmin|1000shores|startWithUrl|FeedBack*Activity.class):
+#   a. help center (gtwt.1000shores.cn/tribit_help_*): MineActivity, MineFragment, DeviceHelpNewActivity .goHelpCenter and
+#      UpdateUtils.goDeviceHelp (the «?» of 17 speaker and earphone pages, plus their FAQ URLs from the server) - all four
+#      open krinik.Guide instead: our guide from assets/krinik/guide_<ru|en>.html in their own web view screen;
+#   b. profile rows «Tribit.com» (ll_mian_page) and «Rate us» (ll_evaluate, the store page) - gone; the «help center» row
+#      is labelled «Руководство пользователя» (krinik.Guide.title);
+#   c. About: Tribit's logo -> our tile; their privacy/terms links (saasadmin.tribit.com) - gone; «Contact:
+#      support@tribit.com» -> our GitHub as a link;
+#   d. not touched: the login/registration privacy links (screens unreachable without an account, patch 8), the support
+#      form of WebViewHelpActivity (reached only through goDeviceHelp, now the guide), DialogDefault -> FeedBackActivity
+#      (sending cut by krinik.Gate), «About Audiodo» (not Tribit).
+# [TESTED: 2026-10-16 · A51: profile without Tribit.com / Rate us, the guide row and the Blast 2 «?» open guide_ru.html
+# with 0 requests, About shows our tile and the GitHub link (opened in Chrome) · testcases/reports/2026-10-16_patch31_32.md]
+# - MineFragment, the other 16 «?» families and guide_en.html not opened
+GUIDE_DIR = pathlib.Path(__file__).resolve().parent / "assets" / "krinik"
+GUIDE_FILES = ("guide_ru.html", "guide_en.html")
+GUIDE_OPEN = "    .locals 0\n\n    invoke-static {}, Lkrinik/Guide;->open()V\n\n    return-void\n.end method"
+HELP_ENTRIES = [
+    ("com.thousandshores.tribit.modulemine.activity.MineActivity", ".method private final goHelpCenter()V"),
+    ("com.thousandshores.tribit.modulemine.fragment.MineFragment", ".method private final goHelpCenter()V"),
+    ("com.thousandshores.tribit.moduledevice.activity.DeviceHelpNewActivity", ".method public final goHelpCenter()V"),
+    ("com.thousandshores.tribit.utils.UpdateUtils", ".method public final goDeviceHelp(Ljava/lang/String;Ljava/util/ArrayList;)V"),
+]
+HELP_CENTER_LABEL = re.compile(
+    r"(const (v\d+), 0x7f1202e7\n\n(?:    \.line \d+\n)?    )"   # R.string.help_center
+    r"invoke-static \{\2\}, Lcom/thousandshores/tool/utils/ResourceUtils;->getString\(I\)Ljava/lang/String;")
+CONTACT_EMAIL = re.compile(
+    r"(const (v\d+), 0x7f1201c6\n\n(?:    \.line \d+\n)?    )"   # R.string.contact_email
+    r"invoke-static \{\2\}, Lcom/thousandshores/tool/utils/ResourceUtils;->getString\(I\)Ljava/lang/String;")
+
+
+def _view_attr(path, view_id, old, new):
+    """Edit one attribute of the single tag with android:id=@id/<view_id>."""
+    t = path.read_text(encoding="utf-8")
+    tags = re.findall(rf'<[\w.]+ [^>]*android:id="@id/{view_id}"[^>]*>', t)
+    if len(tags) != 1 or old not in tags[0]:
+        sys.exit(f"FAIL: {view_id} in {path.name}: {len(tags)} tag(s) or no «{old}»")
+    path.write_text(t.replace(tags[0], tags[0].replace(old, new, 1)), encoding="utf-8")
+
+
+def patch_no_tribit_links():
+    for name in GUIDE_FILES:
+        data = (GUIDE_DIR / name).read_bytes()
+        if b"KRINIK TRIBIT" not in data or b"github.com/MikalaiKryvusha/KrinikTribitApp" not in data:
+            sys.exit(f"FAIL: guide {name} has no title or no GitHub link")
+        target = ROOT / "assets" / "krinik" / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+    # a. every help-center entry opens our guide
+    for cls, header in HELP_ENTRIES:
+        replace_method(smali(cls), header, header + "\n" + GUIDE_OPEN)
+    # b. profile
+    mine = smali("com.thousandshores.tribit.modulemine.activity.MineActivity")
+    t, k = HELP_CENTER_LABEL.subn(r"\1invoke-static {\2}, Lkrinik/Guide;->title(I)Ljava/lang/String;", mine.read_text(encoding="utf-8"))
+    if k != 1:
+        sys.exit(f"FAIL: profile help label sites {k}, expected 1")
+    mine.write_text(t, encoding="utf-8")
+    layout = ROOT / "res/layout/activity_mine.xml"
+    _view_attr(layout, "ll_mian_page", 'android:visibility="visible"', 'android:visibility="gone"')
+    _view_attr(layout, "ll_evaluate", "<LinearLayout ", '<LinearLayout android:visibility="gone" ')
+    # c. About
+    about = ROOT / "res/layout/activity_about.xml"
+    _view_attr(about, "iv_logo", 'android:src="@mipmap/ic_logo_tribit"', 'android:src="@drawable/krinik_logo_tile"')
+    _view_attr(about, "iv_logo", 'android:layout_width="@dimen/dp_170"', 'android:layout_width="@dimen/dp_60"')
+    _view_attr(about, "tv_privacy", "<TextView ", '<TextView android:visibility="gone" ')
+    _view_attr(about, "tv_contact", 'android:textColor="@color/text_gray"',
+               'android:textColor="#ffff1a8c" android:textColorLink="#ffff1a8c" android:autoLink="web"')
+    act = smali("com.thousandshores.tribit.modulemine.activity.AboutActivity")
+    t, k = CONTACT_EMAIL.subn(r"\1invoke-static {\2}, Lkrinik/Guide;->github(I)Ljava/lang/String;", act.read_text(encoding="utf-8"))
+    if k != 1:
+        sys.exit(f"FAIL: About contact sites {k}, expected 1")
+    act.write_text(t, encoding="utf-8")
+    print(f"ok 32 no Tribit links: {len(HELP_ENTRIES)} help entries -> our guide ({len(GUIDE_FILES)} pages), "
+          "profile Tribit.com and Rate us gone, About -> GitHub")
+
+
 # --- Patch 30 (TribitApp.initNetWork): TLS is verified again - no trust-all manager, no always-true hostname check ------------------------
 # bugs/03 (S1): TribitApp builds the app's only HTTP client with HttpSslFactory.generateSslConfig() - with no certificates
 # it falls back to UnSafeTrustManager (empty checkServerTrusted) - and UnSafeHostnameVerifier (verify -> true): anyone on
@@ -1287,6 +1367,7 @@ if __name__ == "__main__":
     patch_no_support_link()
     patch_tls_verified()
     patch_pink_buttons_white_text()
+    patch_no_tribit_links()
     patch_device_base()
     make_dex_room()
     if "--debug" in sys.argv[2:]:

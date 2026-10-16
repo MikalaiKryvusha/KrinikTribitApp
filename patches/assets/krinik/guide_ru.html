@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Руководство пользователя</title>
+<style>
+  :root { --bg: #0D0D0D; --card: #1D1E20; --text: #FFFFFF; --muted: #B8B8B8; --pink: #FF1A8C; }
+  body { margin: 0; padding: 16px 20px 40px; background: var(--bg); color: var(--text);
+         font: 16px/1.5 sans-serif; }
+  h1 { font-size: 24px; margin: 8px 0 4px; letter-spacing: 0.04em; }
+  h2 { font-size: 18px; margin: 28px 0 8px; }
+  h2 span { color: var(--pink); margin-right: 6px; }
+  p, li { color: var(--text); }
+  .lead { color: var(--muted); margin-top: 0; }
+  ol, ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .card { background: var(--card); border-radius: 12px; padding: 12px 16px; margin: 10px 0; }
+  .path { color: var(--pink); font-weight: bold; }
+  a { color: var(--pink); }
+</style>
+</head>
+<body>
+<h1>KRINIK TRIBIT</h1>
+<p class="lead">Приложение Tribit с исправлениями: без аккаунта, без Firebase, без геолокации.</p>
+
+<h2><span>1</span>Подключение колонки</h2>
+<ol>
+  <li>Включите колонку и Bluetooth на телефоне.</li>
+  <li>Откройте Krinik Tribit и нажмите «START».</li>
+  <li>Разрешите доступ к устройствам поблизости: без него телефон не найдёт колонку по Bluetooth. Геолокацию
+    приложение не просит.</li>
+  <li>На главном экране нажмите «Tap to Add Device» и выберите свою колонку.</li>
+</ol>
+
+<h2><span>2</span>Эквалайзер</h2>
+<p>На странице колонки откройте «Sound Effects». Чтобы создать свой эквалайзер, нажмите «New Custom». Имя эквалайзера — до
+  15 символов.</p>
+<p>Имя колонки (до 25 символов) меняет строка «Имя устройства» в настройках колонки: шестерёнка на странице
+  колонки.</p>
+
+<h2><span>3</span>Прошивка колонки</h2>
+<p>Приложение проверяет прошивку, когда вы нажимаете строку «Версия прошивки» в настройках колонки. После нажатия
+  приложение спросит сервер Tribit, есть ли новая прошивка для этой модели, и покажет ответ.</p>
+
+<h2><span>4</span>Приватность</h2>
+<p>Krinik Tribit уважает приватность пользователя и GDPR. Сервер Tribit не может установить личность человека.</p>
+<p><b>Гость</b> — это вход на сервер Tribit без аккаунта и без данных человека. Приложение работает так:</p>
+<ul>
+  <li>аккаунта нет — приложение входит на сервер Tribit анонимным гостем;</li>
+  <li>ID гостя, модель телефона и версия Android в запросах случайные: приложение выбирает их один раз и хранит
+    до очистки данных приложения;</li>
+  <li>к серверу Tribit уходят только четыре вида запросов: вход гостя, каталог колонок, проверка прошивки и переводы
+    строк интерфейса;</li>
+  <li>Firebase (аналитика с рекламным ID, Crashlytics, пуши) удалён из приложения.</li>
+</ul>
+
+<h2><span>5</span>Новый анонимный гость</h2>
+<p>Чтобы приложение вошло на сервер Tribit другим гостем, очистите данные приложения в Android. После очистки
+  приложение выберет новые случайные ID гостя, модель телефона и версию Android.</p>
+<div class="card">
+  <p class="path">Настройки → Приложения → Krinik Tribit → Хранилище → Очистить данные</p>
+  <p class="lead">На телефонах Samsung раздел «Хранилище» называется «Память».</p>
+</div>
+<p>После переустановки приложение тоже входит другим гостем.</p>
+
+<h2><span>6</span>Krinik Tribit на GitHub</h2>
+<p>Исходники исправлений, сборка и отчёты о проверках:
+  <a href="https://github.com/MikalaiKryvusha/KrinikTribitApp">github.com/MikalaiKryvusha/KrinikTribitApp</a></p>
+</body>
+</html>
