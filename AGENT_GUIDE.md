@@ -519,9 +519,14 @@ bash build.sh debug     # «Debug Krinik Tribit», com.kriniks.tribit.debug, bes
 bash build.sh           # release «Krinik Tribit», the original package
 ```
 
-Krinik Tribit is the official Tribit app 5.0.0 with our patches (the owner's word 2026-10-16: «чиним ИХ приложение»).
-The build runs in Git Bash: APKEditor merges the splits of `original-apk/` into `work/merged.apk`, apktool decodes it from scratch,
-`patches/apply.py` applies every patch (each fails with exit 1 when its anchor is missing), apktool rebuilds,
+Krinik Tribit is the official Tribit app 5.0.0 with our fixes (the owner's word 2026-10-16: «чиним ИХ приложение»).
+**Fixes are written as native code in `native/`** — Tribit's apktool tree (smali + resources) in its own git repository,
+remote the PRIVATE `MikalaiKryvusha/KrinikTribitNative`, ignored by this public storefront (`HOUSE_RULES.md` R9). Its first
+commit is the untouched decode, its second the patches 1–36 applied (`patches/apply.py --common`); every later fix is a
+commit there. The build runs in Git Bash: `build.sh` copies `native/` into `work/base` (without `.git` and `build/`),
+`patches/apply.py --variant` adds only the variant step (debug package; release without the HTTP log), apktool rebuilds,
+our Java (`patches/java/krinik/`) becomes one extra dex. Without `native/` the old path still works: APKEditor merges the
+splits of `original-apk/` into `work/merged.apk`, apktool decodes it, `patches/apply.py` applies every patch, apktool rebuilds,
 `zipalign` + `apksigner` from `C:/Android/Sdk/build-tools/36.0.0` sign it
 (`keys/`, one key per variant, created on first run, outside git). Output: `out/KrinikTribit-<variant>.apk` - one universal APK merged from the splits by APKEditor 1.4.9 (`tools/`, outside git). JDK 21 is set inside the script
 (`C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot`); `zipalign`/`apksigner` are not on PATH — the script

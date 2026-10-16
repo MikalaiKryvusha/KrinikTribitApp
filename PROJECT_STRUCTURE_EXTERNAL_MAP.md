@@ -20,6 +20,8 @@ KrinikTribit/
 ├── .kaif/ .claude/ .agents/ .grok/ .cline/ .roo/ .clinerules/   # KAIF machinery and skills (5 agent systems)
 │
 │   — local only, never in git (proprietary or secret) —
+├── native/                 # OWN git repo (private remote MikalaiKryvusha/KrinikTribitNative): Tribit's apktool tree with
+│                           #   our fixes as native code (HOUSE_RULES R9); build.sh builds from it
 ├── original-apk/           # the official split APKs pulled from the tablet
 ├── decompiled/             # jadx sources of base.apk (read-only evidence)
 ├── work/base/              # apktool tree the patches run on (rebuilt from scratch by build.sh)
@@ -32,7 +34,8 @@ KrinikTribit/
 
 | Path | What it is | Depends on / references |
 |------|-----------|-------------------------|
-| `patches/apply.py` | patch set of the fork; anchors are exact smali/XML text | `work/base/` (written by `build.sh`) |
+| `native/` (private repo) | Tribit 5.0.0 decoded by apktool + our fixes; new fixes are commits here | `build.sh` copies it into `work/base/` |
+| `patches/apply.py` | patches 1–36 (how `native/` commit 2 was made) and the variant step `--variant` | `work/base/` (written by `build.sh`) |
 | `build.sh` | the fork's build | `original-apk/`, `tools/apktool.jar`, `patches/apply.py`, SDK build-tools 36.0.0 |
 | `researches/03_tribit_app_pains.md` | the pain list + protocol notes; code quotes point into `decompiled/` and `work/base/` | `01_play_reviews.md`, `diagnostics/` |
 | `researches/01_play_reviews/make-reviews-md.mjs` | generates `01_play_reviews.md` from the ignored raw JSON beside it | `play-reviews-raw.json` (local) |

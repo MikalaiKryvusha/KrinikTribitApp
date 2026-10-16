@@ -32,8 +32,17 @@ if [ ! -f work/merged.apk ] || [ -n "$(find original-apk -name '*.apk' -newer wo
 fi
 
 rm -rf work/base "$OUT" out/aligned.apk
-"$JAVA" -jar tools/apktool.jar d -f -o work/base work/merged.apk >/dev/null
-if [ "$VARIANT" = debug ]; then python -I patches/apply.py work/base --debug; else python -I patches/apply.py work/base; fi
+if [ -d native/smali ]; then
+  # The native tree (native/ = the private repository KrinikTribitNative: Tribit's decoded code with our fixes written in
+  # it) is copied without its .git and apktool's build/; only the variant step is applied on top.
+  mkdir -p work/base
+  tar -C native --exclude=./.git --exclude=./.gitignore --exclude=./build -cf - . | tar -C work/base -xf -
+  if [ "$VARIANT" = debug ]; then python -I patches/apply.py work/base --variant --debug; else python -I patches/apply.py work/base --variant; fi
+else
+  # No native tree on this machine: decode the merged APK and apply every patch (the way the native tree was made).
+  "$JAVA" -jar tools/apktool.jar d -f -o work/base work/merged.apk >/dev/null
+  if [ "$VARIANT" = debug ]; then python -I patches/apply.py work/base --debug; else python -I patches/apply.py work/base; fi
+fi
 "$JAVA" -jar tools/apktool.jar b work/base -o out/unsigned.apk >/dev/null
 
 # Our own code (patches/java, e.g. krinik.ScrollFix of patch 16) -> one extra classesN.dex inside the APK.

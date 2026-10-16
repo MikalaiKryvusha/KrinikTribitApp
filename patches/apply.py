@@ -1476,6 +1476,15 @@ def variant_debug():
 if __name__ == "__main__":
     if ROOT is None or not (ROOT / "apktool.yml").exists():
         sys.exit("usage: python -I patches/apply.py <apktool-decoded-dir>")
+    # --variant: the tree already carries every shared fix (a copy of native/, the private repository KrinikTribitNative);
+    # only the variant step runs: debug -> its own package beside the original; release -> no HTTP log (patch 35).
+    if "--variant" in sys.argv[2:]:
+        if "--debug" in sys.argv[2:]:
+            variant_debug()
+        else:
+            patch_release_quiet_http()
+        print("variant applied")
+        sys.exit(0)
     patch_unnamed_eq_crash()
     patch_no_location()
     patch_stable_density()
@@ -1512,7 +1521,11 @@ if __name__ == "__main__":
     patch_settings_value_under_name()
     patch_device_base()
     make_dex_room()
-    if "--debug" in sys.argv[2:]:
+    # --common: the fixes shared by both variants only - the state committed to the private native repository
+    # (KrinikTribitNative, owner 2026-10-16 ≈ 14:25 +03:00: «давай сделаем приватный репозиторий, в нем работаем с нативным кодом»).
+    if "--common" in sys.argv[2:]:
+        pass
+    elif "--debug" in sys.argv[2:]:
         variant_debug()
     else:
         patch_release_quiet_http()

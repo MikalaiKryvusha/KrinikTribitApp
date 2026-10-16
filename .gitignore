@@ -2,6 +2,10 @@
 /original-apk/
 /decompiled/
 /work/
+# The private working repository with Tribit's decoded code (smali + resources) - its own .git, remote
+# MikalaiKryvusha/KrinikTribitNative (private). Owner 2026-10-16 ≈ 14:27 +03:00: «текущий репозиторий остаётся витриной»
+# · «Новый приватный реп - просто скрытая рабочая репа для работы с нативным декомпилированным кодом».
+/native/
 /out/
 /tools/apktool.jar
 /tools/jadx/
