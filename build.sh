@@ -54,13 +54,20 @@ rm -rf work/java && mkdir -p work/java/classes work/java/dex work/java/r work/ja
 SOURCES=$(find patches/java -name '*.java')
 CLASSPATH="$ANDROID_JAR"
 D8_CP=()
+if [ -d native/src ] && [ -n "$(find native/src -name '*.kt')" ]; then
+  # The guard and the counter accept .kt, but kotlinc is not in the build yet (plans/03, phase 4): a .kt file would count
+  # as migrated while its class is missing from the APK.
+  echo "FAIL: Kotlin sources in native/src but no kotlinc step yet: $(find native/src -name '*.kt' | head -3)"; exit 1
+fi
 if [ -d native/src ] && [ -n "$(find native/src -name '*.java')" ]; then
   # A class written as source must not keep its smali: Android would run the first copy (tools/native_src_guard.py).
   python -I tools/native_src_guard.py native
   # Their classes as a jar - what the sources compile against; R from apktool's public.xml - compile time only.
   [ -f "$DEX2JAR" ] || { echo "FAIL: $DEX2JAR missing - gh release download 2.4.38 -R ThexXTURBOXx/dex2jar"; exit 1; }
-  cmd //c "${DEX2JAR//\//\\} -f -o work\\java\\app.jar out\\unsigned.apk" >/dev/null 2>&1
-  [ -f work/java/app.jar ] || { echo "FAIL: dex2jar wrote no work/java/app.jar"; exit 1; }
+  cmd //c "${DEX2JAR//\//\\} -f -o work\\java\\app.jar out\\unsigned.apk" > work/java/dex2jar.log 2>&1 || true
+  if [ ! -f work/java/app.jar ] || ls work/java/*-error.zip >/dev/null 2>&1 || ls ./*-error.zip >/dev/null 2>&1; then
+    echo "FAIL: dex2jar of out/unsigned.apk failed (no app.jar or an *-error.zip):"; cat work/java/dex2jar.log; exit 1
+  fi
   python -I tools/gen_r.py native/res/values/public.xml work/java/r com.thousandshores.tribit com.thousandshores.tool \
     com.thousandshores.commondialog com.thousandshores.widget com.thousandshores.bluetoothlib
   "$JAVA_HOME/bin/javac" --release 11 -nowarn -d work/java/rclasses $(find work/java/r -name '*.java')

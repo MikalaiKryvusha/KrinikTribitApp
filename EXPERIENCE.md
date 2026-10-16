@@ -92,6 +92,20 @@
 **Lesson:** capture lessons at the level of *approach* (what worked / what to avoid), not defect detail
 (that lives in `bugs/`); one short entry beats a long story.   → link: (none)
 
+### EXP-0011 · 2026-10-16 · ❌→✅ · #java #decompile #measurement
+class: claim-before-evidence
+none-cheap: a one-off measurement trap; the spike script (work/spike/compile_spike.py, researches/10 §3) now runs two passes
+**Context:** measuring whether jadx's Java of Tribit's code compiles (epic plans/03).
+**Tried / did:** the first `javac` run reported 48 errors in 11 files - all parse errors; javac stops before type checking
+when any file fails to parse, so the real count was hidden. Excluding the 11 files gave 23 743; generating R from apktool's
+public.xml (the APK has no R classes, R8 inlined them) brought it to 4 661 in 959 of 1 940 files.
+**Result:** ✅ the number in researches/10 is the type-check count; «48 errors» never reached a document.
+**Lesson:** a compiler's error count is a stage count - exclude the files that fail to parse, then count again; and an
+R8-built APK has no R classes, generate R from public.xml.
+**Repro:** `python -I work/spike/compile_spike.py` (from `work/`) prints «pass 1 … (parse stage)» and «pass 2 …» separately.
+**Trigger:** measuring «does it compile» → two passes, parse then types.
+**Not for:** single-file compiles, where the first error is the answer.
+
 ### EXP-0010 · 2026-10-16 · ❌→✅ · #build #smali #dex
 class: dex-reference-limit
 mechanized: patches/apply.py make_dex_room (kotlin-reflect moved to smali_classes6; the build fails loudly if the move breaks)
