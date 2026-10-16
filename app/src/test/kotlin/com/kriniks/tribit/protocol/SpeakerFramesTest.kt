@@ -32,6 +32,8 @@ class SpeakerFramesTest {
         assertEquals(listOf(13, 84), frames.map { it.cmd })
         assertEquals(listOf(10, 10), frames.map { it.u8(0) })
         assertTrue(frames.all { it.sumOk })
+        // The notice alone moves the volume - the speaker's own buttons send it too (researches/11 §3.6).
+        assertEquals(10, SpeakerState(volume = 9).apply(frames[1]).volume)
     }
 
     @Test fun `echo of play and pause`() {

@@ -21,6 +21,13 @@ object Blast2 {
     const val CMD_VOLUME_GET = 18
     const val CMD_PLAY_STATE = 19
 
+    /**
+     * Sent by the speaker unasked when its volume changes - by our command or by its own buttons; payload[0] = 0..31.
+     * Their app handles it as command 18 (smali `ViewModelDeviceBts.smali:1922` packed-switch 0x52, `researches/11` §3.6);
+     * observed on the A51 2026-10-16 16:17:51: `EA 05 54 0A` after a volume set to 10.
+     */
+    const val CMD_VOLUME_NOTICE = 84
+
     /** Volume steps of the speaker: their slider `setMax(31)` (`Bts56ControlActivity.java:1269`). */
     const val VOLUME_MAX = 31
 
@@ -65,7 +72,7 @@ data class SpeakerState(
     fun apply(f: Frame): SpeakerState = when (f.cmd) {
         Blast2.CMD_VERSION -> Blast2.version(f)?.let { copy(version = it) } ?: this
         Blast2.CMD_BATTERY -> f.u8(0).takeIf { it in 0..100 }?.let { copy(battery = it) } ?: this
-        Blast2.CMD_VOLUME_GET -> f.u8(0).takeIf { it in 0..Blast2.VOLUME_MAX }?.let { copy(volume = it) } ?: this
+        Blast2.CMD_VOLUME_GET, Blast2.CMD_VOLUME_NOTICE -> f.u8(0).takeIf { it in 0..Blast2.VOLUME_MAX }?.let { copy(volume = it) } ?: this
         // Their reading of command 2: payload 3 = paused, anything else = playing (`ViewModelDeviceBts.bts56Read`).
         Blast2.CMD_PLAY -> if (f.u8(0) < 0) this else copy(playing = f.u8(0) != Blast2.PAUSE)
         // Command 19 carries the raw state; their mapping of its values is not in the code we read - logged, not shown.
