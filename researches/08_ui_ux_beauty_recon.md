@@ -79,6 +79,12 @@ them to the owner, and his verdict fixes them.[/AI]
    speaker settings, app settings) shot on the A51, one sheet, every seam marked with its class K1–K7.
 2. **Mock-ups of the speaker page and the EQ editor** — the two screens people use most — in HTML on our material (Blast 2,
    its real battery, presets and bands), 2–3 variants side by side on one sheet, built with the KARTUN shooter.
-3. The owner chooses; the chosen variant becomes the reference, and the patches rework the layouts toward it (their screens
+4. **Testing on devices** — the owner, 2026-10-16 11:19 +03:00: «тестирование макетов и получающегося UI на устройствах, чтобы выглядело красиво». Mock-ups are shot at the dp sizes of our screen profiles
+   (`tools/screen_profile.py list`: Titan 533×853, small 360×640, design 375×667, tab7 600×960, and landscape); the
+   patched UI is shot on the A51 in the same profiles (`screen_profile.py apply …` + `testcases/snap.py`); one sheet per
+   screen puts the chosen mock-up beside the real result; every sheet walks K1–K7 and the contrast check of §6, and the
+   run leaves a report in `testcases/reports/`. The owner's eye gives the verdict on beauty; the agent's check gives the
+   seams and the numbers first.
+5. The owner chooses; the chosen variant becomes the reference, and the patches rework the layouts toward it (their screens
    are fixed, not rewritten — `plans/01`).
 [/AI]
