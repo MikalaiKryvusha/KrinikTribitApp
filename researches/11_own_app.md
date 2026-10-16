@@ -185,6 +185,41 @@ All paths under `D:\work\ai_sandbox\KARTUN` (read-only for us).
      their decision log: drag handle without snap points, no living animation on busy tiles, counters with tabular digits,
      time written in whole words.
 
+## 4b. Bluetooth done right and convenient — the owner's recon (2026-10-16 ≈ 16:28 +03:00)
+
+The owner: «короткая разведка в сети, как граммотно работать по блютус» · «как писать анлдроид приложение граммотно» ·
+«удобно для пользователя» · «корректно с технической точки зрения для анлроид и колонки». Delegated web sweep; primary
+sources, OpenSCQ30 and Gadgetbridge code read through `gh`. INFERRED = no source, to measure on the Blast 2.
+
+1. **Follow the speaker's own link.** `ACTION_ACL_CONNECTED/DISCONNECTED` and `BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED`
+   (exempt implicit broadcasts, https://developer.android.com/develop/background-work/background-tasks/broadcasts/broadcast-exceptions);
+   at start also ask `getProfileProxy(A2DP).getConnectedDevices()` — a receiver misses what connected before it registered
+   (OpenSCQ30 `AutoConnectService.kt` has this as a TODO). Open SPP when A2DP is up, `close()` on ACL disconnect — do not
+   wait for the read to fail; `BluetoothSocket.close()` is thread-safe and aborts a pending `connect()`/`read()` (AOSP
+   `BluetoothSocket.java`).
+2. **No blind reconnect loops.** Gadgetbridge `BtClassicIoThread` goes to WAITING_FOR_RECONNECT after a failed read and waits
+   for the next ACL_CONNECTED; issue #3053 shows a flapping UI from blind retries.
+3. **Command layer.** One command in flight per type, the reply matched to the request, 3 retries with a 500 ms × i timeout,
+   unsolicited packets on their own path (OpenSCQ30 `packet_io_controller.rs`); Sony MDR uses a 0/1 sequence with ACK
+   (https://github.com/AndreasOlofsson/mdr-protocol). `write()` can block on flow control
+   (https://developer.android.com/develop/connectivity/bluetooth/transfer-data) → a slider conflates and sends the final
+   value. Our observation: the Blast 2 echoes every command (`plans/05` inventory) — the echo is the ACK.
+4. **State.** Explicit states with a screen each (OpenSCQ30 `ConnectionStatus.kt`); the speaker's reply is the truth; re-read
+   the full state after every connect (OpenSCQ30 release notes: defaults shown after reconnect).
+5. **Errors that say what to do:** channel held by another app → close it (one RFCOMM session per server channel; observed on
+   the A51 16:30); bond lost → pair again (`ACTION_KEY_MISSING`, Android 16,
+   https://developer.android.com/about/versions/16/behavior-changes-16); command timeout → the speaker is not answering.
+6. **Background.** Control in the background needs a `connectedDevice` foreground service
+   (https://developer.android.com/guide/components/fg-service-types) or CompanionDeviceManager presence; CDM pairing «requires
+   Location Services to be enabled» (companion-device-pairing page) — against the no-location line of `GOAL.md`. Keep SPP
+   while the app is visible (our `onStop` close). INFERRED: whether an open SPP keeps the Blast 2 from auto-sleeping — measure.
+7. **A vanished speaker** (out of range, battery dead) is noticed only after the link supervision timeout (INFERRED ≈ 20 s,
+   controller-defined) — until then the per-command timeout tells.
+8. **Users' complaints of speaker apps** (JBL Portable, Soundcore, Bose Connect — https://www.unitq.com/unitq-scorecards/jblportable/,
+   https://www.unitq.com/unitq-scorecards/boseconnect/): «unable to connect» while music plays, re-pairing demanded by the
+   app, a gap between Android pairing and the app's connection. Our line: never re-pair from the app, one state machine,
+   texts with the action.
+
 ## 5. Findings → implications → forks
 
 **Findings.**

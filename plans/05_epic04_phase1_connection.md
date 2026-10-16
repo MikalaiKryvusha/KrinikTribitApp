@@ -57,6 +57,23 @@ byte-exact JVM tests.
       inventory rows filled from the log. ✅ 16:20 — `testcases/reports/2026-10-16_own_app_connection.md` (location-off run and StrictMode ✅ 16:29; StrictMode found a 115 ms disk read, fixed).
 - [x] 7. Twin of their old app: with `com.kriniks.tribit.old` holding SPP, our connect fails → the card says so (risk (б)). ✅ 16:31 — refused in 83 ms, the failure card; after closing it «Подключить» connects.
 
+### Steps 8–11 — Bluetooth done right (the owner's recon 16:28, `researches/11` §4b)
+
+- [ ] 8. **Follow the speaker's link while the app is visible** (§4b.1–2): a receiver for ACL and A2DP connection changes,
+      registered in onStart, removed in onStop; at start `getProfileProxy(A2DP).getConnectedDevices()`. Bonded Blast 2
+      without A2DP → state «Включите колонку» (no SPP attempt, no 12 s blocking connect); A2DP up → open SPP by itself; ACL
+      down → `close()` at once and back to waiting. No blind retry loop.
+- [ ] 9. **Command layer** (§4b.3): the Blast 2 echoes every command — the echo is the ACK; send the next command of a type
+      after its echo or a timeout (500 ms × attempt, 3 attempts); unsolicited packets (84, 85, 88) on their own path; the
+      full state re-read after every connect (already: startup queries).
+- [ ] 10. **Errors that say what to do** (§4b.5): channel refused → close the other app (done, step 7); command timeout →
+      the speaker does not answer; texts by the portrait (R10).
+- [ ] 11. **Measure** (§4b.6, INFERRED): does an open SPP keep the Blast 2 from its auto-shutdown? Until measured the link
+      lives only while the app is visible.
+
+Test basis for 8: A51 + Blast 2 — speaker off → card «Включите колонку»; speaker on → connected without a tap; speaker off
+while connected → back to the waiting card within the ACL disconnect; log `KT.Link`.
+
 ## Risks
 
 See the epic. Phase-specific: (а) the speaker answers with a checksum of another rule → the framer flags it; we read the
