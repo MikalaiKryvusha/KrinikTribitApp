@@ -32,7 +32,8 @@ screen is the speaker's answer; the speaker's own buttons move what the screen s
 - [x] 1. Protocol: firmware flags from 88 («new» dsp > 10074, «new EQ» dsp > 10095); presets table (id, name, gains) from
       `researches/11` §3.6; `setPreset(id)` (cmd 4 [id, 10 gains]), `setCustom(gains dB)` (cmd 11, 10 bytes, dB + 12 / + 8),
       `queryEq()` (21); parse 21/82 → `Eq(id, gains)`. Tests.
-- [x] 2. Command layer (`plans/05` step 9, `researches/11` §4b.3): the speaker echoes each command — wait for the echo of
+- [x] 2. (Corrected 17:12 after the judge pass 17:11: until then only queries were serialized — sets went outside the
+      lock; now every user sequence runs under one lock and each set waits for its echo.) Command layer (`plans/05` step 9, `researches/11` §4b.3): the speaker echoes each command — wait for the echo of
       the same cmd up to 500 ms × attempt, 3 attempts; one command in flight; sliders send on release only (their app
       does the same, §3.6 «Pacing»).
 - [x] 3. EQ screen: preset list + the custom 10-band editor (±12 dB on «new», ±8 on old), KARTUN components; the home
@@ -53,10 +54,20 @@ screen is the speaker's answer; the speaker's own buttons move what the screen s
       +2.3 dB and −11.8 dB; the room's noise moved between −70 and −53 dBFS. Verdict: at volume 2 the ear hears the tone,
       but one run is not evidence — the room noise is of the same size; three runs and the median, always with a volume-0
       control. Volume restored to 9 (`RX EA 05 54 09`, 17:07).
-- [ ] 8. `ideas/01` JSON export/import of EQ and light — after 3 and 5 work on the speaker.
+- [x] 8. ✅ 17:15 save + open on one phone (`testcases/reports/2026-10-16_settings_file.md`); «share» and a second phone open. `ideas/01` JSON export/import of EQ and light — after 3 and 5 work on the speaker.
 
 Open question for the speaker: reply 15 — the set sleep time or the time left? Set 60 min, read after 2 min (with the
 owner's consent: the timer turns his speaker off).
+
+## Open defects from the judge pass (2026-10-16 17:11)
+
+- [ ] D1. `Eq.state`: a preset id outside the table (not 7) falls back to the speaker's zero gains → shows −12 dB on all
+      bands. Fix: unknown preset → bands unknown (sliders disabled), never the zeros.
+- [ ] D2. Old firmware (±8 dB): `Eq.kt` subtracts 8 from the «new» preset table and `setPreset` always sends the «new»
+      11-byte gains (risk (а)). Not our speaker (DSP 10098); needs the old tables of `Bts56Constant` before any old-firmware
+      user.
+- [ ] D3. `SpeakerViewModel.start`: `if (job?.isActive) return` drops an A2DP «connected» event that arrives while a
+      lookup is running → the card may stay on waiting until the next event. Fix: remember the event, re-run after the job.
 
 ## Risks
 

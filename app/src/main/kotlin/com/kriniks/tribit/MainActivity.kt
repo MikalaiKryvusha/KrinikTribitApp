@@ -6,6 +6,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.StrictMode
 import android.provider.Settings
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.kriniks.tribit.protocol.Profile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -52,6 +58,39 @@ class MainActivity : ComponentActivity() {
         speakerVm.start()
     }
 
+    /** «Сохранить в файл»: Android's own save dialog; the user picks the folder (`ideas/01`). */
+    private val saveFile = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        val profile = Profile.of(speakerVm.speaker.value)
+        if (uri != null && profile != null) lifecycleScope.launch {
+            val ok = withContext(Dispatchers.IO) {
+                runCatching { contentResolver.openOutputStream(uri)?.use { it.write(profile.toJson().toByteArray()) } }.isSuccess
+            }
+            toast(if (ok) R.string.file_saved else R.string.file_unreadable)
+        }
+    }
+
+    /** «Открыть файл»: Android's own file picker; a refused file says why and changes nothing (`ideas/01`, criterion 5). */
+    private val openFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) lifecycleScope.launch {
+            val text = withContext(Dispatchers.IO) {
+                runCatching { contentResolver.openInputStream(uri)?.use { it.readBytes().decodeToString() } }.getOrNull()
+            }
+            when (val r = text?.let { Profile.parse(it) }) {
+                is Profile.Result.Ok -> { speakerVm.apply(r.profile); toast(R.string.file_applied) }
+                is Profile.Result.Refused -> toast(
+                    when (r.problem) {
+                        Profile.Problem.OTHER_MODEL -> R.string.file_other_model
+                        Profile.Problem.BROKEN -> R.string.file_broken
+                        Profile.Problem.NOT_A_PROFILE -> R.string.file_not_profile
+                    },
+                )
+                null -> toast(R.string.file_unreadable)
+            }
+        }
+    }
+
+    private fun toast(text: Int) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Debug only: every disk or network call on the main thread goes to logcat (tag StrictMode) - the check of
         // plans/05 criterion 4 «no main-thread I/O». [NOT-TESTED]
@@ -88,11 +127,17 @@ class MainActivity : ComponentActivity() {
                 openEq = { screen = Screen.EQ }
                 openSpeakerSettings = { screen = Screen.SPEAKER_SETTINGS }
                 BackHandler(enabled = screen.parent != null) { back() }
-                // Speaker screens need a live link; when the speaker leaves, the app returns home to its card.
-                if (screen.needsSpeaker && link !is Link.Connected) screen = Screen.HOME
+                // Speaker screens need a live link; when the speaker leaves, the app returns home to its card. A reconnect
+                // (Connecting) keeps the screen: Android's save dialog stops the app and the link reopens on return - on the
+                // A51 2026-10-16 17:11 the EQ screen jumped home there.
+                if (screen.needsSpeaker && link !is Link.Connected && link !is Link.Connecting) screen = Screen.HOME
                 when (screen) {
                     Screen.HOME -> HomeScreen(link, speaker, actions, onSettings = { screen = Screen.SETTINGS })
-                    Screen.EQ -> EqScreen(speaker, onBack = back, onPreset = speakerVm::selectPreset, onCustom = speakerVm::setCustom)
+                    Screen.EQ -> EqScreen(
+                        speaker, onBack = back, onPreset = speakerVm::selectPreset, onCustom = speakerVm::setCustom,
+                        onSaveFile = { saveFile.launch(PROFILE_FILE_NAME) },
+                        onOpenFile = { openFile.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) },
+                    )
                     Screen.SPEAKER_SETTINGS ->
                         SpeakerSettingsScreen(speakerSettings, speaker.newFirmware, onBack = back, act = settingsActions)
                     Screen.SETTINGS -> SettingsScreen(
@@ -117,6 +162,11 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         speakerVm.unwatch()
+    }
+
+    private companion object {
+        /** The name the save dialog proposes; the user may change it. */
+        const val PROFILE_FILE_NAME = "Krinik Tribit - StormBox Blast 2.json"
     }
 
     private fun openAppSettings() =

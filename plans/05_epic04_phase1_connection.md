@@ -59,11 +59,12 @@ byte-exact JVM tests.
 
 ### Steps 8–11 — Bluetooth done right (the owner's recon 16:28, `researches/11` §4b)
 
-- [ ] 8. **Follow the speaker's link while the app is visible** (§4b.1–2): a receiver for ACL and A2DP connection changes,
+- [x] 8. 🟡 partial (`testcases/reports/2026-10-16_auto_connect.md`): waiting card, BT off/on, connect on return — seen;
+      connect on the A2DP event while visible and the ACL close — not seen (needs the owner's hands). **Follow the speaker's link while the app is visible** (§4b.1–2): a receiver for ACL and A2DP connection changes,
       registered in onStart, removed in onStop; at start `getProfileProxy(A2DP).getConnectedDevices()`. Bonded Blast 2
       without A2DP → state «Включите колонку» (no SPP attempt, no 12 s blocking connect); A2DP up → open SPP by itself; ACL
       down → `close()` at once and back to waiting. No blind retry loop.
-- [ ] 9. **Command layer** (§4b.3): the Blast 2 echoes every command — the echo is the ACK; send the next command of a type
+- [x] 9. ✅ in `plans/06` step 2 (17:12). **Command layer** (§4b.3): the Blast 2 echoes every command — the echo is the ACK; send the next command of a type
       after its echo or a timeout (500 ms × attempt, 3 attempts); unsolicited packets (84, 85, 88) on their own path; the
       full state re-read after every connect (already: startup queries).
 - [ ] 10. **Errors that say what to do** (§4b.5): channel refused → close the other app (done, step 7); command timeout →

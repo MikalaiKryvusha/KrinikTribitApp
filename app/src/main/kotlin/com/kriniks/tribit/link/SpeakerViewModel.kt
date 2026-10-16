@@ -22,6 +22,7 @@ import com.kriniks.tribit.BuildConfig
 import com.kriniks.tribit.protocol.Blast2
 import com.kriniks.tribit.protocol.Eq
 import com.kriniks.tribit.protocol.Frame
+import com.kriniks.tribit.protocol.Profile
 import com.kriniks.tribit.protocol.Settings
 import com.kriniks.tribit.protocol.SpeakerSettings
 import com.kriniks.tribit.protocol.SpeakerState
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -143,6 +145,8 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
                 // The full state is re-read on every connect (`researches/11` §4b.4); each query waits for its answer.
                 launch {
                     for (q in Blast2.startup()) request(c, q, q[CMD_INDEX].toInt() and 0xFF)
+                    // A settings file opened while the link was closed (Android's picker stops the app) goes now.
+                    pending?.let { pending = null; apply(it) }
                     for (cmd in Settings.QUERIES) request(c, Settings.query(cmd), cmd)
                 }
                 c.readLoop { f ->
@@ -158,6 +162,9 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
                 c.close()
                 if (conn === c) conn = null
             }
+            // Closed by unwatch (the app left the screen - e.g. Android's file dialog): no verdict. Without this check the
+            // swallowed IOException of the closed socket set «Failed» and threw the EQ screen home (A51 2026-10-16 17:13).
+            if (!isActive) return@launch
             // The channel ended: the speaker left the phone (off, asleep, away) → wait for it; it is still there → the
             // channel itself failed (held by another app).
             _link.value = if (soundConnected(adapter, device)) Link.Failed(name) else Link.Waiting(name)
@@ -172,10 +179,11 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
 
     /**
      * Sends [packet] and waits for a packet with command [answer] from the speaker: 500 ms × attempt, 3 attempts
-     * (OpenSCQ30 `packet_io_controller.rs`, `researches/11` §4b.3). The Blast 2 echoes its set commands (13, 2 - seen
-     * on the A51); for the EQ the answer is its state 21. Returns false when the speaker stayed silent.
+     * (OpenSCQ30 `packet_io_controller.rs`, `researches/11` §4b.3). The Blast 2 echoes every set command (seen on the
+     * A51 2026-10-16: 13, 2, 12, 4, 11, 52), so a set waits for its own command; a query waits for its answer.
+     * Called only inside [inFlight] - by [commands] or [request]. Returns false when the speaker stayed silent.
      */
-    private suspend fun request(c: SpeakerLink, packet: ByteArray, answer: Int): Boolean = inFlight.withLock {
+    private suspend fun exchange(c: SpeakerLink, packet: ByteArray, answer: Int = packet[CMD_INDEX].toInt() and 0xFF): Boolean {
         for (attempt in 1..ATTEMPTS) {
             val got = coroutineScope {
                 val waiter = async(start = CoroutineStart.UNDISPATCHED) {
@@ -184,20 +192,34 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
                 c.send(packet)
                 waiter.await()
             }
-            if (got != null) return@withLock true
+            if (got != null) return true
             if (BuildConfig.DEBUG) Log.d(SpeakerLink.TAG, "no answer $answer, attempt $attempt")
         }
-        false
+        return false
     }
 
-    /** Runs commands on the open link; a broken link ends the readLoop, which sets the card - nothing to do here. */
-    private fun commands(block: suspend (SpeakerLink) -> Unit) {
+    /** One exchange under the lock - the startup queries, so a user's command can run between two of them. */
+    private suspend fun request(c: SpeakerLink, packet: ByteArray, answer: Int) = inFlight.withLock { exchange(c, packet, answer) }
+
+    /**
+     * Runs a user's command sequence on the open link, the whole sequence under [inFlight]: one command in flight at a
+     * time, a set never mixed into another (the judge pass 2026-10-16 17:11 found sets sent outside the lock). A broken
+     * link ends the readLoop, which sets the card - nothing to do here.
+     */
+    private fun commands(block: suspend Exchange.() -> Unit) {
         val c = conn ?: return
-        viewModelScope.launch { try { block(c) } catch (_: java.io.IOException) {} }
+        viewModelScope.launch {
+            try { inFlight.withLock { Exchange(c).block() } } catch (_: java.io.IOException) {}
+        }
+    }
+
+    /** The command sequence's handle: [send] a packet and wait for its answer. */
+    private inner class Exchange(val c: SpeakerLink) {
+        suspend fun send(packet: ByteArray, answer: Int = packet[CMD_INDEX].toInt() and 0xFF) = exchange(c, packet, answer)
     }
 
     /** Sets the volume 0..31; the echo and the speaker's notice 84 move the slider. */
-    fun setVolume(v: Int) = commands { request(it, Blast2.setVolume(v), Blast2.CMD_VOLUME_SET) }
+    fun setVolume(v: Int) = commands { send(Blast2.setVolume(v)) }
 
     /**
      * Play/pause by the last state the SPEAKER reported (unknown → play); the screen is not flipped ahead of its answer
@@ -206,21 +228,21 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
     fun togglePlay() {
         val playing = _speaker.value.playing ?: false
         commands {
-            request(it, Blast2.play(if (playing) Blast2.PAUSE else Blast2.PLAY), Blast2.CMD_PLAY)
-            request(it, Blast2.queryPlayState(), Blast2.CMD_PLAY_STATE)
+            send(Blast2.play(if (playing) Blast2.PAUSE else Blast2.PLAY))
+            send(Blast2.queryPlayState())
         }
     }
 
     /** Light mode 1..3 or [Blast2.LIGHT_OFF]; the light state 20 read after it (and the notice 85) moves the buttons. */
     fun setLight(mode: Int) = commands {
-        it.send(Blast2.setLight(mode))
-        request(it, Blast2.queryLight(), Blast2.CMD_LIGHT_GET)
+        send(Blast2.setLight(mode))
+        send(Blast2.queryLight())
     }
 
     /** Sends a setting, then reads it back with [get]: the switch shows the speaker's answer. */
     private fun setting(packet: ByteArray, get: Int) = commands {
-        it.send(packet)
-        request(it, Settings.query(get), get)
+        send(packet)
+        send(Settings.query(get))
     }
 
     fun setAutoOff(on: Boolean) = setting(Settings.setAutoOff(on), Settings.CMD_AUTO_OFF_GET)
@@ -230,18 +252,39 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
     fun setMic(on: Boolean) = setting(Settings.setMic(on), Settings.CMD_MIC_GET)
     fun setHowl(on: Boolean) = setting(Settings.setHowl(on), Settings.CMD_HOWL_GET)
 
+    /** A settings file waiting for the link (see [apply]). */
+    private var pending: Profile? = null
+
+    /**
+     * Applies a settings file (`ideas/01`): the preset or the custom bands, then the light. Android's file picker stops
+     * the app, so the link is usually closed when the file arrives (A51 2026-10-16 17:13: nothing was sent) - then the
+     * file waits in [pending] and goes right after the startup queries.
+     */
+    fun apply(p: Profile) {
+        val nf = _speaker.value.newFirmware
+        if (conn == null || nf == null || _link.value !is Link.Connected) { pending = p; return }
+        commands {
+            send(if (p.preset != null) Eq.setPreset(p.preset) else Eq.setCustom(p.customDb ?: List(Eq.BANDS) { 0 }, nf))
+            send(Eq.queryState())
+            if (p.light != null) {
+                send(Blast2.setLight(p.light))
+                send(Blast2.queryLight())
+            }
+        }
+    }
+
     /** Selects a preset; the speaker's EQ state 21 read after it is what the screen shows. */
     fun selectPreset(p: Eq.Preset) = commands {
-        it.send(Eq.setPreset(p))
-        request(it, Eq.queryState(), Eq.CMD_STATE)
+        send(Eq.setPreset(p))
+        send(Eq.queryState())
     }
 
     /** Sends the custom EQ (10 bands, dB); called on slider release only (their app does the same, §3.6 «Pacing»). */
     fun setCustom(db: List<Int>) {
         val nf = _speaker.value.newFirmware ?: return
         commands {
-            it.send(Eq.setCustom(db, nf))
-            request(it, Eq.queryState(), Eq.CMD_STATE)
+            send(Eq.setCustom(db, nf))
+            send(Eq.queryState())
         }
     }
 

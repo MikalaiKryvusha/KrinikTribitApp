@@ -66,7 +66,10 @@ fun eqName(s: SpeakerState): String {
  * current curve. A band is sent on release, as the custom EQ with all ten bands (cmd 11). [NOT-TESTED]
  */
 @Composable
-fun EqScreen(s: SpeakerState, onBack: () -> Unit, onPreset: (Eq.Preset) -> Unit, onCustom: (List<Int>) -> Unit) {
+fun EqScreen(
+    s: SpeakerState, onBack: () -> Unit, onPreset: (Eq.Preset) -> Unit, onCustom: (List<Int>) -> Unit,
+    onSaveFile: () -> Unit, onOpenFile: () -> Unit,
+) {
     val eq = s.eq
     val range = Eq.offset(s.newFirmware ?: true)
     // Finger positions while dragging, by band; released bands fall back to the speaker's value.
@@ -125,6 +128,16 @@ fun EqScreen(s: SpeakerState, onBack: () -> Unit, onPreset: (Eq.Preset) -> Unit,
                     )
                 }
             }
+        }
+        // The settings file (`ideas/01`): the EQ and the light of the speaker in one JSON file.
+        Card {
+            Text(stringResource(R.string.file_title), style = MaterialTheme.typography.titleMedium)
+            Text(
+                stringResource(R.string.file_hint), style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            SettingsRow(stringResource(R.string.file_save), inCard = true, onClick = onSaveFile)
+            SettingsRow(stringResource(R.string.file_open), inCard = true, onClick = onOpenFile)
         }
         Spacer(Modifier.padding(4.dp))
     }

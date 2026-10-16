@@ -50,4 +50,6 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
+    // org.json is part of Android; on the JVM its stub throws - the real library runs the settings-file tests (ProfileTest).
+    testImplementation(libs.json)
 }
