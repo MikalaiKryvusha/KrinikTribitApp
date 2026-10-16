@@ -87,6 +87,21 @@
 
 ## Entries
 
+### EXP-0013 · 2026-10-16 · ❌→✅ · #claims #judge #android #lifecycle
+class: claim-before-evidence
+none-cheap: the judge pass is the check - a plan tick or a verdict line names a behaviour no tool can see; the run reports carry «Не проверено» lines, the judge compares them with the verdict
+**Context:** phases 1–2 of the own app in one hour; a /fable-judge pass at 17:11 over a4f5ea5..eb69e7d.
+**Tried / did:** the judge found: a plan step ticked «one command in flight» while sets went outside the lock; two run
+verdicts «pass» wider than their checks; a commit claiming «A2DP up opens the channel by itself» with no run behind it; strings
+promising that unproven path. On the device the same hour: Android's system dialogs (save, open, share) stop the activity -
+the link closed, a file result arrived to a closed link and a toast said «sent» while nothing was sent.
+**Result:** ✅ all fixed or narrowed where they stood (commit 24122f3 lists the corrections).
+**Lesson:** a tick is the behaviour seen, not the code written; and any screen that opens a system dialog must survive its own
+onStop - a result that arrives while the link is closed waits for the link.
+**Repro:** `adb logcat -s KT.Link:D` around a file pick - the TX of the file's EQ comes after `connected`, never before.
+**Trigger:** ticking a plan step or writing «pass» → name the run that showed it; adding a system dialog → test the return path.
+**Not for:** hygiene results (tests, lint), which are reported as hygiene.
+
 ### EXP-0012 · 2026-10-16 · ❌→✅ · #texts #voice #ui #owner
 class: owner-text-past-portrait
 none-cheap: the machine half runs (`kaif-voice-lint check` on strings.xml, HOUSE_RULES R10); whether a line talks about what is absent is the §7B judgement - the lint was green on «Геолокация не нужна.»
