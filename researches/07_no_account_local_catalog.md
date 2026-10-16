@@ -60,3 +60,5 @@ A or B for the substitution> · consulted <recon of the app's own answers above;
 which models the fork supports is the owner's (asked in the next session's chat, not decided here)>
 
 **Fork closed 2026-10-16 10:45 +03:00 by the owner** (`interviews/interview_001` Q1 = C, his words: «работаем с сервером трибит анонимным аккаунтом без передачи им данных о пользователе, девайс ид и прочее, только сообщаем, какая колонка просит прошивку и настроек»): talk to their server with an anonymous account, send no user data and no device id, tell it only which speaker asks for firmware and settings. Q2 = A: the firmware check runs on a button.
+
+**Owner's clarification 2026-10-16 10:49 +03:00** (chat): «Без входа сервер Tribit не отдаёт данные колонки - всегда рабьотаем анонимным аккаунтом, не передавая данные пользователя и Телефона/планшета пользователя. А если просит, чтобы передавали - передаем случайно сгенерированные каждый раз» — always the anonymous account; no user or device data; a field the server demands gets a value generated at random EVERY time (never stored, never derived from the device).
