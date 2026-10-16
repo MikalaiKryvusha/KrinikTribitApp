@@ -21,6 +21,12 @@
 4. 16:18:15 и 16:18:30 — «Играть», затем «Пауза» (540, 762).
 5. 16:19–16:20 — открыть, «Домой», открыть, «Назад»; последний билд — открыть, «Назад».
 
+6. 16:27–16:29 — `cmd location set-location-enabled false` → `is-location-enabled` false; `am start -S`; журнал `KT.Link` и
+   `logcat --pid` с `StrictMode` (debug); после исправления находки 4 — повтор; `set-location-enabled true` → true.
+7. 16:29–16:31 — «Old Krinik Tribit»: START → разрешение «Устройства поблизости» → «Нет» на уведомления → «Tap to Add Device» →
+   «Go to Connect» → экран колонки «30%» (канал SPP у него); открыть наше приложение; затем `am force-stop
+   com.kriniks.tribit.old` и «Подключить» (540, 756).
+
 Перед каждым касанием — проверка, что сверху `com.kriniks.tribit.debug` (`dumpsys activity activities`).
 
 ## 4. Checks
@@ -40,8 +46,13 @@
   6. «Домой» и «Назад» закрывают связь (`closed`), возврат подключает вновь — pass после исправления (находка 2).
   7. Контрольные суммы всех ответов колонки сошлись с правилом `researches/11` §3.2: строк `checksum mismatch` нет.
   8. `logcat -b crash` — строк с `kriniks` нет.
-- Не проверено: отказ подключения, когда канал держит запасной путь (`plans/05` шаг 7); выключенный Bluetooth; несопряжённая
-  колонка; отказ в разрешении.
+  9. Геолокация телефона выключена: подключение 16:27:21.699, заряд пришёл; разрешений геолокации в пакете нет — pass
+     (`8_location_off.webp`).
+  10. `StrictMode` (debug): после исправления находки 4 — 0 строк `StrictMode` у процесса приложения — pass.
+  11. Канал SPP держит «Old Krinik Tribit»: наш `connect()` получил отказ за 83 мс (16:30:39.079 → `closed` .162), карточка
+      «Связь с колонкой не установлена или прервалась… закройте его.» с кнопкой «Подключить» — pass (`9_busy_channel.webp`).
+      После закрытия запасного пути «Подключить» → `connected` за 0,7 с, заряд пришёл — pass (`10_after_retry.webp`).
+- Не проверено: выключенный Bluetooth; несопряжённая колонка; отказ в разрешении.
 
 ## 5. Found
 
@@ -52,14 +63,15 @@
    вызывается. Исправлено: `MainActivity.onStop` → `SpeakerViewModel.stop()`.
 3. Колонка сама присылает команду 84 со значением громкости (`EA 05 54 0A`) и команду 85 (`EA 05 55 04`, подсветка по
    `researches/11` §3.3). Пока приложение их только пишет в журнал; строки инвентаря фазы 2.
+4. `StrictMode`: первый `getSystemService(BluetoothManager)` читает диск в главном потоке — 114 и 117 мс. Исправлено: поиск
+   адаптера и сопряжённой колонки (`SpeakerViewModel.lookUp`) идёт на `Dispatchers.IO`.
 
 ## 6. Traces
 
 `testcases/reports/2026-10-16_own_app_connection/` — `1_permission.webp`, `2_system_dialog.webp`, `3_connected.webp`,
-`4_volume.webp`, `5_play.webp`, `6_pause.webp`, `7_final.webp`; кадры колонки — `app/src/test/…/SpeakerFramesTest.kt`.
+`4_volume.webp`, `5_play.webp`, `6_pause.webp`, `7_final.webp`, `8_location_off.webp`, `9_busy_channel.webp`,
+`10_after_retry.webp`; кадры колонки — `app/src/test/…/SpeakerFramesTest.kt`.
 
 ## 7. Verdict
 
-partial — на A51 с настоящей колонкой наблюдались критерии 2 и 3 `plans/05`, критерий 1 без геолокации в пакете
-(сам прогон шёл при включённой геолокации телефона) и закрытие сокета из критерия 4. Не пройдены: прогон при выключенной
-геолокации, `StrictMode` из критерия 4, шаг 7 (канал занят другим приложением).
+pass — критерии 1–4 и шаг 7 `plans/05` наблюдались на A51 с настоящей колонкой; громкость на слух не проверялась.

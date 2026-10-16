@@ -1,7 +1,7 @@
 # План 05 — эпик 04, фаза 1: связь с Blast 2
 
 > **Created:** 2026-10-16 · **Parent:** `plans/04_EPIC_own_app.md` → «Фазы», row 1 «Связь с Blast 2» · **Status:** 🔧 in
-> work 2026-10-16 16:05 +03:00; steps 1–6 ✅ 16:20 (`testcases/reports/2026-10-16_own_app_connection.md`); step 7 open · **Outbound:** —
+> work 2026-10-16 16:05 +03:00; steps 1–7 ✅ 16:31 (`testcases/reports/2026-10-16_own_app_connection.md`, pass) · **Outbound:** —
 
 ## Goal vector (Achieve)
 
@@ -54,8 +54,8 @@ byte-exact JVM tests.
 - [x] 5. `SpeakerViewModel` + Home card: states «нет разрешения» → «колонка не сопряжена» (button to Android's Bluetooth
       settings) → «подключение» → connected (battery, volume slider 0..31, play/pause). Strings ru + en.
 - [x] 6. Build, install on A51, walk criteria 1–2; run report `testcases/reports/2026-10-16_own_app_connection.md`;
-      inventory rows filled from the log. ✅ 16:20 — `testcases/reports/2026-10-16_own_app_connection.md` (verdict partial: location-off run and StrictMode open).
-- [ ] 7. Twin of their old app: with `com.kriniks.tribit.old` holding SPP, our connect fails → the card says so (risk (б)).
+      inventory rows filled from the log. ✅ 16:20 — `testcases/reports/2026-10-16_own_app_connection.md` (location-off run and StrictMode ✅ 16:29; StrictMode found a 115 ms disk read, fixed).
+- [x] 7. Twin of their old app: with `com.kriniks.tribit.old` holding SPP, our connect fails → the card says so (risk (б)). ✅ 16:31 — refused in 83 ms, the failure card; after closing it «Подключить» connects.
 
 ## Risks
 

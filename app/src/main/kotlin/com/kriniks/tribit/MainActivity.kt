@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.StrictMode
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -44,6 +45,11 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Debug only: every disk or network call on the main thread goes to logcat (tag StrictMode) - the check of
+        // plans/05 criterion 4 «no main-thread I/O». [NOT-TESTED]
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build())
+        }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val actions = SpeakerActions(

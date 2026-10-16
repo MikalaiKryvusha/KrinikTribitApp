@@ -3,6 +3,8 @@ package com.kriniks.tribit.link
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Application
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
@@ -11,6 +13,8 @@ import androidx.lifecycle.viewModelScope
 import com.kriniks.tribit.protocol.Blast2
 import com.kriniks.tribit.protocol.SpeakerState
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,22 +52,35 @@ class SpeakerViewModel(app: Application) : AndroidViewModel(app) {
     private var conn: SpeakerLink? = null
     private var job: Job? = null
 
-    private val adapter get() = getApplication<Application>().getSystemService(BluetoothManager::class.java)?.adapter
-
     private fun hasPermission() = ContextCompat.checkSelfPermission(
         getApplication(), Manifest.permission.BLUETOOTH_CONNECT,
     ) == PackageManager.PERMISSION_GRANTED
 
+    /** The adapter and the bonded Blast 2 the link opens to. */
+    private class Found(val adapter: BluetoothAdapter, val device: BluetoothDevice)
+
+    /**
+     * Finds the bonded Blast 2, or sets the [Link] state that stops the way to it and returns null. Runs on
+     * Dispatchers.IO: the first `getSystemService(BluetoothManager)` of a process reads the disk - StrictMode on the A51
+     * 2026-10-16 16:27 measured 114 and 117 ms on the main thread - and `bondedDevices` is a binder call.
+     */
+    private fun lookUp(): Found? {
+        if (!hasPermission()) { _link.value = Link.NoPermission; return null }
+        val adapter = getApplication<Application>().getSystemService(BluetoothManager::class.java)?.adapter
+        if (adapter == null || !adapter.isEnabled) { _link.value = Link.BluetoothOff; return null }
+        val device = adapter.bondedDevices.orEmpty().firstOrNull { Blast2.isBlast2(it.name) }
+        if (device == null) { _link.value = Link.NotPaired; return null }
+        return Found(adapter, device)
+    }
+
     /** (Re)starts the way to the speaker; does nothing while a connection is up or being made. */
     fun start() {
         if (job?.isActive == true) return
-        if (!hasPermission()) { _link.value = Link.NoPermission; return }
-        val adapter = adapter
-        if (adapter == null || !adapter.isEnabled) { _link.value = Link.BluetoothOff; return }
-        val device = adapter.bondedDevices.orEmpty().firstOrNull { Blast2.isBlast2(it.name) }
-        if (device == null) { _link.value = Link.NotPaired; return }
-        val name = device.name ?: Blast2.NAME
         job = viewModelScope.launch {
+            val found = withContext(Dispatchers.IO) { lookUp() } ?: return@launch
+            val adapter = found.adapter
+            val device = found.device
+            val name = device.name ?: Blast2.NAME
             _link.value = Link.Connecting(name)
             _speaker.value = SpeakerState()
             val c = SpeakerLink(adapter, device)
