@@ -30,8 +30,7 @@ enum class Screen(val parent: Screen?) { HOME(null), SETTINGS(HOME), ABOUT(SETTI
 /**
  * The single activity: one Compose tree, navigation by a saved enum (survives rotation). The «Отладка» screen comes
  * from DebugTools - src/debug in «Debug Krinik Tribit», an empty stub in release (owner's rule R6). The speaker
- * connection lives in [SpeakerViewModel]; every return to the app (onResume) restarts it if it is down - after the
- * user granted the permission, turned Bluetooth on or paired the speaker in Android's settings. [NOT-TESTED]
+ * connection lives in [SpeakerViewModel], which follows the speaker's link while the app is on screen. [NOT-TESTED]
  */
 class MainActivity : ComponentActivity() {
     private val speakerVm: SpeakerViewModel by viewModels()
@@ -82,15 +81,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        speakerVm.start()
+    /** On screen: follow the speaker's link to the phone (`SpeakerViewModel.watch`). */
+    override fun onStart() {
+        super.onStart()
+        speakerVm.watch()
     }
 
-    /** The speaker's channel is ours only while the app is on screen (`SpeakerViewModel.stop`). */
+    /** Off screen: the speaker's channel is free for other apps (`SpeakerViewModel.unwatch`). */
     override fun onStop() {
         super.onStop()
-        speakerVm.stop()
+        speakerVm.unwatch()
     }
 
     private fun openAppSettings() =

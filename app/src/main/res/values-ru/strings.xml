@@ -9,12 +9,14 @@
     <string name="link_permission_hint">Дайте Krinik Tribit разрешение «Устройства поблизости». С этим разрешением Krinik Tribit видит колонку, сопряжённую с телефоном.</string>
     <string name="link_permission_button">Разрешить</string>
     <string name="link_bt_off">Bluetooth выключен</string>
-    <string name="link_bt_off_hint">Включите Bluetooth и вернитесь в Krinik Tribit. При возвращении Krinik Tribit подключится к колонке.</string>
+    <string name="link_bt_off_hint">Включите Bluetooth. Когда колонка подключится к телефону, Krinik Tribit подключится к колонке сам.</string>
+    <string name="link_waiting">Ожидание колонки</string>
+    <string name="link_waiting_hint">Включите %1$s. Когда колонка подключится к телефону, Krinik Tribit подключится к колонке сам. Если колонка уже включена, подключите её к телефону в настройках Bluetooth.</string>
     <string name="link_bt_settings">Настройки Bluetooth</string>
     <string name="link_not_paired">Сопряжение колонки</string>
     <string name="link_not_paired_hint">Сопрягите %1$s с телефоном в настройках Bluetooth. Сопряжённая колонка играет звук телефона, и Krinik Tribit к ней подключается.</string>
     <string name="link_connecting">Подключение…</string>
-    <string name="link_failed_hint">Связь с колонкой не установлена или прервалась. Включите колонку и поставьте её рядом с телефоном. Если на телефоне открыто другое приложение для колонки Tribit, закройте его.</string>
+    <string name="link_failed_hint">Колонка подключена к телефону, но Krinik Tribit не может управлять колонкой. Если на телефоне запущено другое приложение для колонки Tribit, закройте его. Нажмите «Подключить».</string>
     <string name="link_retry">Подключить</string>
     <string name="value_unknown">—</string>
     <string name="speaker_battery">Заряд: %1$s</string>

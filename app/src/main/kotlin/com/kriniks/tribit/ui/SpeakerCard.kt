@@ -63,6 +63,10 @@ fun SpeakerCard(link: Link, speaker: SpeakerState, act: SpeakerActions) {
                 Dot.Off, stringResource(R.string.link_not_paired), stringResource(R.string.link_not_paired_hint, Blast2.NAME),
                 stringResource(R.string.link_bt_settings), act.openBluetoothSettings,
             )
+            is Link.Waiting -> Face(
+                Dot.Off, stringResource(R.string.link_waiting), stringResource(R.string.link_waiting_hint, link.name),
+                stringResource(R.string.link_bt_settings), act.openBluetoothSettings,
+            )
             is Link.Connecting -> Face(Dot.Wait, link.name, stringResource(R.string.link_connecting))
             is Link.Failed -> Face(
                 Dot.Off, link.name, stringResource(R.string.link_failed_hint),

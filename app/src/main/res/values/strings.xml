@@ -11,12 +11,14 @@
     <string name="link_permission_hint">Give Krinik Tribit the «Nearby devices» permission. With it, Krinik Tribit sees the speaker paired with this phone.</string>
     <string name="link_permission_button">Allow</string>
     <string name="link_bt_off">Bluetooth is off</string>
-    <string name="link_bt_off_hint">Turn Bluetooth on and come back to Krinik Tribit. Krinik Tribit connects to the speaker when you return.</string>
+    <string name="link_bt_off_hint">Turn Bluetooth on. When the speaker connects to the phone, Krinik Tribit connects to it by itself.</string>
+    <string name="link_waiting">Waiting for the speaker</string>
+    <string name="link_waiting_hint">Turn %1$s on. When the speaker connects to the phone, Krinik Tribit connects to the speaker by itself. If the speaker is already on, connect it to the phone in the Bluetooth settings.</string>
     <string name="link_bt_settings">Bluetooth settings</string>
     <string name="link_not_paired">Pair the speaker</string>
     <string name="link_not_paired_hint">Pair %1$s with this phone in the Bluetooth settings. A paired speaker plays the phone\'s sound, and Krinik Tribit connects to it.</string>
     <string name="link_connecting">Connecting…</string>
-    <string name="link_failed_hint">The connection to the speaker failed or dropped. Turn the speaker on and place it next to the phone. If another app for Tribit speakers is open on the phone, close it.</string>
+    <string name="link_failed_hint">The speaker is connected to the phone, but Krinik Tribit cannot control the speaker. If another app for Tribit speakers is running on the phone, close it. Tap «Connect».</string>
     <string name="link_retry">Connect</string>
     <string name="value_unknown">—</string>
     <string name="speaker_battery">Battery: %1$s</string>
