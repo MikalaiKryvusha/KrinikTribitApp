@@ -35,9 +35,10 @@ fi
 rm -rf work/base "$OUT" out/aligned.apk
 if [ -d native/smali ]; then
   # The native tree (native/ = the private repository KrinikTribitNative: Tribit's decoded code with our fixes written in
-  # it) is copied without its .git and apktool's build/; only the variant step is applied on top.
+  # it) is copied without its .git and apktool's build/; only the variant step is applied on top. krinik-app/ (the speaker
+  # photos of OUR app, kept private there) is not part of Tribit's APK and stays out too.
   mkdir -p work/base
-  tar -C native --exclude=./.git --exclude=./.gitignore --exclude=./build -cf - . | tar -C work/base -xf -
+  tar -C native --exclude=./.git --exclude=./.gitignore --exclude=./build --exclude=./krinik-app -cf - . | tar -C work/base -xf -
   if [ "$VARIANT" = debug ]; then python -I patches/apply.py work/base --variant --debug; else python -I patches/apply.py work/base --variant; fi
 else
   # No native tree on this machine: decode the merged APK and apply every patch (the way the native tree was made).

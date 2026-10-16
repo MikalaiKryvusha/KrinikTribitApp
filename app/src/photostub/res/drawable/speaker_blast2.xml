@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stand-in for the speaker photo when the private native/ repository is absent (app/build.gradle.kts → sourceSets): a
+     grey boombox outline, the same name as the photo in native/krinik-app/res/drawable-nodpi/speaker_blast2.webp. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="300dp" android:height="160dp" android:viewportWidth="300" android:viewportHeight="160">
+    <path android:fillColor="#00000000" android:strokeColor="#FF3A3A40" android:strokeWidth="14" android:strokeLineCap="round"
+        android:pathData="M86,62 C92,14 208,14 214,62" />
+    <path android:fillColor="#FF1F1F22"
+        android:pathData="M68,52 h164 a50,50 0 0 1 50,50 v4 a50,50 0 0 1 -50,50 h-164 a50,50 0 0 1 -50,-50 v-4 a50,50 0 0 1 50,-50 z" />
+    <path android:fillColor="#FF2C2C30"
+        android:pathData="M98,66 h104 a24,24 0 0 1 24,24 v28 a24,24 0 0 1 -24,24 h-104 a24,24 0 0 1 -24,-24 v-28 a24,24 0 0 1 24,-24 z" />
+</vector>

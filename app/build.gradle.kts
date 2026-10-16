@@ -57,6 +57,12 @@ android {
     // The «Отладка» screen lives in src/debug; release gets the empty DebugTools of src/nodebug with the same API.
     sourceSets {
         getByName("release") { kotlin.directories.add("src/nodebug/kotlin") }
+        // Tribit's speaker photos live in the PRIVATE repository native/ (KrinikTribitNative): the owner, 2026-10-16
+        // ≈ 20:3x +03:00: «фото можно публиковать в мой приватный репозиторий» · «который мы делали по реверсу приложения
+        // Трибит». With native/ beside the app the photo is built in; without it (a clone of the public storefront) a drawn
+        // stand-in of the same name keeps the build working.
+        val photos = rootProject.file("native/krinik-app/res")
+        getByName("main") { res.directories.add(if (photos.isDirectory) photos.path else "src/photostub/res") }
     }
     buildFeatures {
         compose = true
