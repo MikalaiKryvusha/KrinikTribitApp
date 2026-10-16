@@ -211,7 +211,7 @@ ICON_PATH = ("M508,734 L1430,734 A160,160 0 1 0 1291.4,494 L830.4,1293 "
 # the centre: (532.5 + 160 + 40) x 0.0371 = 27.2 < 33, inside the adaptive-icon safe zone. Same values in design/icon.svg.
 ICON_SCALE = "0.0371"
 ICON_TX = "18.05"   # 54 - 0.0371 x 969
-ICON_TY = "22.82"   # 54 - 0.0371 x 840.3
+ICON_TY = "19.98"   # owner 13:33 «B вариант по иконке»: midway between the bounding box (17.14) and the symmetry centre (22.82)
 
 
 def patch_icon():
