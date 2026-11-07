@@ -37,6 +37,7 @@ import com.kriniks.tribit.ui.SettingsScreen
 import com.kriniks.tribit.ui.SpeakerSettingsScreen
 import com.kriniks.tribit.ui.SpeakerActions
 import com.kriniks.tribit.ui.theme.KrinikTheme
+import org.woheller69.freeDroidWarn.FreeDroidWarn
 
 /** The screens of the app; the back stack is this enum's parent chain (Home ← Settings ← About / Debug). */
 enum class Screen(val parent: Screen?) {
@@ -174,6 +175,9 @@ class MainActivity : ComponentActivity() {
             },
             onShareFile = ::shareProfile,
         )
+        // FreeDroidWarn: once per versionCode, the dialog about Google's developer verification (the owner 2026-11-07:
+        // «во все их нужно встроить FreeDroidWarn», KAST plans/15). Not on re-creation - the user already saw it.
+        if (savedInstanceState == null) FreeDroidWarn.showWarningOnUpgrade(this, BuildConfig.VERSION_CODE)
         setContent {
             KrinikTheme {
                 var screen by rememberSaveable { mutableStateOf(Screen.HOME) }
