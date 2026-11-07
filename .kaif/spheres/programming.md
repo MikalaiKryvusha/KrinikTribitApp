@@ -14,7 +14,7 @@ debugs, and documents. Verification is concrete (builds compile, tests pass, the
 |-----------|----------------|
 | `bugs/` | code defects, crashes, wrong behavior, regressions |
 | release | a tagged, shippable version of the product (GitHub Release) |
-| build | compiling/packaging the product (`bash build.sh`) |
+| build | compiling/packaging the product (`.\gradlew.bat :app:assembleDebug` — JDK 21, HOUSE_RULES) |
 | test / verify | unit/integration tests, running the app, objective checks via a harness |
 | `plans/` | roadmap, phases, architecture map, feature ideas |
 | interview | UI/UX, library/protocol/architecture forks, brand/scope decisions |

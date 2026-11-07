@@ -58,7 +58,7 @@ without those resources.
    loop (`/fable-method`; `/fable-loop` for substantive items) — its gates and forced artifacts
    (`INTENT`/`AUTH`/`TWINS`/`PENDING`) apply inside the cycle too. A HEAVY item with no plan yet →
    build the ladder first (`/plan-epic`: research → meta-plan), then execute phase by phase.
-4. **Build** (`bash build.sh`). If errors — fix them, don't commit broken state.
+4. **Build** (`.\gradlew.bat :app:assembleDebug` — JDK 21, HOUSE_RULES). If errors — fix them, don't commit broken state.
 5. **Deploy/run** as your project requires.
 6. **Verify autonomously** on the harness (adb on the Titan 1, `testcases/`). Look at the result carefully — don't
    wishful-think; verify objectively.

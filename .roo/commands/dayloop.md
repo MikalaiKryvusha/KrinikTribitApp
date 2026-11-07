@@ -54,7 +54,7 @@ when the current one is exhausted (see step 8).
      AND mark `STATUS.md` "❓ awaiting human review: …". Then take ANOTHER task and continue.
    - If a task needs **human actions** (test on real hardware, external accounts) — file **homework** in
      `homeworks/` and move on.
-3. **Do it**: code → build (`bash build.sh`) → deploy → test on the harness (adb on the Titan 1, `testcases/`),
+3. **Do it**: code → build (`.\gradlew.bat :app:assembleDebug` — JDK 21, HOUSE_RULES) → deploy → test on the harness (adb on the Titan 1, `testcases/`),
    verify objectively. Use the high-level harness commands; if one is missing, do it the low-level way,
    then ADD a command to the harness so next time it's one step. Execute the item by the fable loop
    (`/fable-method`; `/fable-loop` for substantive items) — its gates and forced artifacts
