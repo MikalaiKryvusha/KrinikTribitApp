@@ -110,8 +110,10 @@
 5. Debug починенного Tribit ставится как `com.kriniks.tribit.old` («Old Krinik Tribit»); `com.kriniks.tribit.debug` — debug
    своего приложения из `app/` ([OWNER] 2026-10-16 ≈ 15:53 +03:00, чат: «com.kriniks.tribit.debug - так будет называться НАШЕ
    приложение, починеное можно переименовать в олд»).
-- **Исключение:** шаг варианта сборки (имя пакета debug, журнал запросов только в debug) остаётся скриптом
-  `patches/apply.py --variant`: он отличает debug от release, а дерево `native/` у них общее.
+- **Прежний путь** (починка официального APK Tribit скриптами разбора, патчей и пересборки) убран из публичного
+  репозитория 2026-11-07 ([OWNER] чат: «убрать»); история в git. Наше приложение собирается Gradle из `app/` (§5, §6);
+  из `native/` оно берёт только фото колонок (`native/krinik-app/res`). Если папки `native/` нет, сборка берёт
+  нарисованную заглушку `app/src/photostub/res`.
 
 [OWNER] 2026-10-16 ≈ 14:25–14:31 +03:00 · чат: «давай сделаем приватный репозиторий, в нем работаем с нативным кодом» ·
 «текущий репозиторий остаётся витриной, из которой можно будет скачать собранный APK. Новый приватный реп - просто скрытая
@@ -179,7 +181,7 @@
 
 | Поверхность | Где живёт работа | Что покрывает |
 |---|---|---|
-| Патчи smali и ресурсов их приложения | `patches/apply.py`, `build.sh` | шесть патчей, сборка и подпись набора сплитов одним ключом |
+| Сборка нашего приложения | `app/`, `app/build.gradle.kts`; PowerShell из корня: `$env:JAVA_HOME='C:\Program Files\Microsoft\jdk-21.0.11.10-hotspot'; $env:ANDROID_HOME='C:\Android\Sdk'; $env:GRADLE_USER_HOME='C:\Android\gradle-home'; .\gradlew.bat :app:assembleDebug --console=plain` (или `:app:assembleRelease`) | JDK 21 явно; debug — ключ SDK, release — R8 и ключ из `.env` (R6) |
 | Боли их приложения, протокол колонки | `researches/03_tribit_app_pains.md` | десять болей с цитатами кода; пакет `EA …`, команды эквалайзера и громкости, UUID каналов |
 | Отзывы Google Play | `researches/01_play_reviews.md`, скрипты в `researches/01_play_reviews/` | 2648 отзывов по 28 темам |
 | Языки перевода | `researches/02_languages.md` | обязательные и желательные языки |
@@ -197,12 +199,7 @@
 | `python tools/check_tested_ticks.py` | галочка «проверено» в `plans/02` называет существующий отчёт прогона; exit 1 со строкой | галочка шире наблюдения (EXP-0008) |
 | `python tools/check_ctrl_chars.py [файлы…]` | перед коммитом ищет управляющие символы (BEL, form feed…) в изменённых текстовых файлах; exit 1 с файлом и строкой | потерянный уровень экранирования, который превращает `\a`, `\f` пути Windows в байт и проходит с зелёным кодом (EXP-0007) |
 | `python testcases/splash_request_check.py · firebase_check.py <serial> <порт>` | проверки патчей 8а и 21 на устройстве: запросы словаря при старте; строки Firebase и рекламные разрешения | патч, проверенный только сборкой |
-| `bash build.sh` | собирает APK из `native/` (или, без него, из `original-apk/` патчами); классы Tribit из `native/src/` и наша Java — отдельным dex | якорь патча не найден (exit 1); смешанные подписи в наборе |
-| `python -I tools/native_src_guard.py native` | красный, если у класса из `native/src/` остался smali (с `$`-вложенными); `build.sh` зовёт его сам | Android берёт первую копию класса — старый smali тихо победил бы исходник |
-| `python -I tools/native_src_count.py native` | «source N of M (P %)» — сколько классов Tribit уже исходники (`plans/03`, критерий 3) | перенос «на глаз» |
-| `python -I tools/decompile_clean.py <app.jar> <файлы.java…\|@список>` | убирает из Java jadx вызовы Kotlin `foo$default(…)`: значения по умолчанию — из байт-кода APK (`tools/kotlin_defaults.py`), непонятное оставляет и печатает | заглушка jadx вместо значения по умолчанию (`null` вместо `EmptyCoroutineContext`); догадки |
-| `python -I tools/test_decompile_clean.py [app.jar]` | 10 случаев чистильщика на вызовах из кода Tribit | регресс чистильщика (доказан красным на копии без подстановки) |
-| `python -I tools/gen_r.py <public.xml> <dir> <пакеты…>` | R-классы Tribit из `public.xml` apktool — только для компиляции `native/src/` | в APK нет R (R8 вписал ID в код) |
+| `.\gradlew.bat :app:assembleDebug` · `:app:assembleRelease` (рецепт с JDK 21 — §5) | собирает наше приложение: `app/build/outputs/apk/debug/app-debug.apk`, `app/build/outputs/apk/release/app-release.apk` | сборка чужим JDK; release без R8 |
 | `tools/dex2jar/dex-tools-2.4.38/` (вне git; `gh release download 2.4.38 -R ThexXTURBOXx/dex2jar`, sha256 `5d88e269…54e5c`) | dex → jar: classpath для компиляции `native/src/` | — |
 | `node researches/01_play_reviews/make-reviews-md.mjs` | пересобирает `researches/01_play_reviews.md` из сырых отзывов (вне git) | ручная правка сгенерированной таблицы |
 | `node tools/unwire-owner-word-hooks.mjs` | снимает хуки `pretool-owner-word` и `stop-owner-answer` из `.claude/settings.json` | возврат хуков ⏩ после обновления KAIF |

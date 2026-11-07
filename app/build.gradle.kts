@@ -16,8 +16,8 @@ android {
         // выше» (MASTER_PLAN.md journal). On 13+ the speaker search runs with BLUETOOTH_SCAN neverForLocation: no location.
         minSdk = 33
         targetSdk = 37
-        versionCode = 1
-        versionName = "0.1 (1)"
+        versionCode = 2
+        versionName = "0.1.1"  // x.y.z = the release tag vX.Y.Z, Obtainium reads it (KAST plans/17, 2026-11-07)
     }
 
     // Two builds (owner's rule R6, HOUSE_RULES.md): debug is «Debug Krinik Tribit» with the «Отладка» button in

@@ -86,7 +86,7 @@ relies entirely on this document to get to work.
 8. Read the relevant plan         # plans/<feature>.md, if the task touches a specific feature. Code by citing the plan: before implementing a step, QUOTE the anchor line you are doing right now — if you can't name the line, that's scope drift caught BEFORE the diff. A HEAVY task with no plan yet → build the ladder first (Planning discipline below; /plan-task for ordinary work, /plan-epic for epics). Filing a plan/bug/idea → goal vector + acceptance criteria FIRST, per REQUIREMENTS_FRAMEWORK.md
 9. Recon before code (external truth)  # the task rests on an external truth (an old/reference system, a foreign API, prod behavior, a vendor doc)? The FIRST artifact is a recon doc in researches/ — code is forbidden until it exists; then code by the document, not from recall. Recon docs are reused by every future session. The same door opens for an ENGINEERING FORK with a price of error (the fourth door, PHILOSOPHY.md): recon of the domain's authorities BEFORE the choice, never the agent's own reasoning alone
 10. Check the map & blast radius   # before editing code: PROJECT_ARCHITECTURE_INTERNAL_MAP.md — who is affected; update the map if relations change
-11. Run the build (if touching code)   # bash build.sh (the patched Tribit app, see Build)
+11. Run the build (if touching code)   # .\gradlew.bat :app:assembleDebug with JDK 21 (our app in app/, see Build)
 12. Use the test harness          # adb on the Titan 1 tablet (HOUSE_RULES.md §3) + testcases/ — drive/observe the software without a human
 13. Comment the code              # comment blocks, classes, modules, important lines — with a test-status marker: fresh raw content gets [NOT-TESTED]; verified-by-observation flips to [TESTED: date · how] (TESTING_FRAMEWORK.md)
 14. Reflect on bugs in bugs/      # one md per bug; follow BUG_FIXING_FRAMEWORK.md
@@ -506,7 +506,7 @@ there, in its one copy.
 The map lives in its two documents, one copy each: `PROJECT_STRUCTURE_EXTERNAL_MAP.md` (files, modules, data
 flow) and `PROJECT_ARCHITECTURE_INTERNAL_MAP.md` (abstractions and their relations). Only the invariant stands here:
 
-**RULE:** no proprietary Tribit code or APK enters git — only our own code, patches and build scripts
+**RULE:** no proprietary Tribit code or APK enters git — only our own code and build scripts
 (`.gitignore` keeps `original-apk/`, `decompiled/`, `work/`, `out/`, `keys/` local); and no request goes to Tribit's
 servers from the agent's tooling (the owner's word 2026-10-15 ≈ 23:3x +03:00 «не делаем запросы на сервер»).
 
@@ -514,30 +514,28 @@ servers from the agent's tooling (the owner's word 2026-10-15 ≈ 23:3x +03:00 �
 
 ## Build
 
-```bash
-bash build.sh debug     # the patched fallback «Old Krinik Tribit», com.kriniks.tribit.old, beside the original
-bash build.sh           # release «Krinik Tribit», the original package
+```powershell
+# PowerShell from the repository root; JDK 21 explicitly (HOUSE_RULES.md §5)
+$env:JAVA_HOME='C:\Program Files\Microsoft\jdk-21.0.11.10-hotspot'; $env:ANDROID_HOME='C:\Android\Sdk'; $env:GRADLE_USER_HOME='C:\Android\gradle-home'
+.\gradlew.bat :app:assembleDebug --console=plain     # «Debug Krinik Tribit», com.kriniks.tribit.debug, the SDK's debug key
+.\gradlew.bat :app:assembleRelease --console=plain   # «Krinik Tribit», com.kriniks.tribit, R8 + resource shrinking
 ```
 
-Krinik Tribit is the official Tribit app 5.0.0 with our fixes (the owner's word 2026-10-16: «чиним ИХ приложение»).
-**Fixes are written as native code in `native/`** — Tribit's apktool tree (smali + resources) in its own git repository,
-remote the PRIVATE `MikalaiKryvusha/KrinikTribitNative`, ignored by this public storefront (`HOUSE_RULES.md` R9). Its first
-commit is the untouched decode, its second the patches 1–36 applied (`patches/apply.py --common`); every later fix is a
-commit there. The build runs in Git Bash: `build.sh` copies `native/` into `work/base` (without `.git` and `build/`),
-`patches/apply.py --variant` adds only the variant step (debug package; release without the HTTP log), apktool rebuilds,
-our Java (`patches/java/krinik/`) becomes one extra dex. Without `native/` the old path still works: APKEditor merges the
-splits of `original-apk/` into `work/merged.apk`, apktool decodes it, `patches/apply.py` applies every patch, apktool rebuilds,
-`zipalign` + `apksigner` from `C:/Android/Sdk/build-tools/36.0.0` sign it
-(`keys/`, one key per variant, created on first run, outside git). Output: `out/KrinikTribit-<variant>.apk` - one universal APK merged from the splits by APKEditor 1.4.9 (`tools/`, outside git). JDK 21 is set inside the script
-(`C:/Program Files/Microsoft/jdk-21.0.11.10-hotspot`); `zipalign`/`apksigner` are not on PATH — the script
-calls them by full path.
+Krinik Tribit is our own native app, written from scratch in Kotlin + Compose (`app/`): no Tribit code, no C/C++ of
+our own, no `INTERNET` permission; release asks only `BLUETOOTH_CONNECT` (debug adds `RECORD_AUDIO` for its ear).
+Output: `app/build/outputs/apk/debug/app-debug.apk` and `app/build/outputs/apk/release/app-release.apk`. The release key is `keys/krinik-tribit-app-release.jks`; its path and
+passwords live in `.env` at the project root (`KT_RELEASE_STORE_FILE`, `KT_RELEASE_STORE_PASSWORD`, `KT_RELEASE_KEY_ALIAS`,
+`KT_RELEASE_KEY_PASSWORD`), all outside git (`HOUSE_RULES.md` R6); without them the release builds unsigned. Speaker photos
+come from the private `native/krinik-app/res` when that folder is present, otherwise from the drawn stand-in
+`app/src/photostub/res`. The old path (repairing the official Tribit APK by decode, patch and rebuild scripts) was removed
+from the public repo 2026-11-07 (owner: «убрать»); history in git.
 
 ---
 
 ## Test harness (how the agent observes & drives the software)
 
 The functional run is on the real device — the owner's HEADWOLF Titan 1 tablet over adb
-(`adb -s 192.168.1.3:5555`, `HOUSE_RULES.md` §3) with a real Tribit speaker (StormBox Blast 2): `adb install-multiple`
+(`adb -s 192.168.1.3:5555`, `HOUSE_RULES.md` §3) with a real Tribit speaker (StormBox Blast 2): `adb install`
 → `adb shell am start` → drive the UI (`adb shell input`, `uiautomator dump`) → read `adb logcat` → screenshots in WebP
 (`adb exec-out screencap -p | magick png:- -resize 500x -quality 80 <file>.webp`). The case set lives in
 `testcases/` (the first one: `testcases/TC_fork_titan.md`), run reports in `testcases/reports/`. A built, signed APK is

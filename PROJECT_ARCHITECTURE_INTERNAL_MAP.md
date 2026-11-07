@@ -6,12 +6,12 @@
 
 ---
 
-## Two products
+## The product
 
-1. **Our app** (`app/`, `com.kriniks.tribit`, debug `com.kriniks.tribit.debug`) — written from scratch, the owner's
-   decision «Делаем по плану C» (2026-10-16 15:24). The main line.
-2. **The fallback** (`native/`, «Old Krinik Tribit», `com.kriniks.tribit.old`) — Tribit 5.0.0 with our fixes, for models and
-   firmware our app does not handle yet; only blocking fixes.
+**Our app** (`app/`, `com.kriniks.tribit`, debug `com.kriniks.tribit.debug`) — written from scratch, the owner's
+decision «Делаем по плану C» (2026-10-16 15:24); built by Gradle (`:app:assembleDebug` / `:app:assembleRelease`, JDK 21).
+The old path (repairing the official Tribit APK by decode, patch and rebuild scripts) was removed from the public repo
+2026-11-07 (owner: «убрать»); history in git.
 
 ## Our app — the layers
 
@@ -49,8 +49,4 @@ Android Bluetooth broadcasts (ACL, A2DP, adapter) ──▶ SpeakerViewModel.rec
   `tools/fetch_speaker_images.py` (R2, exception 2).
 - The activity handles rotation itself (`configChanges`): turning the phone never closes the speaker's channel.
 - App texts are the owner's text — written by `AUTHOR_STYLOMETRY.md` (`HOUSE_RULES.md` R10).
-
-## The fallback — how it is built
-
-`native/` (Tribit's apktool tree + our fixes) ──`build.sh`──▶ variant step ──apktool──▶ signed APK. A patch edits by an exact
-anchor only; protocol facts for our app are read from its code (`decompiled/`), never linked.
+- Protocol facts are read from Tribit's code in `decompiled/` (local evidence), never linked or copied into git.
